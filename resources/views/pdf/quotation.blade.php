@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Quotation {{ $quotation->quotation_number }}</title>
+    <style>
+        @page { margin: 9mm 9mm; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+            color: #1a1a1a;
+            font-size: 8pt;
+            line-height: 1.38;
+        }
+        .center { text-align: center; }
+        .right { text-align: right; }
+        .bold { font-weight: bold; }
+
+        /* ---------- Base table ---------- */
+        table.cell-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        table.cell-table td, table.cell-table th { padding: 3pt 4pt; vertical-align: top; }
+
+        /* Uniform 1px black borders throughout (max 1.5px) */
+        .bordered td, .bordered th { border: 1px solid #d3d3d3; }
+
+        /* ---------- HEADER ---------- */
+        .header-banner { border: 1px solid #d3d3d3; }
+        .header-row { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .header-row td { vertical-align: middle; border: none; padding: 9pt; }
+        .header-logo { width: 20%; text-align: left; padding-left: 12pt; }
+        .header-logo img { max-height: 72pt; max-width: 100%; }
+        .header-text { width: 60%; text-align: center; }
+        .header-right { width: 20%; }
+        .lab-name { font-size: 13pt; font-weight: bold; color: #1a1a1a; letter-spacing: 0.5pt; }
+        .lab-web { font-size: 8.5pt; font-weight: bold; color: #555555; margin-top: 2pt; }
+        .form-title { font-size: 9.5pt; font-weight: bold; color: #2b2b2b; margin-top: 3pt; }
+        .form-ref { font-size: 7pt; font-weight: bold; color: #555555; margin-top: 2pt; }
+
+        /* ---------- Quote No / Date bar ---------- */
+        .bar { width: 100%; margin-top: 4pt; border: 1px solid #d3d3d3; }
+        .bar td { background-color: #eef0f3; padding: 3.5pt 5pt; font-size: 8pt; border: 1px solid #d3d3d3; }
+        .bar td.k { font-weight: bold; background-color: #ffffff; width: 23%; }
+
+        /* ---------- Section titles ---------- */
+        .section-title { text-align: center; font-weight: bold; text-transform: uppercase; font-size: 11pt; margin: 7pt 0 3pt 0; color: #1a1a1a; }
+        .rule { display: block; margin-top: 2pt; text-align: center; }
+        .rule .line { display: inline-block; width: 55pt; height: 0; border-top: 1px solid #000000; vertical-align: middle; }
+        .rule .dmd { display: inline-block; width: 5pt; height: 5pt; margin: 0 6pt; background-color: #000000; vertical-align: middle; }
+
+        /* ---------- Party ---------- */
+        .party td, .party th { font-size: 7.5pt; }
+        .party td.label { font-weight: bold; width: 40%; background-color: #eef0f3; border-right: 1px solid #d3d3d3; }
+        .bordered.party td { border: 1px solid #d3d3d3; }
+
+        /* ---------- Table headers (sample + quotation) ---------- */
+        .thead td, .thead th { background-color: #3a3f47; color: #ffffff; font-weight: bold; font-size: 7.5pt; }
+
+        .sample-head td, .sample-head th { font-size: 7.5pt; }
+
+        .quote-head th { font-size: 7.5pt; line-height: 1.3; }
+        .quote-head td { font-size: 7pt; }
+        .quote-row:nth-child(even) td { background-color: #f7f8fa; }
+        .quote-row td.sn { text-align: center; }
+        .qty { text-align: center; }
+        .charges { text-align: right; }
+
+        /* ---------- Totals ---------- */
+        .totals { width: 100%; margin-top: 2pt; border-collapse: collapse; }
+        .totals td { padding: 3.5pt 5pt; font-size: 8pt; border: 1px solid #d3d3d3; }
+        .totals td.lbl { background-color: #eef0f3; width: 55%; }
+        .totals tr.grand td { background-color: #2b2b2b; color: #ffffff; font-weight: bold; font-size: 8.5pt; }
+        .totals td.amnt { text-align: right; font-weight: bold; background-color: #f7f8fa; }
+
+        /* ---------- Requested By ---------- */
+        .requested { width: 100%; margin-top: 3pt; border-collapse: collapse; }
+        .requested td { border: 1px solid #d3d3d3; padding: 4pt 5pt; font-size: 8.5pt; }
+        .requested td.lbl { background-color: #eef0f3; font-weight: bold; width: 55%; }
+        .requested .sig { text-align: right; }
+
+        /* ---------- PAGE 2 ---------- */
+        .page2 { page-break-before: always; }
+
+        .h2 { text-align: center; font-weight: bold; text-transform: uppercase; font-size: 11pt; color: #1a1a1a; margin: 8pt 0 4pt 0; }
+
+        .bank { width: 100%; border-collapse: collapse; }
+        .bank td { padding: 3.5pt 5pt; border: 1px solid #d3d3d3; font-size: 8pt; }
+        .bank td.k { font-weight: bold; width: 20%; background-color: #eef0f3; }
+        .bank td.v { width: 30%; }
+
+        .terms-title, .notes-title { text-align: center; font-weight: bold; text-transform: uppercase; font-size: 11pt; margin: 8pt 0 4pt 0; }
+
+        .terms-row { padding: 2.5pt 3pt 2.5pt 6pt; font-size: 8.5pt; line-height: 1.35; text-align: justify; }
+        .terms-row .num { font-weight: bold; }
+
+        .notes-row { padding: 2.5pt 3pt 2.5pt 6pt; font-size: 8.5pt; line-height: 1.35; text-align: justify; }
+        .notes-num { font-weight: bold; }
+        .notes-body { font-weight: normal; }
+    </style>
+</head>
+<body>
+
+@php
+    $currency = $currency ?? '₹';
+    $quot = $quotation;
+    $qdate = $quot->quotation_date ? $quot->quotation_date->format('d-m-Y') : '';
+    $clientCompany = $quot->company_name ?: $quot->client_name;
+    $clientAddr = trim(implode(', ', array_filter([$quot->address, $quot->address_line2, $quot->city, $quot->state, $quot->postal_code, $quot->country])));
+    $courierAddr = $quot->courier_address
+        ? trim(implode(', ', array_filter([$quot->courier_address, $quot->courier_address_line2, $quot->courier_city, $quot->courier_state, $quot->courier_postal_code])))
+        : '';
+    $taxPct = $quot->subtotal > 0 ? (round(((float)$quot->tax / (float)$quot->subtotal) * 100)) : 0;
+    $quot->loadMissing('items.labTest');
+    $currencyFormat = fn($n) => $currency . number_format((float) $n, 2);
+    $companyPhone = $company['phone'] ?? '';
+    $companyName = $company['name'] ?? 'Agri Biochem Research Lab';
+    $companyWebsite = $company['website'] ?? '';
+    $companyAddress = $company['address'] ?? '';
+@endphp
+
+<!-- ================= PAGE 1 ================= -->
+<div class="header-banner">
+    <table class="header-row">
+        <tr>
+            <td class="header-logo">
+                @php
+                    $logoPath = $company['logo_path'] ?? public_path('images/abrl-logo.png');
+                @endphp
+                @if($logoPath && file_exists($logoPath))
+                    <img src="{{ $logoPath }}" alt="ABRL Logo">
+                @endif
+            </td>
+            <td class="header-text">
+                <div class="lab-name">AGRI BIOCHEM RESEARCH LAB (ABRL)</div>
+                <div class="lab-web">{{ $companyWebsite }}</div>
+                <div class="form-title">Party registration &amp; Test Request Form</div>
+                <div class="form-ref">F/CSD/06&nbsp;&nbsp;|&nbsp;&nbsp;Issue No. 02</div>
+            </td>
+            <td class="header-right"></td>
+        </tr>
+    </table>
+</div>
+
+<!-- Quotation No. / Date -->
+<table class="bar">
+    <tr>
+        <td class="k" style="width:23%">Quotation No.</td>
+        <td style="width:27%">{{ $quot->quotation_number }}</td>
+        <td class="k" style="width:23%">Quotation Date</td>
+        <td style="width:27%">{{ $qdate }}</td>
+    </tr>
+</table>
+
+<!-- Party details -->
+<table class="cell-table party bordered" style="margin-top:2pt">
+    <tr>
+        <td class="label">Company Name and Address</td>
+        <td>
+            <div>{{ $clientCompany }}</div>
+            @if($clientAddr)<div>{{ $clientAddr }}</div>@endif
+        </td>
+    </tr>
+    <tr>
+        <td class="label">Contact Person Name</td>
+        <td>{{ $quot->client_name }}</td>
+    </tr>
+    <tr>
+        <td class="label">Mob No.</td>
+        <td>{{ $quot->phone }}</td>
+    </tr>
+    <tr>
+        <td class="label">Email</td>
+        <td>{{ $quot->email }}</td>
+    </tr>
+    <tr>
+        <td class="label">GST Number</td>
+        <td>{{ $quot->gst_number }}</td>
+    </tr>
+    <tr>
+        <td class="label">PAN Number</td>
+        <td>{{ $quot->pan_number }}</td>
+    </tr>
+    <tr>
+        <td class="label">Address on Report and Invoice</td>
+        <td>{{ $clientAddr }}</td>
+    </tr>
+    <tr>
+        <td class="label">Address for courier of Report and Invoice</td>
+        <td>{{ $courierAddr ?: $clientAddr }}</td>
+    </tr>
+</table>
+
+<!-- SAMPLE DETAILS -->
+<div class="section-title sm">SAMPLE DETAILS<span class="rule"><span class="line"></span><span class="dmd"></span><span class="line"></span></span></div>
+<table class="cell-table sample-head bordered">
+    <thead>
+        <tr class="thead">
+            <th style="width:5%">Sr No</th>
+            <th style="width:25%">Name of Sample</th>
+            <th style="width:20%">Sample Batch No.</th>
+            <th style="width:24%">Sample physical form</th>
+            <th style="width:26%">Specific Storage Condition</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="center">1</td>
+            <td>{{ $quot->sample_name }}</td>
+            <td>{{ $quot->sample_batch_no }}</td>
+            <td>{{ $quot->sample_physical_form }}</td>
+            <td>{{ $quot->sample_storage_condition }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- QUOTATION -->
+<div class="section-title lg">QUOTATION<span class="rule"><span class="line"></span><span class="dmd"></span><span class="line"></span></span></div>
+<table class="cell-table quote-head bordered">
+    <thead>
+        <tr class="thead">
+            <th style="width:3.5%">S.N</th>
+            <th style="width:7.5%">NABL/<br>NON NABL</th>
+            <th style="width:19%">Discipline/<br>Group</th>
+            <th style="width:15%">Materials or Products<br>(<span>tested</span>)</th>
+            <th style="width:14%">Parameter</th>
+            <th style="width:17%">Method</th>
+            <th style="width:12%">Sample Quantity<br>per sample (g/mL)</th>
+            <th style="width:12%">Charges per sample</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($quot->items as $index => $item)
+        @php
+            $lt = $item->labTest;
+        @endphp
+        <tr class="quote-row">
+            <td class="sn">{{ $index + 1 }}</td>
+            <td>{{ $lt?->nabl_type }}</td>
+            <td>{{ $lt?->discipline }}</td>
+            <td>{{ $lt?->material }}</td>
+            <td>{{ $lt?->parameter ?? $item->service_name_snapshot }}</td>
+            <td>{{ $lt?->method }}</td>
+            <td class="qty">{{ $lt?->sample_quantity }}</td>
+            <td class="charges">{{ $currencyFormat($item->unit_price_snapshot) }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+
+@unless((float) $quot->grand_total == 0)
+<!-- Totals -->
+<table class="totals" style="margin-top:2pt">
+    <tr>
+        <td class="lbl">Taxable Amount</td>
+        <td class="amnt">{{ $currencyFormat($quot->subtotal) }}</td>
+    </tr>
+    <tr>
+        <td class="lbl">GST @ {{ $taxPct }}% (HSN Code: 998346)</td>
+        <td class="amnt">{{ $currencyFormat($quot->tax) }}</td>
+    </tr>
+    <tr class="grand">
+        <td>TOTAL AMOUNT PAYABLE</td>
+        <td class="right">{{ $currencyFormat($quot->grand_total) }}</td>
+    </tr>
+</table>
+@endunless
+
+<!-- Requested By -->
+<table class="requested">
+    <tr>
+        <td class="lbl">Requested By : (Name and Designation)</td>
+        <td class="sig">{{ $quot->client_name }}</td>
+    </tr>
+</table>
+
+<!-- ================= PAGE 2 ================= -->
+<div class="page2">
+    <div class="h2">BANK DETAILS<span class="rule"><span class="line"></span><span class="dmd"></span><span class="line"></span></span></div>
+    <table class="bank">
+        <tr>
+            <td class="k">GSTIN</td>
+            <td class="v">{{ $company['gst_number'] ?? '' }}</td>
+            <td class="k">A/C Name</td>
+            <td class="v">{{ $payment['account_name'] ?? '' }}</td>
+        </tr>
+        <tr>
+            <td class="k">PAN</td>
+            <td class="v">{{ $company['pan'] ?? $company['gst_number'] ?? '' }}</td>
+            <td class="k">A/C Number</td>
+            <td class="v">{{ $payment['account_number'] ?? '' }}</td>
+        </tr>
+        <tr>
+            <td class="k">Legal Name</td>
+            <td class="v">{{ $company['legal_name'] ?? '' }}</td>
+            <td class="k">Bank Name</td>
+            <td class="v">{{ $payment['bank_name'] ?? '' }}</td>
+        </tr>
+        <tr>
+            <td class="k">Trade Name</td>
+            <td class="v">{{ $company['trade_name'] ?? '' }}</td>
+            <td class="k">IFSC Code</td>
+            <td class="v">{{ $payment['ifsc'] ?? '' }}</td>
+        </tr>
+    </table>
+
+    <div class="terms-title">TERMS &amp; CONDITIONS<span class="rule"><span class="line"></span><span class="dmd"></span><span class="line"></span></span></div>
+
+    <div class="terms-row"><span class="num">1.</span> Payment must be made 100% in advance via NEFT, RTGS, or any online payment mode. Cash or cheque payments are not accepted.</div>
+    <div class="terms-row"><span class="num">2.</span> The analysis will commence only after receipt of full payment. The lead time will begin only after the full advance payment has been received.</div>
+    <div class="terms-row"><span class="num">3.</span> The estimated timeframe for Test Report delivery is 15 working days under normal conditions. In case of any unforeseen circumstances, the delay will be communicated accordingly.</div>
+    <div class="terms-row"><span class="num">4.</span> Except for the Test Report, no raw data or additional supporting documents related to the analysis of samples will be provided.</div>
+    <div class="terms-row"><span class="num">5.</span> Test Reports will be issued in the name specified on the Party Registration &amp; Test Request form, with the same sample name and batch number as mentioned on the received samples.</div>
+    <div class="terms-row"><span class="num">6.</span> Once the Test Report is generated, no corrections or removal of any parameters will be entertained. Any retesting or reconfirmation of parameters will incur additional charges, subject to the availability of the sample.</div>
+    <div class="terms-row"><span class="num">7.</span> The customer is required to declare if there is any probable hazard associated with the sample material to ensure the necessary precautions are taken for occupational safety.</div>
+    <div class="terms-row"><span class="num">8.</span> We do not analyze highly hazardous, flammable, or toxic samples.</div>
+    <div class="terms-row"><span class="num">9.</span> The customer must declare that they have read and understood the above terms and conditions and confirm that the provided information is true and accurate to the best of their knowledge.</div>
+    <div class="terms-row"><span class="num">10.</span> By submitting samples for testing, the customer agrees to comply with the above Terms &amp; Conditions.</div>
+
+    <div class="notes-title">NOTES<span class="rule"><span class="line"></span><span class="dmd"></span><span class="line"></span></span></div>
+
+    <div class="notes-row"><span class="notes-num">1.</span> <span class="notes-body">Perishable samples will be disposed immediately after report dispatch.</span></div>
+    <div class="notes-row"><span class="notes-num">2.</span> <span class="notes-body">Non Perishable samples will be stored for one month after Report dispatch or as per the regulatory norms.</span></div>
+    <div class="notes-row"><span class="notes-num">3.</span> <span class="notes-body">The information provided by you will be kept confidential and not shared with anybody.</span></div>
+    <div class="notes-row"><span class="notes-num">4.</span> <span class="notes-body">The sample to be delivered at: {{ $companyName }}, {{ $companyAddress }} Mob No - {{ $companyPhone }}.</span></div>
+</div>
+
+</body>
+</html>
