@@ -20,10 +20,10 @@ class DatabaseSeeder extends Seeder
 
     protected function seedAdmin(): void
     {
-        if (!Admin::where('email', 'admin@example.com')->exists()) {
+        if (!Admin::where('email', 'support@nexelt.com')->exists()) {
             Admin::create([
                 'name' => 'Master Admin',
-                'email' => 'admin@example.com',
+                'email' => 'support@nexelt.com',
                 'password' => Hash::make('password'),
                 'role' => 'master',
                 'is_active' => true,

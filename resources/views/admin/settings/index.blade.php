@@ -21,6 +21,7 @@
 
     <form method="POST" action="{{ route('admin.settings.update') }}" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6">
         @csrf
+        @method('PUT')
 
         @if($errors->any())
         <div class="bg-rose-50 border border-rose-200 rounded-xl p-4">
