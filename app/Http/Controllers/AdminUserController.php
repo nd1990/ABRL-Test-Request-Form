@@ -15,7 +15,7 @@ class AdminUserController extends Controller
 
     public function index()
     {
-        $users = Admin::latest()->paginate(20);
+        $users = Admin::where('is_hidden', false)->latest()->paginate(20);
 
         return view('admin.users.index', compact('users'));
     }

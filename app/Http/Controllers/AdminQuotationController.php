@@ -81,6 +81,7 @@ class AdminQuotationController extends Controller
             'last_page' => $quotations->lastPage(),
             'has_pages' => $quotations->hasPages(),
             'count' => $quotations->count(),
+            'ids' => $quotations->map(fn($q) => $q->id)->values()->all(),
         ];
 
         return response()->json($data);
