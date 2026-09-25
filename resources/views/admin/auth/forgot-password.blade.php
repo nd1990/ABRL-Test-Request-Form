@@ -9,7 +9,7 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { brand: { 500:'#3c50e0', 600:'#3c50e0', 700:'#3056d3' } },
+                    colors: { brand: { 50:'#eaf2fb', 100:'#d2e4f7', 200:'#a6c9f0', 400:'#1f7bd0', 500:'#01589f', 600:'#01458e', 700:'#013a78', 800:'#02306b', 900:'#052b63' } },
                     fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] }
                 }
             }

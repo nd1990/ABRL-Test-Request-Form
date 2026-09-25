@@ -6,8 +6,9 @@ use App\Models\Admin;
 use App\Services\AuditLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 
 class AdminUserController extends Controller
 {
@@ -15,14 +16,46 @@ class AdminUserController extends Controller
 
     public function index()
     {
-        $users = Admin::where('is_hidden', false)->latest()->paginate(20);
+        $users = Admin::with('permissions')
+            ->where('is_hidden', false)
+            ->latest()
+            ->paginate(20);
 
-        return view('admin.users.index', compact('users'));
+        $modalUsers = $users->map(fn (Admin $user) => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'is_master' => $user->isMaster(),
+            'permissions' => $user->permissionList(),
+        ])->values();
+
+        return view('admin.users.index', [
+            'users' => $users,
+            'modalUsers' => $modalUsers,
+            'modules' => config('permissions.modules'),
+        ]);
     }
 
-    public function showChangePassword()
+    public function create()
     {
-        return view('admin.users.change-password');
+        return view('admin.users.create', [
+            'modules' => config('permissions.modules'),
+        ]);
+    }
+
+    public function edit(Admin $user)
+    {
+        // Master admins are managed only via "Settings > Change Password".
+        if ($user->isMaster()) {
+            return redirect()->route('admin.users.index')->with('error', 'The master admin cannot be edited here. Use "Settings > Change Password" instead.');
+        }
+
+        $user->load('permissions');
+
+        return view('admin.users.edit', [
+            'user' => $user,
+            'modules' => config('permissions.modules'),
+        ]);
     }
 
     public function store(Request $request)
@@ -37,10 +70,15 @@ class AdminUserController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
+        if (!$user->isMaster()) {
+            $user->syncPermissions($data['permissions'] ?? []);
+        }
+
         $this->auditLog->log(app('admin'), 'admin_user.created', 'Admin', $user->id, null, [
             'name' => $user->name,
             'email' => $user->email,
             'role' => $user->role,
+            'permissions' => $user->permissionList(),
         ], $request);
 
         return redirect()->route('admin.users.index')->with('success', 'User "' . $user->name . '" created successfully.');
@@ -49,8 +87,8 @@ class AdminUserController extends Controller
     public function update(Request $request, Admin $user)
     {
         // Guard: never allow editing the master admin via this page
-        if ($user->role === 'master') {
-            return back()->with('error', 'The master admin cannot be edited here. Use "Change Password" instead.');
+        if ($user->isMaster()) {
+            return back()->with('error', 'The master admin cannot be edited here. Use "Settings > Change Password" instead.');
         }
 
         $data = $this->validateUser($request, $user->id);
@@ -67,7 +105,13 @@ class AdminUserController extends Controller
             $user->update(['password' => Hash::make($data['password'])]);
         }
 
-        $this->auditLog->log(app('admin'), 'admin_user.updated', 'Admin', $user->id, $old, $user->toArray(), $request);
+        if ($user->isMaster()) {
+            $user->permissions()->delete();
+        } else {
+            $user->syncPermissions($data['permissions'] ?? []);
+        }
+
+        $this->auditLog->log(app('admin'), 'admin_user.updated', 'Admin', $user->id, $old, $user->toArray() + ['permissions' => $user->permissionList()], $request);
 
         return redirect()->route('admin.users.index')->with('success', 'User "' . $user->name . '" updated successfully.');
     }
@@ -75,7 +119,7 @@ class AdminUserController extends Controller
     public function destroy(Request $request, Admin $user)
     {
         // Guard: master admin cannot be deleted
-        if ($user->role === 'master') {
+        if ($user->isMaster()) {
             return back()->with('error', 'The master admin cannot be deleted.');
         }
 
@@ -94,7 +138,7 @@ class AdminUserController extends Controller
 
     public function changePassword(Request $request)
     {
-        $data = $request->validate([
+        $data = $request->validateWithBag('password', [
             'current_password' => ['required', 'string'],
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
@@ -102,7 +146,8 @@ class AdminUserController extends Controller
         $admin = Admin::findOrFail(session('admin_id'));
 
         if (!Hash::check($data['current_password'], $admin->password)) {
-            return back()->withErrors(['current_password' => 'Your current password is incorrect.'])->withInput();
+            return redirect()->route('admin.settings.index')
+                ->withErrors(['current_password' => 'Your current password is incorrect.'], 'password');
         }
 
         $old = $admin->toArray();
@@ -110,16 +155,26 @@ class AdminUserController extends Controller
 
         $this->auditLog->log($admin, 'admin.password_changed', 'Admin', $admin->id, $old, ['password_changed' => true], $request);
 
-        return back()->with('success', 'Your password has been changed successfully.');
+        return redirect()->route('admin.settings.index')->with('pw_success', 'Your password has been changed successfully.');
     }
 
     protected function validateUser(Request $request, ?int $ignoreId = null): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'name' => ['required', 'string', 'max:191'],
             'email' => ['required', 'email', 'max:191', Rule::unique('admins', 'email')->ignore($ignoreId)],
-            'role' => ['required', 'in:admin,master'],
+            'role' => ['required', Rule::in([Admin::ROLE_MASTER, Admin::ROLE_USER])],
+            'permissions' => ['sometimes', 'array'],
+            'permissions.*' => ['string', Rule::in(config('permissions.assignable'))],
             'password' => [$ignoreId === null ? 'required' : 'nullable', 'string', 'min:8', 'confirmed'],
         ]);
+
+        if ($data['role'] !== Admin::ROLE_MASTER && empty(array_filter($data['permissions'] ?? []))) {
+            throw ValidationException::withMessages([
+                'permissions' => 'Select at least one permission for a User-role account.',
+            ]);
+        }
+
+        return $data;
     }
 }

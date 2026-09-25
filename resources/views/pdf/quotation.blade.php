@@ -12,7 +12,7 @@
             font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
             color: #1a1a1a;
             font-size: 8pt;
-            line-height: 1.38;
+            line-height: 1.33;
         }
         .center { text-align: center; }
         .right { text-align: right; }
@@ -28,23 +28,23 @@
         /* ---------- HEADER ---------- */
         .header-banner { border: 1px solid #d3d3d3; }
         .header-row { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .header-row td { vertical-align: middle; border: none; padding: 9pt; }
-        .header-logo { width: 20%; text-align: left; padding-left: 12pt; }
-        .header-logo img { max-height: 72pt; max-width: 100%; }
+        .header-row td { vertical-align: middle; border: none; padding: 7pt; }
+        .header-logo { width: 20%; text-align: left; padding-left: 10pt; }
+        .header-logo img { max-height: 62pt; max-width: 100%; }
         .header-text { width: 60%; text-align: center; }
         .header-right { width: 20%; }
         .lab-name { font-size: 13pt; font-weight: bold; color: #1a1a1a; letter-spacing: 0.5pt; }
         .lab-web { font-size: 8.5pt; font-weight: bold; color: #555555; margin-top: 2pt; }
-        .form-title { font-size: 9.5pt; font-weight: bold; color: #2b2b2b; margin-top: 3pt; }
+        .form-title { font-size: 9.5pt; font-weight: bold; color: #2b2b2b; margin-top: 2pt; }
         .form-ref { font-size: 7pt; font-weight: bold; color: #555555; margin-top: 2pt; }
 
         /* ---------- Quote No / Date bar ---------- */
-        .bar { width: 100%; margin-top: 4pt; border: 1px solid #d3d3d3; }
+        .bar { width: 100%; margin-top: 3pt; border: 1px solid #d3d3d3; }
         .bar td { background-color: #eef0f3; padding: 3.5pt 5pt; font-size: 8pt; border: 1px solid #d3d3d3; }
         .bar td.k { font-weight: bold; background-color: #ffffff; width: 23%; }
 
         /* ---------- Section titles ---------- */
-        .section-title { text-align: center; font-weight: bold; text-transform: uppercase; font-size: 11pt; margin: 7pt 0 3pt 0; color: #1a1a1a; }
+        .section-title { text-align: center; font-weight: bold; text-transform: uppercase; font-size: 11pt; margin: 5.5pt 0 2.5pt 0; color: #1a1a1a; }
         .rule { display: block; margin-top: 2pt; text-align: center; }
         .rule .line { display: inline-block; width: 55pt; height: 0; border-top: 1px solid #000000; vertical-align: middle; }
         .rule .dmd { display: inline-block; width: 5pt; height: 5pt; margin: 0 6pt; background-color: #000000; vertical-align: middle; }
@@ -60,21 +60,22 @@
         .sample-head td, .sample-head th { font-size: 7.5pt; }
 
         .quote-head th { font-size: 7.5pt; line-height: 1.3; }
-        .quote-head td { font-size: 7pt; }
+        .quote-head td { font-size: 7pt; padding: 2pt 4pt; }
+        .quote-row td { padding: 2pt 4pt; font-size: 7pt; }
         .quote-row:nth-child(even) td { background-color: #f7f8fa; }
         .quote-row td.sn { text-align: center; }
         .qty { text-align: center; }
         .charges { text-align: right; }
 
         /* ---------- Totals ---------- */
-        .totals { width: 100%; margin-top: 2pt; border-collapse: collapse; }
+        .totals { width: 100%; margin-top: 2pt; border-collapse: collapse; page-break-inside: avoid; }
         .totals td { padding: 3.5pt 5pt; font-size: 8pt; border: 1px solid #d3d3d3; }
         .totals td.lbl { background-color: #eef0f3; width: 55%; }
         .totals tr.grand td { background-color: #2b2b2b; color: #ffffff; font-weight: bold; font-size: 8.5pt; }
         .totals td.amnt { text-align: right; font-weight: bold; background-color: #f7f8fa; }
 
         /* ---------- Requested By ---------- */
-        .requested { width: 100%; margin-top: 3pt; border-collapse: collapse; }
+        .requested { width: 100%; margin-top: 2pt; border-collapse: collapse; page-break-inside: avoid; }
         .requested td { border: 1px solid #d3d3d3; padding: 4pt 5pt; font-size: 8.5pt; }
         .requested td.lbl { background-color: #eef0f3; font-weight: bold; width: 55%; }
         .requested .sig { text-align: right; }
@@ -108,7 +109,7 @@
     $clientCompany = $quot->company_name ?: $quot->client_name;
     $clientAddr = trim(implode(', ', array_filter([$quot->address, $quot->address_line2, $quot->city, $quot->state, $quot->postal_code, $quot->country])));
     $courierAddr = $quot->courier_address
-        ? trim(implode(', ', array_filter([$quot->courier_address, $quot->courier_address_line2, $quot->courier_city, $quot->courier_state, $quot->courier_postal_code])))
+        ? trim(implode(', ', array_filter([$quot->courier_address, $quot->courier_address_line2, $quot->courier_city, $quot->courier_state, $quot->courier_postal_code, $quot->courier_country])))
         : '';
     $taxPct = $quot->subtotal > 0 ? (round(((float)$quot->tax / (float)$quot->subtotal) * 100)) : 0;
     $quot->loadMissing('items.labTest');
@@ -176,10 +177,6 @@
     <tr>
         <td class="label">GST Number</td>
         <td>{{ $quot->gst_number }}</td>
-    </tr>
-    <tr>
-        <td class="label">PAN Number</td>
-        <td>{{ $quot->pan_number }}</td>
     </tr>
     <tr>
         <td class="label">Address on Report and Invoice</td>

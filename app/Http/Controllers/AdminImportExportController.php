@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Invoice;
 use App\Models\Quotation;
 use App\Services\AuditLogService;
 use Illuminate\Http\Request;
@@ -65,5 +66,58 @@ class AdminImportExportController extends Controller
         $format = $request->input('format', 'xlsx') === 'csv' ? \Maatwebsite\Excel\Excel::CSV : \Maatwebsite\Excel\Excel::XLSX;
 
         return Excel::download(new \App\Exports\QuotationsExport($rows), 'quotations-' . now()->format('Y-m-d') . ($format === \Maatwebsite\Excel\Excel::CSV ? '.csv' : '.xlsx'), $format);
+    }
+
+    public function invoicesExport(Request $request)
+    {
+        $admin = app('admin');
+
+        $query = Invoice::with('items', 'quotation')->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_number', 'like', "%{$search}%")
+                    ->orWhere('client_name', 'like', "%{$search}%")
+                    ->orWhere('company_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('invoice_date', '>=', $request->input('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('invoice_date', '<=', $request->input('date_to'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $rows = $query->get()->map(function ($inv) {
+            return [
+                'Invoice #' => $inv->invoice_number,
+                'Date' => $inv->invoice_date?->format('Y-m-d'),
+                'Client' => $inv->client_name,
+                'Company' => $inv->company_name,
+                'Email' => $inv->email,
+                'Phone' => $inv->phone,
+                'Subtotal' => $inv->subtotal,
+                'Discount' => $inv->discount,
+                'Tax' => $inv->tax,
+                'Grand Total' => $inv->grand_total,
+                'Status' => $inv->status,
+                'Source Quotation' => $inv->quotation?->quotation_number,
+                'Invoiced Parameters' => $inv->items->pluck('service_name_snapshot')->implode(', '),
+            ];
+        })->toArray();
+
+        $this->auditLog->log($admin, 'invoices.exported', 'Invoice', null, null, ['count' => count($rows)], $request);
+
+        $format = $request->input('format', 'xlsx') === 'csv' ? \Maatwebsite\Excel\Excel::CSV : \Maatwebsite\Excel\Excel::XLSX;
+
+        return Excel::download(new \App\Exports\InvoicesExport($rows), 'invoices-' . now()->format('Y-m-d') . ($format === \Maatwebsite\Excel\Excel::CSV ? '.csv' : '.xlsx'), $format);
     }
 }

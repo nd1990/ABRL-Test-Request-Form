@@ -38,6 +38,16 @@ class SettingsService
         return $this->group('payment');
     }
 
+    public function invoice(): array
+    {
+        return $this->group('invoice');
+    }
+
+    public function backup(): array
+    {
+        return $this->group('backup');
+    }
+
     public function email(): array
     {
         return $this->group('email');

@@ -17,7 +17,7 @@ class AdminSettingsController extends Controller
     public function index()
     {
         $emailSettings = $this->settings->email();
-        $admins = Admin::where('is_active', true)->orderBy('role')->orderBy('name')->get();
+        $admins = Admin::where('is_active', true)->where('is_hidden', false)->orderBy('role')->orderBy('name')->get();
 
         $subject = $emailSettings['notify_new_quotation_subject'] ?? 'New Quotation Request {{quotation_number}}';
         $enabled = ($emailSettings['notify_new_quotation'] ?? '1') === '1';

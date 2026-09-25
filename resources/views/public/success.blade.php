@@ -10,7 +10,7 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { brand: { 500:'#6366f1', 600:'#4f46e5', 700:'#4338ca' } },
+                    colors: { brand: { 50:'#eaf2fb', 100:'#d2e4f7', 200:'#a6c9f0', 300:'#6ea9e2', 400:'#1f7bd0', 500:'#01589f', 600:'#01458e', 700:'#013a78', 800:'#02306b', 900:'#052b63' }, indigo: { 50:'#eaf2fb', 100:'#d2e4f7', 200:'#a6c9f0', 300:'#6ea9e2', 400:'#1f7bd0', 500:'#01589f', 600:'#01458e', 700:'#013a78', 800:'#02306b', 900:'#052b63' } },
                     fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] }
                 }
             }
@@ -22,7 +22,7 @@
 <body class="font-sans antialiased bg-slate-50 min-h-screen flex flex-col">
     <header class="bg-white border-b border-gray-200">
         <div class="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-800 text-white flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
             </div>
             <h1 class="font-bold text-gray-900">ABRL Test Request Form</h1>
@@ -88,7 +88,8 @@
             <div class="flex items-start gap-3 bg-slate-50 border border-gray-100 rounded-xl p-4 text-sm text-gray-600 mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
                 <div>
-                    <p>A copy of your quotation will be emailed to {{ $quotation->email }}.</p>
+                    <p class="font-semibold">A copy of your quotation is being emailed to {{ $quotation->email }}.</p>
+                    <p class="mt-1">It usually arrives within a minute. Please also check your spam folder.</p>
                 </div>
             </div>
             @endif

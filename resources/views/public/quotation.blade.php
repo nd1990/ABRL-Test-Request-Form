@@ -12,16 +12,28 @@
                 extend: {
                     colors: {
                         brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            200: '#c7d2fe',
-                            300: '#a5b4fc',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                            900: '#312e81',
+                            50: '#eaf2fb',
+                            100: '#d2e4f7',
+                            200: '#a6c9f0',
+                            300: '#6ea9e2',
+                            400: '#1f7bd0',
+                            500: '#01589f',
+                            600: '#01458e',
+                            700: '#013a78',
+                            800: '#02306b',
+                            900: '#052b63',
+                        },
+                        indigo: {
+                            50: '#eaf2fb',
+                            100: '#d2e4f7',
+                            200: '#a6c9f0',
+                            300: '#6ea9e2',
+                            400: '#1f7bd0',
+                            500: '#01589f',
+                            600: '#01458e',
+                            700: '#013a78',
+                            800: '#02306b',
+                            900: '#052b63',
                         }
                     },
                     fontFamily: {
@@ -53,37 +65,34 @@
 
     <!-- ======= HEADER ======= -->
     <header class="bg-white/80 backdrop-blur border-b border-gray-200 sticky top-0 z-40">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
-                </div>
-                <div>
-                    <h1 class="font-bold text-gray-900 leading-tight">ABRL Test Request Form</h1>
-                    <p class="text-xs text-gray-500">Request a Quotation</p>
-                </div>
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+            <div class="flex items-center">
+                <img src="{{ asset('images/admin-frontend-logo.jpg') }}" alt="ABRL Logo" class="h-12 sm:h-[52px] w-auto object-contain">
             </div>
-            <button type="button" @click="resetForm()" x-show="hasSavedState()" x-cloak
-                class="text-xs font-medium text-gray-500 hover:text-rose-600 border border-gray-200 hover:border-rose-200 rounded-lg px-3 py-1.5 transition">
-                Start Over
-            </button>
+            <h1 class="text-sm sm:text-base font-bold text-gray-900 text-center leading-tight">ABRL Test Request Form</h1>
+            <div class="flex justify-end">
+                <button type="button" @click="resetForm()" x-show="hasSavedState()" x-cloak
+                    class="text-xs font-medium text-gray-500 hover:text-rose-600 border border-gray-200 hover:border-rose-200 rounded-lg px-3 py-1.5 transition">
+                    Start Over
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- ======= STEP INDICATOR ======= -->
     <div class="bg-white border-b border-gray-200">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-2">
             <div class="flex items-center justify-between overflow-x-auto scrollbar-hide" x-cloak>
                 <template x-for="(s, i) in steps" :key="i">
                     <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0" :class="i > 0 ? 'sm:pl-2' : ''">
-                        <div class="hidden sm:flex h-px w-6 lg:w-10 bg-gray-200" x-show="i > 0"></div>
+                        <div class="hidden sm:flex h-px w-5 lg:w-8 bg-gray-200" x-show="i > 0"></div>
                         <button type="button"
                             @click="gotoStep(i)"
                             :class="step === i + 1 ? 'text-gray-900' : (step > i + 1 ? 'text-indigo-600' : 'text-gray-400')"
-                            class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium py-1 px-0.5 cursor-pointer">
+                            class="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-medium py-0.5 px-0.5 cursor-pointer">
                             <span
                                 :class="step === i + 1 ? 'bg-indigo-600 text-white ring-4 ring-indigo-100' : (step > i + 1 ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500')"
-                                class="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[11px] sm:text-xs font-bold shrink-0 transition">
+                                class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] font-bold shrink-0 transition">
                                 <span x-show="step > i + 1">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5" /></svg>
                                 </span>
@@ -135,6 +144,12 @@
                         <!-- Address -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Complete Address <span class="text-gray-400">(for Report &amp; Invoice)</span> <span class="text-rose-500">*</span></label>
+                            <button type="button" @click="detectLocation()" :disabled="detectingLocation"
+                                class="inline-flex items-center gap-2 text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg px-3 py-1.5 mb-3 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg x-show="!detectingLocation" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+                                <span x-show="detectingLocation" class="spinner" style="width:12px;height:12px;border-width:1.5px;"></span>
+                                <span x-text="detectingLocation ? 'Detecting...' : 'Detect my location'"></span>
+                            </button>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <div class="sm:col-span-3">
                                     <input type="text" x-model="form.address" placeholder="Street Address"
@@ -145,29 +160,41 @@
                                     <input type="text" x-model="form.address_line2" placeholder="Street Address Line 2"
                                         class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                                 </div>
-                                <div>
-                                    <select x-model="form.city" @change="onCityChange()"
+                                <div class="sm:col-span-3">
+                                    <select id="country" x-model="form.country" @change="onCountryChange()"
                                         class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
-                                        :class="shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
-                                        <option value="">Select City</option>
-                                        <template x-for="city in cityOptions()" :key="city">
-                                            <option x-bind:value="city" x-text="city"></option>
+                                        :class="shouldShowValidation(1) && !form.country ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                        <option value="">Select Country</option>
+                                        <template x-for="c in countries" :key="c">
+                                            <option :value="c" x-text="c"></option>
                                         </template>
                                     </select>
                                 </div>
                                 <div>
-                                    <select x-model="form.state" :disabled="true"
-                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70">
-                                        <template x-if="form.state">
-                                            <option :value="form.state" x-text="form.state"></option>
-                                        </template>
-                                        <template x-if="!form.state">
-                                            <option value="">Select City first</option>
-                                        </template>
-                                    </select>
+                                    <template x-if="form.country === 'India'">
+                                        <select id="city" x-model="form.city" @change="onCityChange()"
+                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                            :class="shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                            <option value="">Select City</option>
+                                            <template x-for="city in cityOptions()" :key="city">
+                                                <option x-bind:value="city" x-text="city"></option>
+                                            </template>
+                                        </select>
+                                    </template>
+                                    <template x-if="form.country !== 'India'">
+                                        <input type="text" id="city" x-model="form.city" placeholder="City"
+                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                    </template>
                                 </div>
                                 <div>
-                                    <input type="text" x-model="form.postal_code" placeholder="Postal / Zip Code"
+                                    <input type="text" id="state" x-model="form.state" placeholder="State / Province / Region"
+                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                        :class="form.country === 'India' ? 'bg-gray-100' : ''"
+                                        :readonly="form.country === 'India' && form.city && cityStateMap[form.city]">
+                                </div>
+                                <div>
+                                    <input type="text" id="postal_code" x-model="form.postal_code" placeholder="Postal / Zip Code"
                                         class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                         :class="shouldShowValidation(1) && !form.postal_code.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
                                 </div>
@@ -193,29 +220,40 @@
                                         <input type="text" x-model="form.courier_address_line2" placeholder="Street Address Line 2"
                                             class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                                     </div>
-                                    <div>
-                                        <select x-model="form.courier_city" @change="onCourierCityChange()"
-                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
-                                            :class="shouldShowValidation(1) && form.different_courier_address && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
-                                            <option value="">Select City</option>
-                                            <template x-for="city in cityOptions()" :key="city">
-                                                <option x-bind:value="city" x-text="city"></option>
+                                    <div class="sm:col-span-3">
+                                        <select id="courier_country" x-model="form.courier_country" @change="onCourierCountryChange()"
+                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                            <option value="">Select Country</option>
+                                            <template x-for="c in countries" :key="'courier-'+c">
+                                                <option :value="c" x-text="c"></option>
                                             </template>
                                         </select>
                                     </div>
                                     <div>
-                                        <select x-model="form.courier_state" :disabled="true"
-                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70">
-                                            <template x-if="form.courier_state">
-                                                <option :value="form.courier_state" x-text="form.courier_state"></option>
-                                            </template>
-                                            <template x-if="!form.courier_state">
-                                                <option value="">Select City first</option>
-                                            </template>
-                                        </select>
+                                        <template x-if="form.courier_country === 'India'">
+                                            <select id="courier_city" x-model="form.courier_city" @change="onCourierCityChange()"
+                                                class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                                :class="shouldShowValidation(1) && form.different_courier_address && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                                <option value="">Select City</option>
+                                                <template x-for="city in cityOptions()" :key="'c-'+city">
+                                                    <option x-bind:value="city" x-text="city"></option>
+                                                </template>
+                                            </select>
+                                        </template>
+                                        <template x-if="form.courier_country !== 'India'">
+                                            <input type="text" id="courier_city" x-model="form.courier_city" placeholder="City"
+                                                class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="shouldShowValidation(1) && form.different_courier_address && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                        </template>
                                     </div>
                                     <div>
-                                        <input type="text" x-model="form.courier_postal_code" placeholder="Postal / Zip Code"
+                                        <input type="text" id="courier_state" x-model="form.courier_state" placeholder="State / Province / Region"
+                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="form.courier_country === 'India' ? 'bg-gray-100' : ''"
+                                            :readonly="form.courier_country === 'India' && form.courier_city && cityStateMap[form.courier_city]">
+                                    </div>
+                                    <div>
+                                        <input type="text" id="courier_postal_code" x-model="form.courier_postal_code" placeholder="Postal / Zip Code"
                                             class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                             :class="shouldShowValidation(1) && form.different_courier_address && !form.courier_postal_code.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
                                     </div>
@@ -233,12 +271,25 @@
                                 <p x-show="shouldShowValidation(1) && !form.client_name.trim()" class="text-xs text-rose-500 mt-1">Please enter contact person name</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Mobile Number <span class="text-gray-400">(10-digit Indian)</span> <span class="text-rose-500">*</span></label>
-                                <input type="tel" id="mobile" x-model="form.mobile" placeholder="Enter 10-digit mobile number" maxlength="10"
-                                    class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                    :class="shouldShowValidation(1) && (form.mobile.trim() && !/^[6-9]\d{9}$/.test(form.mobile.trim())) ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Mobile Number <span class="text-gray-400">(with country code)</span> <span class="text-rose-500">*</span></label>
+                                <div class="flex gap-2">
+                                    <select id="mobile_country" x-model="form.mobile_country" @change="onMobileCountryChange()"
+                                        class="w-32 shrink-0 rounded-xl border border-gray-300 pl-3 pr-8 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white text-gray-700"
+                                        :class="shouldShowValidation(1) && form.mobile.trim() && !form.mobile_country ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                        <option value="">Code</option>
+                                        <template x-for="mc in mobileCodes" :key="mc.code">
+                                            <option :value="mc.code" x-text="mc.code + ' ' + mc.name"></option>
+                                        </template>
+                                    </select>
+                                    <input type="tel" id="mobile" x-model="form.mobile"
+                                        :placeholder="form.country === 'India' ? 'Enter 10-digit mobile number' : 'Enter mobile number'"
+                                        :maxlength="form.country === 'India' ? 10 : 20"
+                                        class="w-full min-w-0 rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                        :class="shouldShowValidation(1) && form.mobile.trim() && !isValidMobile() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                </div>
                                 <p x-show="shouldShowValidation(1) && !form.mobile.trim()" class="text-xs text-rose-500 mt-1">Please enter mobile number</p>
-                                <p x-show="shouldShowValidation(1) && form.mobile.trim() && !/^[6-9]\d{9}$/.test(form.mobile.trim())" class="text-xs text-rose-500 mt-1">Please enter a valid 10-digit Indian mobile number</p>
+                                <p x-show="shouldShowValidation(1) && form.mobile.trim() && !form.mobile_country" class="text-xs text-rose-500 mt-1">Please select country code</p>
+                                <p x-show="shouldShowValidation(1) && form.mobile.trim() && form.mobile_country && !isValidMobile()" class="text-xs text-rose-500 mt-1" x-text="form.country === 'India' ? 'Please enter a valid 10-digit Indian mobile number' : 'Please enter a valid mobile number'"></p>
                             </div>
                         </div>
 
@@ -252,25 +303,14 @@
                             <p x-show="shouldShowValidation(1) && form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)" class="text-xs text-rose-500 mt-1">Please enter a valid email address</p>
                         </div>
 
-                        <!-- GST & PAN -->
+                        <!-- GST (optional) -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">GST Number <span class="text-rose-500">*</span></label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">GST Number <span class="text-gray-400">(optional)</span></label>
                                 <input type="text" id="gst_number" x-model="form.gst_number" placeholder="Enter 15-character GSTIN" maxlength="15"
                                     @input="form.gst_number = form.gst_number.toUpperCase()"
-                                    class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition uppercase"
-                                    :class="shouldShowValidation(1) && (!form.gst_number.trim() || !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/.test(form.gst_number.trim())) ? 'border-rose-400 ring-1 ring-rose-200' : ''">
-                                <p x-show="shouldShowValidation(1) && !form.gst_number.trim()" class="text-xs text-rose-500 mt-1">Please enter GST number</p>
-                                <p x-show="shouldShowValidation(1) && form.gst_number.trim() && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/.test(form.gst_number.trim())" class="text-xs text-rose-500 mt-1">Please enter a valid 15-character GSTIN</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">PAN Number <span class="text-rose-500">*</span></label>
-                                <input type="text" id="pan_number" x-model="form.pan_number" placeholder="Enter 10-character PAN" maxlength="10"
-                                    @input="form.pan_number = form.pan_number.toUpperCase()"
-                                    class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition uppercase"
-                                    :class="shouldShowValidation(1) && (!form.pan_number.trim() || !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(form.pan_number.trim())) ? 'border-rose-400 ring-1 ring-rose-200' : ''">
-                                <p x-show="shouldShowValidation(1) && !form.pan_number.trim()" class="text-xs text-rose-500 mt-1">Please enter PAN number</p>
-                                <p x-show="shouldShowValidation(1) && form.pan_number.trim() && !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(form.pan_number.trim())" class="text-xs text-rose-500 mt-1">Please enter a valid 10-character PAN</p>
+                                    class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition uppercase">
+                                <p x-show="shouldShowValidation(1) && form.gst_number.trim().length > 50" class="text-xs text-rose-500 mt-1">GST number must be at most 50 characters.</p>
                             </div>
                         </div>
                     </div>
@@ -303,6 +343,10 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                             <p class="text-sm font-medium text-amber-800">It is required to fill out the test report form separately for each sample.</p>
                         </div>
+                    </div>
+                    <div x-show="shouldShowValidation(2) && !hasDocuments()" x-cloak class="mb-5 p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-rose-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+                        <p class="text-sm font-medium text-rose-800">Please upload at least one document (MSDS or a reference document).</p>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
@@ -349,6 +393,111 @@
                             <p x-show="shouldShowValidation(2) && !form.sample_storage_condition" class="text-xs text-rose-500 mt-1">Please select storage condition</p>
                         </div>
                     </div>
+
+                    <!-- ============ DOCUMENT UPLOADS ============ -->
+                    <div class="mt-7 pt-6 border-t border-gray-200">
+                        <div class="flex items-start gap-3 mb-5">
+                            <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" style="width:18px;height:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" /></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Document Uploads <span class="text-rose-500">*</span></h3>
+                                <p class="text-xs text-gray-500 mt-0.5">Upload MSDS and/or other supporting reference documents. <span class="font-medium text-gray-600">At least one document is required.</span></p>
+                            </div>
+                        </div>
+
+                        <!-- MSDS Report (single file) -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">MSDS Report <span class="font-normal text-gray-400">(Single file · PDF, DOC, DOCX · max 10 MB)</span></label>
+
+                            <!-- Dropzone when nothing selected -->
+                            <div x-show="!msdsFile" @click="$refs.msdsInput.click()"
+                                @dragover.prevent.stop="msdsDragOver = true"
+                                @dragleave.prevent.stop="msdsDragOver = false"
+                                @drop.prevent.stop="handleMsdsDrop($event)"
+                                class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition group"
+                                :class="msdsDragOver ? 'border-indigo-400 bg-indigo-50/50' : 'border-gray-300 hover:border-indigo-400 hover:bg-indigo-50/30'">
+                                <div class="flex flex-col items-center gap-2">
+                                    <span class="w-11 h-11 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-100 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                                    </span>
+                                    <p class="text-sm font-medium text-gray-700">Click to upload or drag &amp; drop</p>
+                                    <p class="text-xs text-gray-400">Single MSDS document · PDF, DOC, DOCX up to 10 MB</p>
+                                </div>
+                            </div>
+
+                            <!-- Selected MSDS file -->
+                            <div x-show="msdsFile" class="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <span class="w-9 h-9 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" style="width:18px;height:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                    </span>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-gray-900 truncate" x-text="msdsFile ? msdsFile.name : ''"></p>
+                                        <p class="text-xs text-gray-500 mt-0.5" x-text="msdsFile && msdsFile.size ? formatFileSize(msdsFile.size) : ''"></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <button type="button" @click="$refs.msdsInput.click()"
+                                        class="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg px-3 py-1.5 transition">
+                                        Replace
+                                    </button>
+                                    <button type="button" @click="clearMsdsFile()"
+                                        class="inline-flex items-center gap-1.5 text-xs font-medium text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg px-3 py-1.5 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                            <p x-show="msdsError" class="text-xs text-rose-500 mt-1.5" x-text="msdsError"></p>
+                            <input type="file" x-ref="msdsInput" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="hidden" @change="onMsdsSelect($event)">
+                        </div>
+
+                        <!-- Other Reference Documents (multiple files) -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Other Reference Documents <span class="font-normal text-gray-400">(Multiple files · PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG · max 10 MB each)</span></label>
+
+                            <!-- Dropzone -->
+                            <div @click="$refs.otherDocsInput.click()"
+                                @dragover.prevent.stop="otherDragOver = true"
+                                @dragleave.prevent.stop="otherDragOver = false"
+                                @drop.prevent.stop="handleOtherDrop($event)"
+                                class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition group"
+                                :class="otherDragOver ? 'border-indigo-400 bg-indigo-50/50' : 'border-gray-300 hover:border-indigo-400 hover:bg-indigo-50/30'">
+                                <div class="flex flex-col items-center gap-2">
+                                    <span class="w-11 h-11 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-100 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+                                    </span>
+                                    <p class="text-sm font-medium text-gray-700">Click to upload or drag &amp; drop multiple files</p>
+                                    <p class="text-xs text-gray-400">PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG up to 10 MB each</p>
+                                </div>
+                            </div>
+
+                            <!-- Uploaded list -->
+                            <ul class="mt-3 space-y-2" x-show="otherFiles.length">
+                                <template x-for="(f, idx) in otherFiles" :key="'of-' + idx">
+                                    <li class="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5">
+                                        <div class="flex items-center gap-3 min-w-0">
+                                            <span class="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                            </span>
+                                            <div class="min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 truncate" x-text="f.name"></p>
+                                                <p class="text-xs text-gray-500 mt-0.5" x-text="formatFileSize(f.size)"></p>
+                                            </div>
+                                        </div>
+                                        <button type="button" @click="removeOtherFile(idx)"
+                                            class="inline-flex items-center gap-1 text-xs font-medium text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg px-2.5 py-1.5 transition shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                                            Remove
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
+                            <p x-show="otherError" class="text-xs text-rose-500 mt-1.5" x-text="otherError"></p>
+                            <input type="file" x-ref="otherDocsInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,application/pdf" class="hidden" @change="onOtherSelect($event)">
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between">
                     <button type="button" @click="step = 1; saveState(); window.scrollTo({top:0, behavior:'smooth'})"
@@ -382,6 +531,14 @@
                     </div>
                 </div>
 
+                <div x-show="(stepErrors[3] || []).length > 0" x-cloak class="mb-4 bg-rose-50 border border-rose-200 rounded-xl p-3">
+                    <template x-for="(err, i) in (stepErrors[3] || [])" :key="i">
+                        <p class="text-sm text-rose-700 flex items-center gap-2 py-0.5">
+                            <span class="w-1.5 h-1.5 bg-rose-500 rounded-full shrink-0"></span><span x-text="err"></span>
+                        </p>
+                    </template>
+                </div>
+
                 <div x-show="shouldShowValidation(3) && selectedTests.length === 0" class="mb-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg px-3 py-2.5 text-sm flex items-center gap-2">
                     <span class="w-1.5 h-1.5 bg-rose-500 rounded-full shrink-0"></span>Please select at least one test.
                 </div>
@@ -390,7 +547,7 @@
                     <template x-if="activeSlot()">
                         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
                             <div class="flex items-center justify-between gap-3 mb-4">
-                                <span class="text-sm font-bold text-gray-800" x-text="'NABL Testing Selection ' + activeSlot().index"></span>
+                                <span class="text-sm font-bold text-gray-800">Select the Parameter to be Tested</span>
                                 <span x-show="activeSlot().parameter" class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full" x-text="activeSlot().parameter ? 'Selected: ' + activeSlot().parameter.parameter : ''"></span>
                             </div>
 
@@ -449,8 +606,28 @@
                             <div class="min-w-0 flex items-start gap-2.5">
                                 <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5" x-text="idx + 1"></span>
                                 <div>
-                                    <p class="text-sm font-semibold text-gray-800" x-text="t.parameter"></p>
-                                    <p class="text-xs text-gray-500" x-text="t.discipline + (t.material ? ' — ' + t.material : '')"></p>
+                                    <p class="text-sm leading-relaxed">
+                                        <span class="font-semibold text-gray-700">Parameter / Test:</span>
+                                        <span class="font-semibold text-gray-800" x-text="t.parameter"></span>
+                                    </p>
+                                    <div class="mt-1 space-y-1 text-xs leading-relaxed">
+                                        <p>
+                                            <span class="font-semibold text-gray-700">Discipline:</span>
+                                            <span class="text-gray-800" x-text="t.discipline"></span>
+                                        </p>
+                                        <p x-show="t.material">
+                                            <span class="font-semibold text-gray-700">Material / Product:</span>
+                                            <span class="text-gray-800" x-text="t.material"></span>
+                                        </p>
+                                        <p x-show="t.nabl">
+                                            <span class="font-semibold text-gray-700">NABL Selection:</span>
+                                            <span class="text-gray-800" x-text="t.nabl"></span>
+                                        </p>
+                                        <p x-show="t.method">
+                                            <span class="font-semibold text-gray-700">Method:</span>
+                                            <span class="text-gray-800 break-words" x-text="t.method"></span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                             <button type="button" @click="removeTest(idx)" class="text-gray-400 hover:text-rose-500 transition shrink-0">
@@ -487,11 +664,10 @@
                                 <h2 class="text-lg sm:text-xl font-bold text-gray-900">Preview Your Quotation</h2>
                                 <p class="text-sm text-gray-500 mt-0.5">Review the details below, then accept the terms to download and send.</p>
                             </div>
-                            <button type="button" @click="previewMode = !previewMode"
-                                class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl border transition"
-                                :class="previewMode ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700' : 'bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50'">
+                            <button type="button" @click="previewOpen = true; loadPreview();"
+                                class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl border transition bg-indigo-600 hover:bg-indigo-700 text-white border-indigo-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                                <span x-text="previewMode ? 'Hide Preview' : 'Preview'"></span>
+                                <span>Preview</span>
                             </button>
                         </div>
                     </div>
@@ -499,7 +675,7 @@
                     <div class="p-6 sm:p-8 space-y-6">
                         <!-- User Details -->
                         <div class="rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50/60 via-white to-white shadow-sm overflow-hidden">
-                            <div class="px-4 sm:px-5 py-3.5 flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-violet-600">
+                            <div class="px-4 sm:px-5 py-3.5 flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-indigo-800">
                                 <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                                 </span>
@@ -521,7 +697,7 @@
                                     </div>
                                     <div>
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Mobile</p>
-                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="form.mobile ? ('+91 ' + form.mobile) : '—'"></p>
+                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="form.mobile ? ((form.mobile_country || '') + ' ' + form.mobile).trim() : '—'"></p>
                                     </div>
                                     <div>
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Email</p>
@@ -529,19 +705,15 @@
                                     </div>
                                     <div class="sm:col-span-2">
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Address</p>
-                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.address, form.address_line2, form.city, form.state, form.postal_code].filter(Boolean).join(', ') || '—'"></p>
+                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.address, form.address_line2, form.city, form.state, form.postal_code, form.country].filter(Boolean).join(', ') || '—'"></p>
                                     </div>
                                     <div class="sm:col-span-2" x-show="form.different_courier_address">
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Courier Address</p>
-                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.courier_address, form.courier_address_line2, form.courier_city, form.courier_state, form.courier_postal_code].filter(Boolean).join(', ') || '—'"></p>
+                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.courier_address, form.courier_address_line2, form.courier_city, form.courier_state, form.courier_postal_code, form.courier_country].filter(Boolean).join(', ') || '—'"></p>
                                     </div>
                                     <div>
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">GST Number</p>
                                         <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="form.gst_number || '—'"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">PAN Number</p>
-                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="form.pan_number || '—'"></p>
                                     </div>
                                 </div>
                             </div>
@@ -581,6 +753,37 @@
                             </div>
                         </div>
 
+                        <!-- Documents Attached (review) -->
+                        <div x-show="msdsFile || otherFiles.length || msdsFileName || otherFileNames.length" class="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/60 via-white to-white shadow-sm overflow-hidden">
+                            <div class="px-4 sm:px-5 py-3.5 flex items-center gap-3 bg-gradient-to-r from-amber-500 to-orange-500">
+                                <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" /></svg>
+                                </span>
+                                <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">Documents</h3>
+                                <span class="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-100 bg-amber-500/25 rounded-full px-2.5 py-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                                    <span x-text="fileCount() + ' file' + (fileCount() === 1 ? '' : 's')"></span>
+                                </span>
+                            </div>
+                            <div class="p-4 sm:p-5 space-y-3">
+                                <div x-show="msdsFile || msdsFileName">
+                                    <p class="text-[11px] uppercase tracking-wider text-amber-500 font-semibold">MSDS Report</p>
+                                    <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="msdsName()"></p>
+                                </div>
+                                <div x-show="otherFiles.length || otherFileNames.length">
+                                    <p class="text-[11px] uppercase tracking-wider text-amber-500 font-semibold">Other Documents</p>
+                                    <ul class="mt-1 space-y-1">
+                                        <template x-for="(fname, i) in otherFileList()" :key="'rf-' + i">
+                                            <li class="text-sm font-medium text-gray-900" x-text="fname"></li>
+                                        </template>
+                                    </ul>
+                                </div>
+                                <p x-show="!msdsFile && !otherFiles.length && (msdsFileName || otherFileNames.length)" class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                                    These documents were attached earlier, but this page was reloaded so they can no longer be sent. Please go to Sample Details and re-upload them before submitting.
+                                </p>
+                            </div>
+                        </div>
+
                         <!-- Selected Tests Table -->
                         <div class="rounded-2xl border border-violet-100 bg-white shadow-sm overflow-hidden">
                             <div class="px-4 sm:px-5 py-3.5 flex items-center gap-3 bg-gradient-to-r from-violet-600 to-fuchsia-600">
@@ -596,11 +799,12 @@
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm">
                                     <thead>
-                                        <tr class="text-left text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100 bg-gray-50/60">
-                                            <th class="py-3 px-4 sm:px-5 font-semibold">Test / Parameter</th>
-                                            <th class="py-3 px-3 font-semibold">Method</th>
-                                            <th class="py-3 px-4 sm:px-5 font-semibold text-right">No. of Samples</th>
-                                        </tr>
+<tr class="text-left text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100 bg-gray-50/60">
+                                        <th class="py-3 px-4 sm:px-5 font-semibold">Test / Parameter</th>
+                                        <th class="py-3 px-3 font-semibold">NABL Selection</th>
+                                        <th class="py-3 px-3 font-semibold">Method</th>
+                                        <th class="py-3 px-4 sm:px-5 font-semibold text-right">No. of Samples</th>
+                                    </tr>
                                     </thead>
                                     <tbody>
                                         <template x-for="(t, idx) in selectedTests" :key="'rev-' + t.id + '-' + idx">
@@ -610,6 +814,10 @@
                                                     <p class="text-xs text-gray-500 mt-0.5" x-text="[t.discipline, t.material].filter(Boolean).join(' — ')"></p>
                                                     <p class="text-xs text-gray-400" x-text="t.protocol_no ? 'Protocol: ' + t.protocol_no : ''"></p>
                                                 </td>
+                                                <td class="py-3 px-3 text-xs text-center">
+                                                    <span x-show="t.nabl" class="inline-block text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-full px-2 py-0.5 font-bold text-[10px] uppercase tracking-wide" x-text="t.nabl"></span>
+                                                    <span x-show="!t.nabl" class="text-gray-300">—</span>
+                                                </td>
                                                 <td class="py-3 px-3 text-xs text-gray-600" x-text="t.method || '—'"></td>
                                                 <td class="py-3 px-4 sm:px-5 text-right">
                                                     <span class="inline-flex items-center gap-1 font-bold text-violet-700 bg-violet-50 rounded-full px-2.5 py-0.5" x-text="t.no_of_samples"></span>
@@ -617,7 +825,7 @@
                                             </tr>
                                         </template>
                                         <tr x-show="!selectedTests.length">
-                                            <td class="py-6 text-center text-sm text-gray-400" colspan="3">No tests selected.</td>
+                                            <td class="py-6 text-center text-sm text-gray-400" colspan="4">No tests selected.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -634,95 +842,6 @@
                             </div>
                             <div class="p-4 sm:p-5">
                                 <p class="text-sm text-gray-700 whitespace-pre-line" x-text="form.notes"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===== PREVIEW MODE : DOCUMENT PREVIEW ===== -->
-                <div x-show="previewMode" x-cloak x-transition class="mt-6">
-                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                        <div class="bg-slate-50 border-b border-gray-200 px-4 sm:px-5 py-3 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
-                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                            </div>
-                            <span class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold">Document Preview</span>
-                        </div>
-                        <div class="max-h-[70vh] overflow-y-auto p-5 sm:p-8">
-                            <div class="border border-gray-200 rounded-xl overflow-hidden">
-                                <!-- Quote header -->
-                                <div class="bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-5">
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                        <span class="text-white font-bold">ABRL Test Request Form</span>
-                                        <span class="text-white/70 text-xs">Quotation Preview</span>
-                                    </div>
-                                </div>
-                                <div class="p-6 sm:p-8">
-                                    <!-- Party -->
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                                        <div>
-                                            <p class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1">Bill To</p>
-                                            <p class="text-sm font-semibold text-gray-900" x-text="form.company_name || form.client_name || '-'"></p>
-                                            <p class="text-sm text-gray-600" x-text="[form.address, form.address_line2, form.city, form.state, form.postal_code].filter(Boolean).join(', ')"></p>
-                                            <p class="text-sm text-gray-600 mt-1" x-show="form.gst_number" x-text="'GST: ' + form.gst_number"></p>
-                                            <p class="text-sm text-gray-600 mt-1" x-show="form.different_courier_address" x-text="'Courier: ' + [form.courier_address, form.courier_address_line2, form.courier_city, form.courier_state, form.courier_postal_code].filter(Boolean).join(', ')"></p>
-                                        </div>
-                                        <div class="sm:text-right">
-                                            <p class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1">Contact</p>
-                                            <p class="text-sm text-gray-600" x-text="form.client_name || '-'"></p>
-                                            <p class="text-sm text-gray-600" x-text="form.email"></p>
-                                            <p class="text-sm text-gray-600" x-text="form.mobile ? ('+91 ' + form.mobile) : ''"></p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Sample -->
-                                    <div class="rounded-xl bg-slate-50 p-4 mb-6">
-                                        <p class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-2">Sample Details</p>
-                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                                            <div>
-                                                <p class="text-xs text-gray-400">Sample Name</p>
-                                                <p class="font-medium text-gray-900" x-text="form.sample_name || '-'"></p>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-gray-400">Batch No.</p>
-                                                <p class="font-medium text-gray-900" x-text="form.sample_batch_no || '-'"></p>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-gray-400">Physical Form</p>
-                                                <p class="font-medium text-gray-900" x-text="form.sample_physical_form || '-'"></p>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-gray-400">Storage</p>
-                                                <p class="font-medium text-gray-900" x-text="form.sample_storage_condition || '-'"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tests table -->
-                                    <table class="w-full text-sm">
-                                        <thead>
-                                            <tr class="text-left text-gray-400 text-xs uppercase tracking-wider border-b border-gray-200">
-                                                <th class="py-2.5 pr-3 font-semibold">Test / Parameter</th>
-                                                <th class="py-2.5 px-3 font-semibold">Method</th>
-                                                <th class="py-2.5 pl-3 font-semibold text-right">Samples</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <template x-for="(t, idx) in selectedTests" :key="'prev-' + t.id + '-' + idx">
-                                                <tr class="border-b border-gray-100 align-top">
-                                                    <td class="py-3 pr-3">
-                                                        <p class="font-medium text-gray-900" x-text="t.parameter"></p>
-                                                        <p class="text-xs text-gray-400 mt-0.5" x-text="[t.discipline, t.material].filter(Boolean).join(' — ')"></p>
-                                                    </td>
-                                                    <td class="py-3 px-3 text-xs text-gray-600" x-text="t.method || '—'"></td>
-                                                    <td class="py-3 pl-3 text-right font-semibold text-gray-900" x-text="t.no_of_samples"></td>
-                                                </tr>
-                                            </template>
-                                        </tbody>
-                                    </table>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -773,14 +892,80 @@
                     </button>
                     <button type="button" @click="submitQuotation()"
                         :disabled="submitting || !acceptTerms"
-                        class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm px-7 py-3.5 rounded-xl shadow-lg shadow-indigo-500/30 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm px-7 py-3.5 rounded-xl shadow-lg shadow-indigo-500/30 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <span x-show="submitting" class="spinner"></span>
-                        <span x-text="submitting ? 'Generating & sending...' : 'Send to my Email'"></span>
+                        <span x-text="submitting ? 'Generating & sending...' : 'Send to Email'"></span>
                         <svg x-show="!submitting" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M22 7l-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7" /></svg>
                     </button>
                 </div>
             </section>
+
+        <!-- ===== PREVIEW POPUP MODAL ===== -->
+        <div x-show="previewOpen" x-cloak x-transition.opacity @click="closePreview()" class="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-black/90 px-3 sm:px-6 py-4 sm:py-6">
+            <div @click.stop class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden" style="height: calc(100vh - 1.25rem); max-height: calc(100vh - 1.25rem);">
+                <div class="flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 border-b border-gray-200 bg-slate-50 shrink-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-3 min-w-0">
+                        <span class="text-sm font-bold text-gray-900">Quotation Preview</span>
+                        <span class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold">Exact PDF — same as emailed quotation</span>
+                    </div>
+                    <button type="button" @click="closePreview()"
+                        class="text-gray-400 hover:text-gray-700 transition shrink-0" aria-label="Close preview">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <div class="p-3 sm:p-4 bg-slate-100 flex-1 min-h-0">
+                    <div x-show="previewLoading" class="flex flex-col items-center justify-center h-full min-h-[45vh] text-gray-500">
+                        <svg class="w-8 h-8 animate-spin mb-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 11-6.219-8.56" /></svg>
+                        <p class="text-sm font-medium">Generating your quotation preview...</p>
+                    </div>
+                    <div x-show="previewError && !previewLoading" class="flex flex-col items-center justify-center h-full min-h-[45vh]">
+                        <p class="text-sm text-rose-600 font-medium text-center px-4" x-text="previewError"></p>
+                        <button type="button" @click="loadPreview()" class="mt-4 text-xs font-semibold text-indigo-600 hover:text-indigo-800">Try again</button>
+                    </div>
+                    <div x-show="previewUrl && !previewLoading" class="h-full rounded-lg overflow-hidden bg-white shadow-sm">
+                        <iframe :src="previewUrl" class="w-full h-full" style="border:0" title="Quotation preview"></iframe>
+                    </div>
+                </div>
+                <div class="px-4 sm:px-5 py-3.5 border-t border-gray-200 bg-slate-50 flex items-center justify-center sm:justify-end gap-3 shrink-0">
+                    <button type="button" @click="closePreview()"
+                        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14" /><path d="M12 5l7 7-7 7" /></svg>
+                        Close Preview &amp; Continue
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <!-- ===== SUBMIT PROGRESS OVERLAY ===== -->
+        <div x-show="submitting" x-cloak x-transition.opacity class="fixed inset-0 z-[60] flex items-center justify-center bg-white/85 backdrop-blur-sm px-4">
+            <div class="bg-white rounded-3xl border border-gray-200 shadow-2xl p-8 w-full max-w-md">
+                <div class="flex items-center gap-4 mb-7">
+                    <span class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shrink-0 animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+                    </span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 leading-tight">Generating your quotation...</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Please keep this page open — this usually takes a few seconds</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <template x-for="(label, i) in submitStages" :key="i">
+                        <div class="flex items-center gap-3">
+                            <span class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors duration-300"
+                                  :class="i < submitStage ? 'bg-emerald-500 text-white' : (i === submitStage ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-400')">
+                                <svg x-show="i < submitStage" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                <svg x-show="i === submitStage" class="w-3.5 h-3.5 animate-spin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
+                            </span>
+                            <span class="text-sm" :class="i <= submitStage ? 'font-medium text-gray-800' : 'text-gray-400'" x-text="label"></span>
+                        </div>
+                    </template>
+                </div>
+
+                <p class="mt-7 text-center text-xs text-gray-400">Your PDF is being prepared and emailed to <span class="font-medium text-gray-500" x-text="form.email"></span>.<br/>You'll see your quotation on the next page.</p>
+            </div>
+        </div>
+    </div>
     </main>
 
     <!-- ======= FOOTER ======= -->
@@ -803,17 +988,166 @@ function quotationApp() {
         firstErrorId: null,
         submitting: false,
         serverError: '',
-        previewMode: false,
+        submitStage: 0,
+        submitStages: ['Saving your details', 'Generating your PDF', 'Sending to your email', 'Finalising...'],
+        submitTimer: null,
+        previewOpen: false,
+        previewUrl: '',
+        previewLoading: false,
+        previewError: '',
         acceptTerms: false,
         shouldShowTermsError: false,
 
         form: {
             client_name: '', company_name: '', email: '', phone: '', mobile_country: '+91', mobile: '',
-            address: '', address_line2: '', city: '', state: '', postal_code: '', gst_number: '', pan_number: '',
-            different_courier_address: false, courier_address: '', courier_address_line2: '', courier_city: '', courier_state: '', courier_postal_code: '',
+            address: '', address_line2: '', city: '', state: '', postal_code: '', country: 'India',
+            gst_number: '',
+            different_courier_address: false, courier_address: '', courier_address_line2: '',
+            courier_city: '', courier_state: '', courier_postal_code: '', courier_country: 'India',
             sample_name: '', sample_batch_no: '', sample_physical_form: '', sample_storage_condition: '',
             notes: ''
         },
+
+        detectingLocation: false,
+
+        msdsFile: null,
+        msdsError: '',
+        msdsDragOver: false,
+        msdsFileName: '',
+        msdsFileSize: 0,
+        otherFiles: [],
+        otherError: '',
+        otherDragOver: false,
+        otherFileNames: [],
+        fileSizeLimitMB: 10,
+        msdsExts: ['pdf', 'doc', 'docx'],
+        otherExts: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png'],
+
+        mobileCodes: [
+            { code: '+91', name: 'India' },
+            { code: '+1', name: 'US / Canada' },
+            { code: '+44', name: 'United Kingdom' },
+            { code: '+61', name: 'Australia' },
+            { code: '+27', name: 'South Africa' },
+            { code: '+20', name: 'Egypt' },
+            { code: '+33', name: 'France' },
+            { code: '+49', name: 'Germany' },
+            { code: '+7', name: 'Russia' },
+            { code: '+81', name: 'Japan' },
+            { code: '+82', name: 'South Korea' },
+            { code: '+86', name: 'China' },
+            { code: '+65', name: 'Singapore' },
+            { code: '+60', name: 'Malaysia' },
+            { code: '+62', name: 'Indonesia' },
+            { code: '+63', name: 'Philippines' },
+            { code: '+66', name: 'Thailand' },
+            { code: '+84', name: 'Vietnam' },
+            { code: '+92', name: 'Pakistan' },
+            { code: '+880', name: 'Bangladesh' },
+            { code: '+94', name: 'Sri Lanka' },
+            { code: '+977', name: 'Nepal' },
+            { code: '+975', name: 'Bhutan' },
+            { code: '+960', name: 'Maldives' },
+            { code: '+971', name: 'UAE' },
+            { code: '+966', name: 'Saudi Arabia' },
+            { code: '+974', name: 'Qatar' },
+            { code: '+965', name: 'Kuwait' },
+            { code: '+968', name: 'Oman' },
+            { code: '+973', name: 'Bahrain' },
+            { code: '+972', name: 'Israel' },
+            { code: '+55', name: 'Brazil' },
+            { code: '+52', name: 'Mexico' },
+            { code: '+34', name: 'Spain' },
+            { code: '+39', name: 'Italy' },
+            { code: '+351', name: 'Portugal' },
+            { code: '+31', name: 'Netherlands' },
+            { code: '+32', name: 'Belgium' },
+            { code: '+41', name: 'Switzerland' },
+            { code: '+43', name: 'Austria' },
+            { code: '+46', name: 'Sweden' },
+            { code: '+47', name: 'Norway' },
+            { code: '+45', name: 'Denmark' },
+            { code: '+358', name: 'Finland' },
+            { code: '+48', name: 'Poland' },
+            { code: '+30', name: 'Greece' },
+            { code: '+90', name: 'Turkey' },
+            { code: '+98', name: 'Iran' },
+            { code: '+234', name: 'Nigeria' },
+            { code: '+254', name: 'Kenya' }
+        ],
+
+        countryCodeMap: {
+            'India': '+91', 'Afghanistan': '+93', 'Albania': '+355', 'Algeria': '+213', 'Andorra': '+376',
+            'Angola': '+244', 'Argentina': '+54', 'Armenia': '+374', 'Australia': '+61', 'Austria': '+43',
+            'Bahamas': '+1', 'Bahrain': '+973', 'Bangladesh': '+880', 'Barbados': '+1', 'Belarus': '+375',
+            'Belgium': '+32', 'Belize': '+501', 'Benin': '+229', 'Bhutan': '+975', 'Bolivia': '+591',
+            'Bosnia and Herzegovina': '+387', 'Botswana': '+267', 'Brazil': '+55', 'Brunei': '+673',
+            'Bulgaria': '+359', 'Burkina Faso': '+226', 'Burundi': '+257', 'Cabo Verde': '+238',
+            'Cambodia': '+855', 'Cameroon': '+237', 'Canada': '+1', 'Chad': '+235', 'Chile': '+56',
+            'China': '+86', 'Colombia': '+57', 'Comoros': '+269', 'Congo': '+242', 'Costa Rica': '+506',
+            'Croatia': '+385', 'Cuba': '+53', 'Cyprus': '+357', 'Czech Republic': '+420', 'Denmark': '+45',
+            'Djibouti': '+253', 'Dominica': '+1', 'Dominican Republic': '+1', 'Ecuador': '+593',
+            'Egypt': '+20', 'El Salvador': '+503', 'Equatorial Guinea': '+240', 'Eritrea': '+291',
+            'Estonia': '+372', 'Eswatini': '+268', 'Ethiopia': '+251', 'Fiji': '+679', 'Finland': '+358',
+            'France': '+33', 'Gabon': '+241', 'Gambia': '+220', 'Georgia': '+995', 'Germany': '+49',
+            'Ghana': '+233', 'Greece': '+30', 'Grenada': '+1', 'Guatemala': '+502', 'Guinea': '+224',
+            'Guinea-Bissau': '+245', 'Guyana': '+592', 'Haiti': '+509', 'Honduras': '+504',
+            'Hungary': '+36', 'Iceland': '+354', 'Indonesia': '+62', 'Iran': '+98', 'Iraq': '+964',
+            'Ireland': '+353', 'Israel': '+972', 'Italy': '+39', 'Ivory Coast': '+225', 'Jamaica': '+1',
+            'Japan': '+81', 'Jordan': '+962', 'Kazakhstan': '+7', 'Kenya': '+254', 'Kiribati': '+686',
+            'Kosovo': '+383', 'Kuwait': '+965', 'Kyrgyzstan': '+996', 'Laos': '+856', 'Latvia': '+371',
+            'Lebanon': '+961', 'Lesotho': '+266', 'Liberia': '+231', 'Libya': '+218', 'Liechtenstein': '+423',
+            'Lithuania': '+370', 'Luxembourg': '+352', 'Madagascar': '+261', 'Malawi': '+265',
+            'Malaysia': '+60', 'Maldives': '+960', 'Mali': '+223', 'Malta': '+356', 'Marshall Islands': '+692',
+            'Mauritania': '+222', 'Mauritius': '+230', 'Mexico': '+52', 'Micronesia': '+691',
+            'Moldova': '+373', 'Monaco': '+377', 'Mongolia': '+976', 'Montenegro': '+382', 'Morocco': '+212',
+            'Mozambique': '+258', 'Myanmar': '+95', 'Namibia': '+264', 'Nauru': '+674', 'Nepal': '+977',
+            'Netherlands': '+31', 'New Zealand': '+64', 'Nicaragua': '+505', 'Niger': '+227',
+            'Nigeria': '+234', 'North Korea': '+850', 'North Macedonia': '+389', 'Norway': '+47', 'Oman': '+968',
+            'Pakistan': '+92', 'Palau': '+680', 'Palestine': '+970', 'Panama': '+507',
+            'Papua New Guinea': '+675', 'Paraguay': '+595', 'Peru': '+51', 'Philippines': '+63',
+            'Poland': '+48', 'Portugal': '+351', 'Qatar': '+974', 'Romania': '+40', 'Russia': '+7',
+            'Rwanda': '+250', 'Saint Kitts and Nevis': '+1', 'Saint Lucia': '+1',
+            'Saint Vincent and the Grenadines': '+1', 'Samoa': '+685', 'San Marino': '+378',
+            'Sao Tome and Principe': '+239', 'Saudi Arabia': '+966', 'Senegal': '+221', 'Serbia': '+381',
+            'Seychelles': '+248', 'Sierra Leone': '+232', 'Singapore': '+65', 'Slovakia': '+421',
+            'Slovenia': '+386', 'Solomon Islands': '+677', 'Somalia': '+252', 'South Africa': '+27',
+            'South Korea': '+82', 'South Sudan': '+211', 'Spain': '+34', 'Sri Lanka': '+94', 'Sudan': '+249',
+            'Suriname': '+597', 'Sweden': '+46', 'Switzerland': '+41', 'Syria': '+963', 'Taiwan': '+886',
+            'Tajikistan': '+992', 'Tanzania': '+255', 'Thailand': '+66', 'Timor-Leste': '+670',
+            'Togo': '+228', 'Tonga': '+676', 'Trinidad and Tobago': '+1', 'Tunisia': '+216',
+            'Turkey': '+90', 'Turkmenistan': '+993', 'Tuvalu': '+688', 'Uganda': '+256', 'Ukraine': '+380',
+            'United Arab Emirates': '+971', 'United Kingdom': '+44', 'United States': '+1',
+            'Uruguay': '+598', 'Uzbekistan': '+998', 'Vanuatu': '+678', 'Vatican City': '+39',
+            'Venezuela': '+58', 'Vietnam': '+84', 'Yemen': '+967', 'Zambia': '+260', 'Zimbabwe': '+263'
+        },
+
+        countries: [
+            'Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia',
+            'Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium',
+            'Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei',
+            'Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada',
+            'Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica',
+            'Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominica','Dominican Republic',
+            'Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia',
+            'Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada',
+            'Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India',
+            'Indonesia','Iran','Iraq','Ireland','Israel','Italy','Ivory Coast','Jamaica','Japan','Jordan','Kazakhstan',
+            'Kenya','Kiribati','Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia',
+            'Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali',
+            'Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco',
+            'Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands',
+            'New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman',
+            'Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines',
+            'Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia',
+            'Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia',
+            'Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands',
+            'Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname',
+            'Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo',
+            'Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine',
+            'United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu',
+            'Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'
+        ],
 
         cityStateMap: {
             'Ahmedabad': 'Gujarat', 'Surat': 'Gujarat', 'Vadodara': 'Gujarat', 'Rajkot': 'Gujarat',
@@ -937,7 +1271,14 @@ function quotationApp() {
         },
 
         cityOptions() {
-            return Object.keys(this.cityStateMap).sort();
+            const list = Object.keys(this.cityStateMap);
+            if (this.form.city && !this.cityStateMap.hasOwnProperty(this.form.city)) {
+                list.push(this.form.city);
+            }
+            if (this.form.courier_city && !this.cityStateMap.hasOwnProperty(this.form.courier_city)) {
+                list.push(this.form.courier_city);
+            }
+            return list.sort();
         },
 
         onCityChange() {
@@ -956,7 +1297,279 @@ function quotationApp() {
             }
         },
 
-        optionsUrl: '{{ route("lab-tests.options") }}',
+        onCountryChange() {
+            if (!this.form.country) return;
+            const code = this.countryCodeMap[this.form.country];
+            if (code) this.form.mobile_country = code;
+        },
+
+        onCourierCountryChange() {},
+
+        onMobileCountryChange() {},
+
+        countryCodeFor(country) {
+            if (country && this.countryCodeMap.hasOwnProperty(country)) {
+                return this.countryCodeMap[country];
+            }
+            return '';
+        },
+
+        isValidMobile() {
+            const m = this.form.mobile.trim();
+            if (!m || !this.form.mobile_country) return false;
+            if (this.form.country === 'India') {
+                return /^[6-9]\d{9}$/.test(m);
+            }
+            return /^[0-9][0-9\s\-()]{5,19}$/.test(m);
+        },
+
+        fileExtension(name) {
+            const parts = String(name || '').split('.');
+            return parts.length > 1 ? parts.pop().toLowerCase() : '';
+        },
+
+        formatFileSize(bytes) {
+            if (!bytes && bytes !== 0) return '';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        },
+
+        validateMsdsFile(file) {
+            if (!file) return null;
+            const ext = this.fileExtension(file.name);
+            if (!file.name || !this.msdsExts.includes(ext)) {
+                return 'Unsupported file type. Only PDF, DOC and DOCX are allowed.';
+            }
+            if (file.size > this.fileSizeLimitMB * 1024 * 1024) {
+                return `File is too large. Maximum allowed size is ${this.fileSizeLimitMB} MB.`;
+            }
+            return null;
+        },
+
+        onMsdsSelect(event) {
+            const file = event.target.files && event.target.files[0];
+            if (file) this.setMsdsFile(file);
+            event.target.value = '';
+        },
+
+        setMsdsFile(file) {
+            const err = this.validateMsdsFile(file);
+            if (err) {
+                this.msdsFile = null;
+                this.msdsError = err;
+                return;
+            }
+            this.msdsFile = file;
+            this.msdsFileName = file.name;
+            this.msdsFileSize = file.size;
+            this.msdsError = '';
+        },
+
+        handleMsdsDrop(event) {
+            this.msdsDragOver = false;
+            const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+            if (file) this.setMsdsFile(file);
+        },
+
+        clearMsdsFile() {
+            this.msdsFile = null;
+            this.msdsFileName = '';
+            this.msdsFileSize = 0;
+            this.msdsError = '';
+            this.saveState();
+        },
+
+        validateOtherFile(file) {
+            if (!file) return null;
+            const ext = this.fileExtension(file.name);
+            if (!file.name || !this.otherExts.includes(ext)) {
+                return `"${file.name}" has an unsupported file type. Allowed: PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG.`;
+            }
+            if (file.size > this.fileSizeLimitMB * 1024 * 1024) {
+                return `"${file.name}" is too large. Maximum allowed size is ${this.fileSizeLimitMB} MB.`;
+            }
+            return null;
+        },
+
+        onOtherSelect(event) {
+            const files = Array.from(event.target.files || []);
+            if (files.length) this.addOtherFiles(files);
+            event.target.value = '';
+        },
+
+        handleOtherDrop(event) {
+            this.otherDragOver = false;
+            const files = Array.from((event.dataTransfer && event.dataTransfer.files) || []);
+            if (files.length) this.addOtherFiles(files);
+        },
+
+        addOtherFiles(files) {
+            let err = '';
+            const accepted = [];
+            for (const f of files) {
+                const e = this.validateOtherFile(f);
+                if (e) {
+                    if (!err) err = e;
+                } else {
+                    accepted.push(f);
+                }
+            }
+            if (accepted.length) {
+                this.otherFiles = this.otherFiles.concat(accepted);
+                this.otherFileNames = this.otherFiles.map(f => f.name);
+                this.otherError = '';
+            }
+            if (err) this.otherError = err;
+        },
+
+        removeOtherFile(index) {
+            if (index >= 0 && index < this.otherFiles.length) {
+                this.otherFiles.splice(index, 1);
+                this.otherFileNames = this.otherFiles.map(f => f.name);
+            }
+            this.otherError = '';
+            this.saveState();
+        },
+
+        hasDocuments() {
+            return !!(this.msdsFile || this.otherFiles.length || this.msdsFileName || this.otherFileNames.length);
+        },
+
+        fileCount() {
+            let count = 0;
+            if (this.msdsFile || this.msdsFileName) count += 1;
+            count += this.otherFiles.length ? this.otherFiles.length : this.otherFileNames.length;
+            return count;
+        },
+
+        msdsName() {
+            return this.msdsFile ? this.msdsFile.name : (this.msdsFileName || '—');
+        },
+
+        otherFileList() {
+            return this.otherFiles.length ? this.otherFiles.map(f => f.name) : this.otherFileNames;
+        },
+
+        normalizeCountry(value) {
+            if (!value) return 'India';
+            const aliases = {
+                'united states': 'United States',
+                'united states of america': 'United States',
+                'usa': 'United States',
+                'us': 'United States',
+                'uk': 'United Kingdom',
+                'great britain': 'United Kingdom',
+                'england': 'United Kingdom',
+                'scotland': 'United Kingdom',
+                'wales': 'United Kingdom',
+                'northern ireland': 'United Kingdom',
+                'russia': 'Russia',
+                'russian federation': 'Russia',
+                'iran': 'Iran',
+                'south korea': 'South Korea',
+                'republic of korea': 'South Korea',
+                'vietnam': 'Vietnam',
+                'laos': 'Laos',
+                'brunei': 'Brunei',
+                'syria': 'Syria',
+                'venezuela': 'Venezuela',
+                'bolivia': 'Bolivia',
+                'tanzania': 'Tanzania',
+                'moldova': 'Moldova',
+                'macedonia': 'North Macedonia',
+                'czechia': 'Czech Republic',
+                'dominican republic': 'Dominican Republic',
+                'congo (kinshasa)': 'Congo',
+                'congo (brazzaville)': 'Congo',
+                'ivory coast': 'Ivory Coast',
+                'cote d\'ivoire': 'Ivory Coast',
+                'eswatini': 'Eswatini',
+                'swaziland': 'Eswatini',
+                'east timor': 'Timor-Leste',
+                'palestine': 'Palestine',
+                'vatican': 'Vatican City',
+                'myanmar': 'Myanmar',
+                'burma': 'Myanmar'
+            };
+            const lower = value.trim();
+            const key = lower.toLowerCase();
+            if (aliases.hasOwnProperty(key)) return aliases[key];
+            if (this.countries.includes(lower)) return lower;
+            const found = this.countries.find(c => c.toLowerCase() === key);
+            if (found) return found;
+            const partial = this.countries.find(c => c.toLowerCase().includes(key) || key.includes(c.toLowerCase()));
+            return partial || '';
+        },
+
+        detectLocation() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser.');
+                return;
+            }
+            this.detectingLocation = true;
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`, {
+                        headers: { 'Accept': 'application/json' }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.address) {
+                            const addr = data.address;
+                            const house = addr.house_number ? addr.house_number + ', ' : '';
+                            const road = addr.road || addr.pedestrian || addr.footway || addr.path || addr.highway || '';
+                            const sub = addr.neighbourhood || addr.suburb || addr.quarter || addr.locality || '';
+                            let town = addr.city || addr.town || addr.village || addr.hamlet || addr.municipality || addr.county || '';
+                            const state = addr.state || addr.province || addr.state_district || addr.region || addr.island || '';
+                            const country = this.normalizeCountry(addr.country);
+
+                            if (country === 'India') {
+                                if (!(town && this.cityStateMap.hasOwnProperty(town))) {
+                                    town = addr.state_district || addr.district || addr.city_district || town || '';
+                                }
+                            }
+
+                            if (house || road) this.form.address = (house + road).trim();
+                            if (sub) this.form.address_line2 = sub;
+                            this.form.city = town;
+                            this.form.state = state;
+                            this.form.country = country;
+                            this.onCountryChange();
+                            if (this.form.city === this.form.address_line2) this.form.address_line2 = '';
+                            if (this.form.country === 'India' && this.form.city && this.cityStateMap.hasOwnProperty(this.form.city)) {
+                                this.form.state = this.cityStateMap[this.form.city];
+                            }
+                            if (this.form.city && this.form.city.toLowerCase() === this.form.state.toLowerCase()) {
+                                this.form.state = '';
+                            }
+                            if (addr.postcode) this.form.postal_code = addr.postcode;
+                            if (!this.form.country) {
+                                alert('Could not identify your country. Please select it from the dropdown.');
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        alert('Could not determine your address. Please fill in manually.');
+                    })
+                    .finally(() => {
+                        this.detectingLocation = false;
+                    });
+                },
+                (error) => {
+                    this.detectingLocation = false;
+                    if (error.code === 1) {
+                        alert('Location permission denied. Please allow location access or fill in manually.');
+                    } else {
+                        alert('Unable to get your location. Please fill in manually.');
+                    }
+                },
+                { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+            );
+        },
+
+        optionsUrl: '{{ route("lab-tests.options", [], false) }}',
 
         nablOptions: [],
         disciplineOptions: [],
@@ -994,7 +1607,7 @@ function quotationApp() {
                 form: { ...this.form },
                 selectedTests: this.selectedTests.map(t => ({
                     id: t.id, parameter: t.parameter, discipline: t.discipline, material: t.material,
-                    method: t.method, sample_quantity: t.sample_quantity, lead_time: t.lead_time,
+                    nabl: t.nabl, method: t.method, sample_quantity: t.sample_quantity, lead_time: t.lead_time,
                     protocol_no: t.protocol_no, nabl_range: t.nabl_range,
                     limit_of_quantification: t.limit_of_quantification, remarks: t.remarks,
                     protocol_link: t.protocol_link, no_of_samples: t.no_of_samples
@@ -1002,6 +1615,9 @@ function quotationApp() {
                 currentSlotIndex: this.currentSlotIndex,
                 acceptTerms: this.acceptTerms,
                 submittedSteps: [...this.submittedSteps],
+                msdsFileName: this.msdsFile ? this.msdsFile.name : this.msdsFileName,
+                msdsFileSize: this.msdsFile ? this.msdsFile.size : this.msdsFileSize,
+                otherFileNames: this.otherFiles.length ? this.otherFiles.map(f => f.name) : this.otherFileNames,
             };
             try { localStorage.setItem(this._saveKey, JSON.stringify(state)); } catch (e) {}
         },
@@ -1017,6 +1633,9 @@ function quotationApp() {
                 if (state.currentSlotIndex !== undefined) this.currentSlotIndex = state.currentSlotIndex;
                 if (state.acceptTerms) this.acceptTerms = state.acceptTerms;
                 if (state.submittedSteps) this.submittedSteps = state.submittedSteps;
+                if (state.msdsFileName) this.msdsFileName = state.msdsFileName;
+                if (state.msdsFileSize) this.msdsFileSize = state.msdsFileSize;
+                if (state.otherFileNames) this.otherFileNames = state.otherFileNames;
                 return true;
             } catch (e) { return false; }
         },
@@ -1218,7 +1837,7 @@ function quotationApp() {
             const t = s.parameter;
             this.selectedTests.push({
                 id: t.id, parameter: t.parameter, discipline: t.discipline, material: t.material,
-                method: t.method, sample_quantity: t.sample_quantity, lead_time: t.lead_time,
+                nabl: s.nabl, method: t.method, sample_quantity: t.sample_quantity, lead_time: t.lead_time,
                 protocol_no: t.protocol_no, nabl_range: t.nabl_range,
                 limit_of_quantification: t.limit_of_quantification, remarks: t.remarks,
                 protocol_link: t.protocol_link, no_of_samples: 1
@@ -1243,22 +1862,25 @@ function quotationApp() {
             if (n === 1) {
                 if (!this.form.company_name.trim()) { this.stepErrors[1].push('Please enter company name.'); if (!this.firstErrorId) this.firstErrorId = 'company_name'; }
                 if (!this.form.address.trim()) { this.stepErrors[1].push('Please enter complete address.'); if (!this.firstErrorId) this.firstErrorId = 'address'; }
-                if (!this.form.city) { this.stepErrors[1].push('Please select city.'); if (!this.firstErrorId) this.firstErrorId = 'city'; }
+                if (!this.form.country) { this.stepErrors[1].push('Please select country.'); if (!this.firstErrorId) this.firstErrorId = 'country'; }
+                else if (this.form.country === 'India' && !this.form.state) { this.stepErrors[1].push('Please enter state.'); if (!this.firstErrorId) this.firstErrorId = 'state'; }
+                if (!this.form.city) { this.stepErrors[1].push('Please enter city.'); if (!this.firstErrorId) this.firstErrorId = 'city'; }
                 if (!this.form.postal_code.trim()) { this.stepErrors[1].push('Please enter postal code.'); if (!this.firstErrorId) this.firstErrorId = 'postal_code'; }
                 if (this.form.different_courier_address) {
                     if (!this.form.courier_address.trim()) { this.stepErrors[1].push('Please enter courier address.'); if (!this.firstErrorId) this.firstErrorId = 'courier_address'; }
-                    if (!this.form.courier_city) { this.stepErrors[1].push('Please select courier city.'); if (!this.firstErrorId) this.firstErrorId = 'courier_city'; }
+                    if (!this.form.courier_country) { this.stepErrors[1].push('Please select courier country.'); if (!this.firstErrorId) this.firstErrorId = 'courier_country'; }
+                    if (!this.form.courier_city.trim()) { this.stepErrors[1].push('Please enter courier city.'); if (!this.firstErrorId) this.firstErrorId = 'courier_city'; }
                     if (!this.form.courier_postal_code.trim()) { this.stepErrors[1].push('Please enter courier postal code.'); if (!this.firstErrorId) this.firstErrorId = 'courier_postal_code'; }
                 }
                 if (!this.form.client_name.trim()) { this.stepErrors[1].push('Please enter contact person name.'); if (!this.firstErrorId) this.firstErrorId = 'client_name'; }
                 if (!this.form.mobile.trim()) { this.stepErrors[1].push('Please enter mobile number.'); if (!this.firstErrorId) this.firstErrorId = 'mobile'; }
-                else if (!/^[6-9]\d{9}$/.test(this.form.mobile.trim())) { this.stepErrors[1].push('Please enter a valid 10-digit Indian mobile number.'); if (!this.firstErrorId) this.firstErrorId = 'mobile'; }
+                else if (!this.form.mobile_country) { this.stepErrors[1].push('Please select country code.'); if (!this.firstErrorId) this.firstErrorId = 'mobile_country'; }
+                else if (!this.isValidMobile()) {
+                    this.stepErrors[1].push(this.form.country === 'India' ? 'Please enter a valid 10-digit Indian mobile number.' : 'Please enter a valid mobile number.');
+                    if (!this.firstErrorId) this.firstErrorId = 'mobile';
+                }
                 if (!this.form.email.trim()) { this.stepErrors[1].push('Please enter your email address.'); if (!this.firstErrorId) this.firstErrorId = 'email'; }
                 else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) { this.stepErrors[1].push('Please enter a valid email address.'); if (!this.firstErrorId) this.firstErrorId = 'email'; }
-                if (!this.form.gst_number.trim()) { this.stepErrors[1].push('Please enter GST number.'); if (!this.firstErrorId) this.firstErrorId = 'gst_number'; }
-                else if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/.test(this.form.gst_number.trim())) { this.stepErrors[1].push('Please enter a valid 15-character GSTIN.'); if (!this.firstErrorId) this.firstErrorId = 'gst_number'; }
-                if (!this.form.pan_number.trim()) { this.stepErrors[1].push('Please enter PAN number.'); if (!this.firstErrorId) this.firstErrorId = 'pan_number'; }
-                else if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(this.form.pan_number.trim())) { this.stepErrors[1].push('Please enter a valid 10-character PAN.'); if (!this.firstErrorId) this.firstErrorId = 'pan_number'; }
             }
 
             if (n === 2) {
@@ -1266,6 +1888,7 @@ function quotationApp() {
                 if (!this.form.sample_batch_no.trim()) { this.stepErrors[2].push('Please enter sample batch no.'); if (!this.firstErrorId) this.firstErrorId = 'sample_batch_no'; }
                 if (!this.form.sample_physical_form) { this.stepErrors[2].push('Please select sample physical form.'); if (!this.firstErrorId) this.firstErrorId = 'sample_physical_form'; }
                 if (!this.form.sample_storage_condition) { this.stepErrors[2].push('Please select storage condition.'); if (!this.firstErrorId) this.firstErrorId = 'sample_storage_condition'; }
+                if (!this.hasDocuments()) { this.stepErrors[2].push('Please upload at least one document (MSDS or a reference document).'); }
             }
 
             if (n === 3) {
@@ -1303,6 +1926,92 @@ function quotationApp() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
 
+        buildFormData() {
+            const formData = new FormData();
+            formData.append('client_name', this.form.client_name || '');
+            formData.append('company_name', this.form.company_name || '');
+            formData.append('email', this.form.email || '');
+            formData.append('mobile_country', this.form.mobile_country || '');
+            formData.append('mobile', this.form.mobile || '');
+            formData.append('address', this.form.address || '');
+            formData.append('address_line2', this.form.address_line2 || '');
+            formData.append('city', this.form.city || '');
+            formData.append('state', this.form.state || '');
+            formData.append('postal_code', this.form.postal_code || '');
+            formData.append('country', this.form.country || '');
+            formData.append('different_courier_address', this.form.different_courier_address ? '1' : '0');
+            formData.append('courier_address', this.form.different_courier_address ? (this.form.courier_address || '') : '');
+            formData.append('courier_address_line2', this.form.different_courier_address ? (this.form.courier_address_line2 || '') : '');
+            formData.append('courier_city', this.form.different_courier_address ? (this.form.courier_city || '') : '');
+            formData.append('courier_state', this.form.different_courier_address ? (this.form.courier_state || '') : '');
+            formData.append('courier_postal_code', this.form.different_courier_address ? (this.form.courier_postal_code || '') : '');
+            formData.append('courier_country', this.form.different_courier_address ? (this.form.courier_country || '') : '');
+            formData.append('gst_number', this.form.gst_number || '');
+            formData.append('sample_name', this.form.sample_name || '');
+            formData.append('sample_batch_no', this.form.sample_batch_no || '');
+            formData.append('sample_physical_form', this.form.sample_physical_form || '');
+            formData.append('sample_storage_condition', this.form.sample_storage_condition || '');
+            formData.append('notes', this.form.notes || '');
+
+            if (this.msdsFile) {
+                formData.append('msds_report', this.msdsFile, this.msdsFile.name);
+            }
+            this.otherFiles.forEach((f, i) => {
+                formData.append('other_documents[]', f, f.name);
+            });
+
+            this.selectedTests.forEach((t, i) => {
+                formData.append(`lab_tests[${i}][lab_test_id]`, t.id);
+                formData.append(`lab_tests[${i}][no_of_samples]`, Math.max(1, Number(t.no_of_samples) || 1));
+                formData.append(`lab_tests[${i}][notes]`, '');
+            });
+
+            return formData;
+        },
+
+        loadPreview() {
+            if (!this.previewOpen) return;
+            this.previewLoading = true;
+            this.previewError = '';
+            if (this.previewUrl) {
+                URL.revokeObjectURL(this.previewUrl);
+                this.previewUrl = '';
+            }
+            const formData = this.buildFormData();
+            fetch('{{ route("quotation.preview", [], false) }}', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/pdf',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: formData
+            })
+            .then(r => {
+                if (!r.ok) {
+                    return r.json().then(() => { throw new Error('Preview could not be generated.'); });
+                }
+                return r.blob();
+            })
+            .then(blob => {
+                this.previewUrl = URL.createObjectURL(blob);
+            })
+            .catch(() => {
+                this.previewError = 'We could not prepare the preview right now. Please try again.';
+            })
+            .finally(() => {
+                this.previewLoading = false;
+            });
+        },
+
+        closePreview() {
+            this.previewOpen = false;
+            if (this.previewUrl) {
+                URL.revokeObjectURL(this.previewUrl);
+                this.previewUrl = '';
+            }
+            this.previewError = '';
+        },
+
         submitQuotation() {
             if (this.submitting) return;
             if (this.selectedTests.length === 0) { this.serverError = 'Please select at least one test.'; return; }
@@ -1316,46 +2025,23 @@ function quotationApp() {
             }
             this.shouldShowTermsError = false;
             this.submitting = true;
+            this.submitStage = 0;
             this.serverError = '';
 
-            const payload = {
-                client_name: this.form.client_name,
-                company_name: this.form.company_name,
-                email: this.form.email,
-                mobile_country: '+91',
-                mobile: this.form.mobile,
-                address: this.form.address,
-                address_line2: this.form.address_line2,
-                city: this.form.city,
-                state: this.form.state,
-                postal_code: this.form.postal_code,
-                different_courier_address: this.form.different_courier_address,
-                courier_address: this.form.different_courier_address ? this.form.courier_address : '',
-                courier_address_line2: this.form.different_courier_address ? this.form.courier_address_line2 : '',
-                courier_city: this.form.different_courier_address ? this.form.courier_city : '',
-                courier_state: this.form.different_courier_address ? this.form.courier_state : '',
-                courier_postal_code: this.form.different_courier_address ? this.form.courier_postal_code : '',
-                gst_number: this.form.gst_number,
-                pan_number: this.form.pan_number,
-                sample_name: this.form.sample_name,
-                sample_batch_no: this.form.sample_batch_no,
-                sample_physical_form: this.form.sample_physical_form,
-                sample_storage_condition: this.form.sample_storage_condition,
-                notes: this.form.notes,
-                lab_tests: this.selectedTests.map(t => ({
-                    lab_test_id: t.id,
-                    no_of_samples: Math.max(1, Number(t.no_of_samples) || 1),
-                    notes: ''
-                }))
-            };
-            fetch('{{ route("quotation.store") }}', {
+            if (this.submitTimer) clearInterval(this.submitTimer);
+            this.submitTimer = setInterval(() => {
+                if (this.submitStage < this.submitStages.length - 1) this.submitStage++;
+            }, 900);
+
+            const formData = this.buildFormData();
+
+            fetch('{{ route("quotation.store", [], false) }}', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify(payload)
+                body: formData
             })
             .then(r => r.json().then(data => ({ ok: r.ok, status: r.status, data })))
             .then(({ ok, status, data }) => {
@@ -1364,15 +2050,21 @@ function quotationApp() {
                     window.location.href = data.redirect;
                 } else {
                     this.serverError = data.message || data.errors
-                        ? (data.errors && data.errors.lab_tests ? data.errors.lab_tests[0] : (data.message || 'Something went wrong. Please try again.'))
+                        ? (data.errors && data.errors.lab_tests ? data.errors.lab_tests[0] : (data.errors && data.errors.documents ? data.errors.documents[0] : (data.message || 'Something went wrong. Please try again.')))
                         : 'Something went wrong. Please try again.';
-                    this.submitting = false;
+                    this.stopSubmitProgress();
                 }
             })
             .catch(() => {
                 this.serverError = 'Network error. Please check your connection and try again.';
-                this.submitting = false;
+                this.stopSubmitProgress();
             });
+        },
+
+        stopSubmitProgress() {
+            if (this.submitTimer) { clearInterval(this.submitTimer); this.submitTimer = null; }
+            this.submitting = false;
+            this.submitStage = 0;
         }
     };
 }

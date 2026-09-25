@@ -9,7 +9,7 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { brand: { 500:'#3c50e0', 600:'#3c50e0', 700:'#3056d3' } },
+                    colors: { brand: { 50:'#eaf2fb', 100:'#d2e4f7', 200:'#a6c9f0', 400:'#1f7bd0', 500:'#01589f', 600:'#01458e', 700:'#013a78', 800:'#02306b', 900:'#052b63' } },
                     fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] }
                 }
             }
@@ -21,9 +21,7 @@
 <body class="font-sans antialiased bg-[#F1F5F9] min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md">
         <div class="text-center mb-8">
-            <div class="w-14 h-14 rounded-lg bg-brand-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-brand-600/30 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
-            </div>
+            <img src="{{ asset('images/admin-frontend-logo.jpg') }}" alt="ABRL Logo" class="h-16 w-auto object-contain mx-auto mb-4" style="mix-blend-mode: multiply">
             <h1 class="text-2xl font-bold text-gray-900">ABRL Test Request Form</h1>
             <p class="text-gray-500 text-sm mt-1">Sign in to the admin panel</p>
         </div>

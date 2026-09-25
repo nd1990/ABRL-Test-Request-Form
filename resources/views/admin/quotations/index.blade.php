@@ -1,5 +1,9 @@
 @extends('admin.layouts.app')
-@section('title', 'Quotations')
+@php
+    $lockedStatus = $lockedStatus ?? null;
+    $pageTitle = $pageTitle ?? 'Quotations';
+@endphp
+@section('title', $pageTitle)
 @section('styles')
 <style>
     [x-cloak] { display: none !important; }
@@ -12,7 +16,7 @@
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Quotations</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{{ $pageTitle ?? 'Quotations' }}</h1>
             <p class="text-sm text-gray-500 mt-1"><span x-text="total"></span> total quotation{{ $quotations->total() !== 1 ? 's' : '' }}</p>
         </div>
         <div class="flex items-center gap-2">
@@ -39,22 +43,23 @@
                         </span>
                         <input type="text" id="search" x-model="filters.search" @input="onSearchInput"
                             placeholder="Search by #, client, company, email"
-                            class="w-full rounded-xl border border-gray-300 pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition">
+                            class="w-full h-[52px] rounded-xl border border-gray-300 pl-10 pr-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition">
                     </div>
                 </div>
                 <div>
                     <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1.5">From</label>
                     <input type="date" id="date_from" x-model="filters.date_from" @change="onFilterChange"
-                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition bg-white">
+                        class="w-full h-[52px] rounded-xl border border-gray-300 px-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition bg-white">
                 </div>
                 <div>
                     <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1.5">To</label>
                     <input type="date" id="date_to" x-model="filters.date_to" @change="onFilterChange"
-                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition bg-white">
+                        class="w-full h-[52px] rounded-xl border border-gray-300 px-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition bg-white">
                 </div>
-                <div class="flex gap-2">
-                    <select name="status" x-model="filters.status" @change="onFilterChange"
-                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition bg-white">
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                    <select name="status" id="status" x-model="filters.status" @change="onFilterChange" @disabled($lockedStatus)
+                        class="w-full h-[52px] rounded-xl border border-gray-300 px-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition bg-white disabled:bg-gray-50 disabled:text-gray-500">
                         <option value="">All Status</option>
                         <option value="draft">Draft</option>
                         <option value="sent">Sent</option>
@@ -64,22 +69,11 @@
                     </select>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mt-3">
-                <div class="lg:col-span-2">
-                    <select name="email_status" x-model="filters.email_status" @change="onFilterChange"
-                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition bg-white">
-                        <option value="">All Email Status</option>
-                        <option value="sent">Sent</option>
-                        <option value="failed">Failed</option>
-                        <option value="pending">Pending</option>
-                    </select>
-                </div>
-                <div class="lg:col-span-3 flex items-center gap-2 justify-end">
-                    <button type="button" @click="clearFilters"
-                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                        Clear Filters
-                    </button>
-                </div>
+            <div class="flex items-center gap-2 justify-end mt-3">
+                <button type="button" @click="clearFilters"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    Clear Filters
+                </button>
             </div>
         </form>
 
@@ -106,15 +100,16 @@
                             <th class="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Company</th>
                             <th class="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Email</th>
                             <th class="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Date</th>
+                            <th class="text-center px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Status</th>
                             <th class="text-right px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Amount</th>
-                            <th class="text-center px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Email</th>
+                            <th class="text-center px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Email Status</th>
                             <th class="text-right px-4 py-3 font-semibold text-gray-600 whitespace-nowrap sticky right-0 bg-gray-50 border-l border-gray-200">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="rowsBody" class="divide-y divide-[rgb(229,229,229)]">
-                        <tr>
-                            <td colspan="8" class="px-3 py-12 text-center text-sm text-gray-400">Loading quotations...</td>
-                        </tr>
+<tr>
+    <td colspan="9" class="px-3 py-12 text-center text-sm text-gray-400">Loading quotations...</td>
+</tr>
                     </tbody>
                 </table>
             </div>
@@ -129,13 +124,13 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('quotationsList', () => ({
         dataUrl: '{{ route('admin.quotations.data') }}',
         exportBase: '{{ route('admin.export.quotations') }}',
+        lockedStatus: {{ Js::from($lockedStatus ?? null) }},
 
         filters: {
             search: {{ Js::from($filters['search'] ?? '') }},
             date_from: {{ Js::from($filters['date_from'] ?? '') }},
             date_to: {{ Js::from($filters['date_to'] ?? '') }},
             status: {{ Js::from($filters['status'] ?? '') }},
-            email_status: {{ Js::from($filters['email_status'] ?? '') }},
         },
         page: 1,
         loading: false,
@@ -160,6 +155,7 @@ document.addEventListener('alpine:init', () => {
             for (const [k, v] of Object.entries(this.filters)) {
                 if (v !== '' && v != null) params.set(k, v);
             }
+            if (this.lockedStatus) params.set('status', this.lockedStatus);
             params.set('format', format);
             return this.exportBase + '?' + params.toString();
         },
@@ -183,6 +179,7 @@ document.addEventListener('alpine:init', () => {
                 for (const [k, v] of Object.entries(this.filters)) {
                     if (v !== '' && v != null) params.set(k, v);
                 }
+                if (this.lockedStatus) params.set('status', this.lockedStatus);
                 params.set('page', this.page);
 
                 const res = await fetch(this.dataUrl + '?' + params.toString(), {
@@ -229,7 +226,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         clearFilters() {
-            this.filters = { search: '', date_from: '', date_to: '', status: '', email_status: '' };
+            this.filters = { search: '', date_from: '', date_to: '', status: this.lockedStatus || '' };
             if (this.debounceTimer) clearTimeout(this.debounceTimer);
             if (this.page !== 1) this.page = 1;
             this.fetchData();

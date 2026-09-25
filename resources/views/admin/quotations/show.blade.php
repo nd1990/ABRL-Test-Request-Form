@@ -28,16 +28,19 @@
             </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
+            @if($currentAdmin?->hasPermission('quotations.edit'))
             <a href="{{ route('admin.quotations.edit', $quotation) }}"
                class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 Edit
             </a>
+            @endif
             <a href="{{ route('admin.quotations.pdf', $quotation) }}"
                class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Download PDF
             </a>
+            @if($currentAdmin?->hasPermission('quotations.send_email'))
             <form method="POST" action="{{ route('admin.quotations.resend', $quotation) }}" class="inline" x-data>
                 @csrf
                 <button type="submit"
@@ -46,14 +49,8 @@
                     Resend Email
                 </button>
             </form>
-            <form method="POST" action="{{ route('admin.quotations.duplicate', $quotation) }}" class="inline" x-data>
-                @csrf
-                <button type="submit"
-                        class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-violet-700 bg-violet-50 border border-violet-200 rounded-lg hover:bg-violet-100 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                    Duplicate
-                </button>
-            </form>
+            @endif
+            @if($currentAdmin?->hasPermission('quotations.delete'))
             <form method="POST" action="{{ route('admin.quotations.destroy', $quotation) }}" class="inline" x-data onsubmit="return confirm('Are you sure you want to permanently delete this quotation?')">
                 @csrf
                 @method('DELETE')
@@ -63,8 +60,32 @@
                     Delete
                 </button>
             </form>
+            @endif
         </div>
     </div>
+
+    @if($quotation->invoices->isNotEmpty())
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Final Invoices Generated</h2>
+        <ul class="space-y-2">
+            @foreach($quotation->invoices as $invoice)
+            <li class="flex items-center justify-between gap-4 text-sm">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2h16v20l-2.5-1.5L15 22l-2.5-1.5L10 22l-2.5-1.5L5 22V4a2 2 0 00-1-2z"/></svg>
+                    </span>
+                    <a href="{{ route('admin.invoices.show', $invoice) }}" class="font-medium text-brand-600 hover:underline">{{ $invoice->invoice_number }}</a>
+                    <span class="text-xs text-gray-500">{{ $invoice->invoice_date->format('d M Y') }}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="font-medium text-gray-900">{{ $currency }}{{ number_format($invoice->grand_total, 2) }}</span>
+                    <a href="{{ route('admin.invoices.pdf', $invoice) }}" class="text-xs font-medium text-emerald-600 hover:underline">PDF</a>
+                </div>
+            </li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
@@ -98,7 +119,7 @@
                     <div class="sm:col-span-2">
                         <p class="text-xs text-gray-500">Courier Address</p>
                         <p class="text-sm font-medium text-gray-900">
-                            {{ $quotation->courier_address }}{{ $quotation->courier_address_line2 ? ', ' . $quotation->courier_address_line2 : '' }}{{ $quotation->courier_city ? ', ' . $quotation->courier_city : '' }}{{ $quotation->courier_state ? ', ' . $quotation->courier_state : '' }}{{ $quotation->courier_postal_code ? ', ' . $quotation->courier_postal_code : '' }}
+                            {{ $quotation->courier_address }}{{ $quotation->courier_address_line2 ? ', ' . $quotation->courier_address_line2 : '' }}{{ $quotation->courier_city ? ', ' . $quotation->courier_city : '' }}{{ $quotation->courier_state ? ', ' . $quotation->courier_state : '' }}{{ $quotation->courier_postal_code ? ', ' . $quotation->courier_postal_code : '' }}{{ $quotation->courier_country ? ', ' . $quotation->courier_country : '' }}
                         </p>
                     </div>
                     @endif
@@ -106,9 +127,88 @@
                         <p class="text-xs text-gray-500">GST Number</p>
                         <p class="text-sm font-medium text-gray-900">{{ $quotation->gst_number ?: '—' }}</p>
                     </div>
+                </div>
+            </div>
+
+            {{-- Document Uploads --}}
+            @php
+                $hasMsds = !empty($quotation->msds_report_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($quotation->msds_report_path);
+                $docs = $quotation->other_documents ?? [];
+            @endphp
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-100">
+                    <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Document Uploads</h2>
+                </div>
+                <div class="px-5 py-4 space-y-4">
+                    {{-- MSDS Report --}}
                     <div>
-                        <p class="text-xs text-gray-500">PAN Number</p>
-                        <p class="text-sm font-medium text-gray-900">{{ $quotation->pan_number ?: '—' }}</p>
+                        <p class="text-xs text-gray-500 font-medium mb-1">MSDS Report</p>
+                        @if($hasMsds)
+                            @php
+                                $msdsViewUrl = route('admin.quotations.documents.msds', $quotation);
+                                $msdsDownloadUrl = route('admin.quotations.documents.msds', ['quotation' => $quotation, 'action' => 'download']);
+                            @endphp
+                            <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+                                <span class="w-9 h-9 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-semibold text-gray-900 truncate">{{ $quotation->msds_report_name }}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">MSDS Document</p>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="{{ $msdsViewUrl }}" target="_blank" rel="noopener"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                                        View
+                                    </a>
+                                    <a href="{{ $msdsDownloadUrl }}"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-400 italic">No document uploaded</p>
+                        @endif
+                    </div>
+
+                    {{-- Other Reference Documents --}}
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium mb-1">Other Reference Documents</p>
+                        @if(count($docs) > 0)
+                            <ul class="space-y-2">
+                                @foreach($docs as $doc)
+                                    @php
+                                        $docViewUrl = route('admin.quotations.documents.other', ['quotation' => $quotation, 'index' => $loop->index]);
+                                        $docDownloadUrl = route('admin.quotations.documents.other', ['quotation' => $quotation, 'index' => $loop->index, 'action' => 'download']);
+                                    @endphp
+                                    <li class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+                                        <span class="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                        </span>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-semibold text-gray-900 truncate">{{ $doc['name'] ?? basename($doc['path']) }}</p>
+                                        </div>
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            <a href="{{ $docViewUrl }}" target="_blank" rel="noopener"
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                                                View
+                                            </a>
+                                            <a href="{{ $docDownloadUrl }}"
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                                                Download
+                                            </a>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="text-sm text-gray-400 italic">No documents uploaded</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -130,6 +230,7 @@
                                 <th class="text-left px-4 py-2.5 font-semibold text-gray-600">Test / Parameter</th>
                                 <th class="text-left px-4 py-2.5 font-semibold text-gray-600">Method</th>
                                 <th class="text-right px-4 py-2.5 font-semibold text-gray-600">No. of Samples</th>
+                                <th class="text-center px-4 py-2.5 font-semibold text-gray-600">Invoice</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -138,6 +239,15 @@
                                 <td class="px-4 py-3 font-medium text-gray-900">{{ $item->service_name_snapshot }}</td>
                                 <td class="px-4 py-3 text-gray-600">{{ $item->unit_snapshot }}</td>
                                 <td class="px-4 py-3 text-right text-gray-800">{{ $item->quantity }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    @if($item->invoice_status === 'invoiced')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Invoiced</span>
+                                    @elseif($item->invoice_status === 'excluded')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Excluded</span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Pending</span>
+                                    @endif
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -153,6 +263,7 @@
                                 <th class="text-right px-4 py-2.5 font-semibold text-gray-600">Discount</th>
                                 <th class="text-right px-4 py-2.5 font-semibold text-gray-600">Tax %</th>
                                 <th class="text-right px-4 py-2.5 font-semibold text-gray-600">Total</th>
+                                <th class="text-center px-4 py-2.5 font-semibold text-gray-600">Invoice</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -165,6 +276,15 @@
                                 <td class="px-4 py-3 text-right text-gray-800">{{ $currency }}{{ number_format($item->discount_snapshot, 2) }}</td>
                                 <td class="px-4 py-3 text-right text-gray-800">{{ number_format($item->tax_percentage_snapshot, 1) }}%</td>
                                 <td class="px-4 py-3 text-right font-medium text-gray-900">{{ $currency }}{{ number_format($item->total, 2) }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    @if($item->invoice_status === 'invoiced')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Invoiced</span>
+                                    @elseif($item->invoice_status === 'excluded')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Excluded</span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Pending</span>
+                                    @endif
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

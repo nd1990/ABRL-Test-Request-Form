@@ -174,6 +174,7 @@ class QuotationService
                 'courier_city' => $data['different_courier_address'] ?? false ? ($data['courier_city'] ?? null) : null,
                 'courier_state' => $data['different_courier_address'] ?? false ? ($data['courier_state'] ?? null) : null,
                 'courier_postal_code' => $data['different_courier_address'] ?? false ? ($data['courier_postal_code'] ?? null) : null,
+                'courier_country' => $data['different_courier_address'] ?? false ? ($data['courier_country'] ?? null) : null,
                 'quotation_date' => now()->toDateString(),
                 'valid_until' => $data['valid_until'] ?? null,
                 'subtotal' => $calc['subtotal'],
@@ -217,6 +218,16 @@ class QuotationService
         return DB::transaction(function () use ($quotation, $data) {
             $calc = $this->buildQuotation($data);
 
+            $invoicingState = $quotation->items->mapWithKeys(function ($item) {
+                $key = $item->lab_test_id ?: 's' . $item->service_id;
+
+                return [$key => [
+                    'invoice_status' => $item->invoice_status,
+                    'invoice_id' => $item->invoice_id,
+                    'invoiced_at' => $item->invoiced_at,
+                ]];
+            })->all();
+
             $quotation->update([
                 'client_name' => $data['client_name'] ?? $quotation->client_name,
                 'company_name' => $data['company_name'] ?? $quotation->company_name,
@@ -239,6 +250,7 @@ class QuotationService
                 'courier_city' => ($data['different_courier_address'] ?? false) ? ($data['courier_city'] ?? $quotation->courier_city) : null,
                 'courier_state' => ($data['different_courier_address'] ?? false) ? ($data['courier_state'] ?? $quotation->courier_state) : null,
                 'courier_postal_code' => ($data['different_courier_address'] ?? false) ? ($data['courier_postal_code'] ?? $quotation->courier_postal_code) : null,
+                'courier_country' => ($data['different_courier_address'] ?? false) ? ($data['courier_country'] ?? $quotation->courier_country) : null,
                 'quotation_date' => $data['quotation_date'] ?? $quotation->quotation_date,
                 'valid_until' => $data['valid_until'] ?? $quotation->valid_until,
                 'subtotal' => $calc['subtotal'],
@@ -254,8 +266,9 @@ class QuotationService
 
             $quotation->items()->delete();
 
+            $created = [];
             foreach ($calc['items'] as $item) {
-                QuotationItem::create([
+                $created[] = QuotationItem::create([
                     'quotation_id' => $quotation->id,
                     'service_id' => $item['service_id'],
                     'lab_test_id' => $item['lab_test_id'] ?? null,
@@ -270,6 +283,18 @@ class QuotationService
                     'total' => $item['total'],
                     'notes' => $item['notes'],
                 ]);
+            }
+
+            foreach ($created as $item) {
+                $key = $item->lab_test_id ?: 's' . $item->service_id;
+
+                if (isset($invoicingState[$key]) && $invoicingState[$key]['invoice_status'] !== 'pending') {
+                    $item->forceFill([
+                        'invoice_status' => $invoicingState[$key]['invoice_status'],
+                        'invoice_id' => $invoicingState[$key]['invoice_id'],
+                        'invoiced_at' => $invoicingState[$key]['invoiced_at'],
+                    ])->save();
+                }
             }
 
             return $quotation->load('items');
@@ -304,6 +329,7 @@ class QuotationService
                 'courier_city' => $quotation->courier_city,
                 'courier_state' => $quotation->courier_state,
                 'courier_postal_code' => $quotation->courier_postal_code,
+                'courier_country' => $quotation->courier_country,
                 'quotation_date' => now()->toDateString(),
                 'valid_until' => $quotation->valid_until,
                 'subtotal' => $quotation->subtotal,

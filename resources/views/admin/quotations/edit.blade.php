@@ -18,6 +18,17 @@
         @csrf
         @method('PUT')
 
+        @if($errors->any())
+        <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-6">
+            <p class="text-sm font-semibold text-rose-700 mb-1">Please fix the following errors:</p>
+            <ul class="list-disc list-inside space-y-1">
+                @foreach($errors->all() as $error)
+                <li class="text-xs text-rose-600">{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <div class="space-y-6">
 
             <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
@@ -78,11 +89,6 @@
                     <div>
                         <label for="gst_number" class="block text-xs font-medium text-gray-700 mb-1">GST Number</label>
                         <input type="text" id="gst_number" name="gst_number" value="{{ old('gst_number', $quotation->gst_number) }}"
-                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
-                    </div>
-                    <div>
-                        <label for="pan_number" class="block text-xs font-medium text-gray-700 mb-1">PAN Number</label>
-                        <input type="text" id="pan_number" name="pan_number" value="{{ old('pan_number', $quotation->pan_number) }}"
                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none uppercase">
                     </div>
                     <div class="sm:col-span-2">
@@ -103,6 +109,11 @@
                     <div>
                         <label for="courier_postal_code" class="block text-xs font-medium text-gray-700 mb-1">Courier Postal Code</label>
                         <input type="text" id="courier_postal_code" name="courier_postal_code" value="{{ old('courier_postal_code', $quotation->courier_postal_code) }}"
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+                    </div>
+                    <div>
+                        <label for="courier_country" class="block text-xs font-medium text-gray-700 mb-1">Courier Country</label>
+                        <input type="text" id="courier_country" name="courier_country" value="{{ old('courier_country', $quotation->courier_country) }}"
                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
                     </div>
                 </div>
@@ -165,6 +176,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Services</h2>
                     <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500" x-text="selectedServices.length + ' / ' + maxTests + ' services'"></span>
                         <select x-model="serviceToAdd"
                                 class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white">
                             <option value="">Select a service...</option>
@@ -172,12 +184,20 @@
                                 <option :value="s.id" x-text="s.name + ' (' + s.category + ')'"></option>
                             </template>
                         </select>
-                        <button type="button" @click="addService()"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition">
+                        <button type="button" @click="addService()" :disabled="selectedServices.length >= maxTests"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition disabled:opacity-40 disabled:cursor-not-allowed">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                             Add Service
                         </button>
                     </div>
+                </div>
+
+                <div x-show="maxAlert" x-cloak x-transition class="mb-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-3 text-sm flex items-center gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span x-text="maxAlert" class="flex-1"></span>
+                    <button type="button" @click="maxAlert = ''" class="text-amber-400 hover:text-amber-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
                 </div>
 
                 <div class="space-y-3">
@@ -289,11 +309,17 @@ function quotationEditor() {
             'notes' => $item->notes ?? '',
         ])->values()->toArray()),
         currency: @js($currency),
+        maxTests: 5,
+        maxAlert: '',
 
         addService() {
             if (!this.serviceToAdd) return;
             const service = this.services.find(s => s.id == this.serviceToAdd);
             if (!service) return;
+            if (this.selectedServices.length >= this.maxTests) {
+                this.maxAlert = 'Maximum ' + this.maxTests + ' tests allowed per quotation. Remove a test first to add a different one.';
+                return;
+            }
             if (this.selectedServices.some(s => s.service_id == service.id)) return;
             this.selectedServices.push({
                 service_id: service.id,
@@ -304,6 +330,7 @@ function quotationEditor() {
                 notes: ''
             });
             this.serviceToAdd = '';
+            this.maxAlert = '';
         },
 
         removeService(idx) {

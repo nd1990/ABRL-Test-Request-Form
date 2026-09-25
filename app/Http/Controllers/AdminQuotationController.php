@@ -12,6 +12,7 @@ use App\Services\QuotationService;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rule;
 
 class AdminQuotationController extends Controller
 {
@@ -66,6 +67,24 @@ class AdminQuotationController extends Controller
         ]);
     }
 
+    public function accepted(Request $request)
+    {
+        $quotations = $this->buildIndexQuery($request)
+            ->where('status', 'accepted')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.quotations.index', [
+            'quotations' => $quotations,
+            'filters' => array_merge(
+                $request->only(['search', 'date_from', 'date_to', 'email_status']),
+                ['status' => 'accepted']
+            ),
+            'lockedStatus' => 'accepted',
+            'pageTitle' => 'Accepted Quotations',
+        ]);
+    }
+
     public function data(Request $request)
     {
         $quotations = $this->buildIndexQuery($request)
@@ -89,7 +108,7 @@ class AdminQuotationController extends Controller
 
     public function show(Quotation $quotation)
     {
-        $quotation->load('items', 'creator');
+        $quotation->load('items', 'creator', 'invoices');
         $company = $this->settings->company();
         $payment = $this->settings->payment();
         $currency = $this->settings->currencySymbol();
@@ -140,6 +159,27 @@ class AdminQuotationController extends Controller
         return redirect()->route('admin.quotations.index')->with('success', 'Quotation updated successfully.');
     }
 
+    public function updateStatus(Request $request, Quotation $quotation)
+    {
+        $data = $request->validate([
+            'status' => ['required', Rule::in(['sent', 'accepted'])],
+        ]);
+
+        $oldStatus = $quotation->status;
+        $quotation->update(['status' => $data['status']]);
+
+        $admin = app('admin');
+        $this->auditLog->statusChanged($admin, $quotation, $oldStatus, $data['status'], $request);
+
+        if ($data['status'] === 'accepted') {
+            return redirect()->route('admin.quotations.show', $quotation)
+                ->with('success', 'Quotation marked as accepted. You can now generate the invoice.');
+        }
+
+        return redirect()->route('admin.quotations.show', $quotation)
+            ->with('success', 'Quotation moved back to Sent.');
+    }
+
     public function pdf(Quotation $quotation)
     {
         $admin = app('admin');
@@ -151,6 +191,39 @@ class AdminQuotationController extends Controller
         $this->auditLog->pdfGenerated($admin, $quotation, request());
 
         return $this->pdfService->download($quotation);
+    }
+
+    public function documentMsds(Quotation $quotation, Request $request)
+    {
+        if (empty($quotation->msds_report_path) || !\Illuminate\Support\Facades\Storage::disk('public')->exists($quotation->msds_report_path)) {
+            abort(404);
+        }
+
+        return $this->streamDocument($quotation->msds_report_path, $quotation->msds_report_name, $request);
+    }
+
+    public function documentOther(Quotation $quotation, int $index, Request $request)
+    {
+        $docs = $quotation->other_documents ?? [];
+
+        if (!isset($docs[$index]) || empty($docs[$index]['path']) || !\Illuminate\Support\Facades\Storage::disk('public')->exists($docs[$index]['path'])) {
+            abort(404);
+        }
+
+        $doc = $docs[$index];
+
+        return $this->streamDocument($doc['path'], $doc['name'] ?? basename($doc['path']), $request);
+    }
+
+    protected function streamDocument(string $path, string $name, Request $request)
+    {
+        $disk = \Illuminate\Support\Facades\Storage::disk('public');
+
+        if (($request->query('action') ?? 'view') === 'download') {
+            return $disk->download($path, $name);
+        }
+
+        return $disk->response($path, $name);
     }
 
     public function resend(Quotation $quotation)

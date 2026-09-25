@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Admin;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +13,7 @@ class AdminMaster
     {
         $admin = app('admin');
 
-        if (!$admin || $admin->role !== 'master') {
+        if (!$admin || $admin->role !== Admin::ROLE_MASTER) {
             abort(403, 'Access denied. Master admin privileges required.');
         }
 

@@ -7,7 +7,7 @@
     <style>
         body { font-family: Arial, Helvetica, sans-serif; background: #f3f4f6; margin: 0; padding: 24px; color: #1f2937; }
         .wrap { max-width: 680px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
-        .head { background: #3c50e0; color: #ffffff; padding: 20px 24px; }
+        .head { background: #01458e; color: #ffffff; padding: 20px 24px; }
         .head h1 { margin: 0; font-size: 20px; }
         .head p { margin: 4px 0 0; opacity: .9; font-size: 13px; }
         .body { padding: 24px; }
@@ -21,7 +21,7 @@
         table.items td { padding: 7px 8px; border: 1px solid #e5e7eb; vertical-align: top; }
         .total { text-align: right; font-size: 13px; margin-top: 14px; }
         .total b { font-size: 15px; color: #111827; }
-        .btn { display: block; text-decoration: none; background: #3c50e0; color: #ffffff; font-weight: 600; text-align: center; padding: 12px 16px; border-radius: 6px; margin-top: 22px; font-size: 14px; }
+        .btn { display: block; text-decoration: none; background: #01458e; color: #ffffff; font-weight: 600; text-align: center; padding: 12px 16px; border-radius: 6px; margin-top: 22px; font-size: 14px; }
         .foot { background: #f9fafb; padding: 14px 24px; font-size: 12px; color: #6b7280; }
         .alt { display: block; text-align: center; margin-top: 12px; font-size: 12px; color: #6b7280; }
     </style>
@@ -45,7 +45,6 @@
                 @if($quotation->phone)<tr><td class="k">Phone</td><td>{{ $quotation->phone }}</td></tr>@endif
                 @if($quotation->preferred_contact_method)<tr><td class="k">Preferred Contact</td><td>{{ $quotation->preferred_contact_method }}</td></tr>@endif
                 @if($quotation->gst_number)<tr><td class="k">GST Number</td><td>{{ $quotation->gst_number }}</td></tr>@endif
-                @if($quotation->pan_number)<tr><td class="k">PAN Number</td><td>{{ $quotation->pan_number }}</td></tr>@endif
                 @if($quotation->address)
                     <tr><td class="k">Address</td><td>{{ $quotation->address }}{{ $quotation->address_line2 ? ', ' . $quotation->address_line2 : '' }}{{ $quotation->city ? ', ' . $quotation->city : '' }}{{ $quotation->state ? ', ' . $quotation->state : '' }}{{ $quotation->country ? ', ' . $quotation->country : '' }}</td></tr>
                 @endif

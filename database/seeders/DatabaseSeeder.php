@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Master Admin',
                 'email' => 'support@nexelt.com',
                 'password' => Hash::make('password'),
-                'role' => 'master',
+                'role' => Admin::ROLE_MASTER,
                 'is_active' => true,
                 'last_login_at' => null,
             ]);
@@ -36,12 +36,15 @@ class DatabaseSeeder extends Seeder
     {
         $settings = [
             'company' => [
-                'name' => 'Your Company Pvt Ltd',
-                'address' => 'Level 4, Business Tower, MG Road',
-                'phone' => '+91 90000 00000',
-                'email' => 'contact@yourcompany.com',
-                'website' => 'https://www.yourcompany.com',
-                'gst_number' => '27ABCDE1234F1Z5',
+                'name' => 'Agri Biochem Research Lab',
+                'address' => 'Plot No. 906/13, Near Ganesh Anand Chokdi, GIDC Panoli, Tal: Ankleshwar, Dist: Bharuch, Panoli - 394116, Gujarat, India',
+                'phone' => '+91 9925549313',
+                'email' => 'ea.operations@pushpajshah.com',
+                'website' => 'https://www.agribioresearch.com/',
+                'gst_number' => '24AAJFP5389G1ZW',
+                'pan' => 'AAJFP5389G',
+                'legal_name' => 'PUSHPA J SHAH',
+                'trade_name' => 'PUSHPA J SHAH',
             ],
             'quotation' => [
                 'prefix' => 'QT',
@@ -52,12 +55,21 @@ class DatabaseSeeder extends Seeder
                 'terms' => "1. Quotation is valid for 15 days from the date of issue.\n2. 50% advance payment is required to begin work.\n3. Prices are inclusive of applicable taxes.\n4. Delivery timeline starts after receipt of advance payment.\n5. Any changes in scope may affect the total quotation amount.",
             ],
             'payment' => [
-                'bank_name' => 'State Bank of India',
-                'account_name' => 'Your Company Pvt Ltd',
-                'account_number' => '35678901234',
-                'ifsc' => 'SBIN0001234',
-                'upi' => 'yourcompany@upi',
+                'bank_name' => 'HDFC BANK LTD (Ankleshwar)',
+                'account_name' => 'Pushpa J Shah',
+                'account_number' => '50200026660770',
+                'ifsc' => 'HDFC0000255',
+                'upi' => '',
                 'instructions' => 'Please mention your quotation number as the payment reference.',
+            ],
+            'invoice' => [
+                'prefix' => 'INV',
+                'starting_number' => '1',
+            ],
+            'backup' => [
+                'frequency' => 'off',
+                'time' => '02:00',
+                'keep' => '10',
             ],
             'email' => [
                 'sender_name' => 'Your Company Pvt Ltd',

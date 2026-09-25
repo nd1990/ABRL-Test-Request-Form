@@ -5,11 +5,15 @@
     [x-cloak] { display: none !important; }
     #rowsBody tr td { transition: background-color .15s ease; }
     .tbl-loading tbody { opacity: .55; transition: opacity .15s ease; }
-    .checkbox-indeterminate { accent-color: #3c50e0; }
+    .checkbox-indeterminate { accent-color: #01458e; }
 </style>
 @endsection
 @section('content')
 <div x-data="servicesList()" class="space-y-6">
+
+{{-- Gate config for Alpine --}}
+<input type="hidden" id="canDeleteLabTests" value="{{ $currentAdmin?->hasPermission('lab_tests.delete') ? '1' : '0' }}">
+<input type="hidden" id="canCreateLabTests" value="{{ $currentAdmin?->hasPermission('lab_tests.create') ? '1' : '0' }}">
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -17,6 +21,7 @@
             <p class="text-sm text-gray-500 mt-1">Manage the NABL catalog used by the public quotation form</p>
         </div>
         <div class="flex items-center gap-3">
+            @if($currentAdmin?->hasPermission('lab_tests.create'))
             <button @click="openImport()" class="inline-flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-semibold px-4 py-2.5 rounded-xl transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 Import CSV
@@ -25,6 +30,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Add Lab Test
             </button>
+            @endif
         </div>
     </div>
 
@@ -107,7 +113,7 @@
     </div>
 
     <!-- Bulk action bar -->
-    <div x-show="selectedCount > 0" x-cloak x-transition
+    <div x-show="canDelete && selectedCount > 0" x-cloak x-transition
         class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-brand-50 border border-brand-200 rounded-2xl px-4 py-3 sm:px-6">
         <div class="flex items-center gap-3">
             <span class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-white">
@@ -149,6 +155,7 @@
             <table class="min-w-full text-sm">
                 <thead>
                     <tr class="border-b border-gray-200 bg-gray-50/80">
+                        @if($currentAdmin?->hasPermission('lab_tests.delete'))
                         <th class="w-10 px-2 py-3">
                             <input type="checkbox" id="selectAll" data-select-all
                                 class="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 cursor-pointer"
@@ -156,6 +163,7 @@
                                 :indeterminate="selectAllIndeterminate"
                                 @change="toggleSelectAll($event)">
                         </th>
+                        @endif
                         <th class="text-left font-semibold text-gray-500 px-2 py-3">S.No</th>
                         <th class="text-left font-semibold text-gray-500 px-2 py-3">NABL</th>
                         <th class="text-left font-semibold text-gray-500 px-2 py-3">Discipline</th>
@@ -166,7 +174,9 @@
                         <th class="text-right font-semibold text-gray-500 px-2 py-3">Charges/Sample</th>
                         <th class="text-right font-semibold text-gray-500 px-2 py-3">Total</th>
                         <th class="text-center font-semibold text-gray-500 px-2 py-3">Status</th>
+                        @if($currentAdmin?->hasAnyPermission(['lab_tests.edit', 'lab_tests.delete']))
                         <th class="text-right font-semibold text-gray-500 px-2 py-3">Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody id="rowsBody" class="divide-y divide-gray-100" @click="onRowClick($event)" @change="onRowChange($event)">
@@ -263,6 +273,8 @@ document.addEventListener('alpine:init', () => {
 
         selected: [],
         deleting: false,
+        canDelete: document.getElementById('canDeleteLabTests')?.value === '1',
+        canCreate: document.getElementById('canCreateLabTests')?.value === '1',
         toast: { show: false, type: 'success', message: '', timer: null },
 
         // ------- Modal (delegated from _modal partial) -------
@@ -398,6 +410,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         async singleDelete(id) {
+            if (!this.canDelete) return;
             if (!confirm('Are you sure you want to delete this service?')) return;
             try {
                 const res = await fetch(this.destroyUrlBase + id, {
@@ -415,6 +428,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         requestBulkDelete() {
+            if (!this.canDelete) return;
             if (this.selected.length === 0 || this.deleting) return;
             if (!confirm('Are you sure you want to delete the selected services?')) return;
             this.bulkDelete();

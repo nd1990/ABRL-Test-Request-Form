@@ -106,4 +106,43 @@ class AuditLogService
             'status' => $newStatus,
         ], $request);
     }
+
+    public function invoicePdfGenerated($admin, $invoice, ?Request $request = null): void
+    {
+        $this->log($admin, 'invoice.pdf_generated', 'Invoice', $invoice->id, null, [
+            'invoice_number' => $invoice->invoice_number,
+        ], $request);
+    }
+
+    public function invoiceGenerated($admin, $invoice, ?Request $request = null): void
+    {
+        $this->log($admin, 'invoice.generated', 'Invoice', $invoice->id, null, [
+            'invoice_number' => $invoice->invoice_number,
+            'quotation_number' => $invoice->quotation->quotation_number ?? null,
+            'grand_total' => $invoice->grand_total,
+        ], $request);
+    }
+
+    public function invoiceDeleted($admin, $invoice, ?Request $request = null): void
+    {
+        $this->log($admin, 'invoice.deleted', 'Invoice', $invoice->id, [
+            'invoice_number' => $invoice->invoice_number,
+            'grand_total' => $invoice->grand_total,
+        ], null, $request);
+    }
+
+    public function backupCreated($admin, string $filename, ?Request $request = null): void
+    {
+        $this->log($admin, 'backup.created', 'Backup', null, null, ['filename' => $filename], $request);
+    }
+
+    public function backupDeleted($admin, string $filename, ?Request $request = null): void
+    {
+        $this->log($admin, 'backup.deleted', 'Backup', null, ['filename' => $filename], null, $request);
+    }
+
+    public function backupRestored($admin, string $filename, ?Request $request = null): void
+    {
+        $this->log($admin, 'backup.restored', 'Backup', null, ['filename' => $filename], null, $request);
+    }
 }

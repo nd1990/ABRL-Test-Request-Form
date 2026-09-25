@@ -11,7 +11,7 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50:'#eef2ff', 100:'#e0e7ff', 200:'#c7d2fe', 400:'#4361ee', 500:'#3c50e0', 600:'#3c50e0', 700:'#3056d3', 800:'#264bc8', 900:'#1e40af' },
+                        brand: { 50:'#eaf2fb', 100:'#d2e4f7', 200:'#a6c9f0', 300:'#6ea9e2', 400:'#1f7bd0', 500:'#01589f', 600:'#01458e', 700:'#013a78', 800:'#02306b', 900:'#052b63' },
                         gray: { 50:'#F9FAFB', 100:'#F3F4F6', 200:'#E5E7EB', 300:'#D1D5DB', 400:'#9CA3AF', 500:'#6B7280', 600:'#4B5563', 700:'#374151', 800:'#1F2937', 900:'#111827' }
                     },
                     fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] }
@@ -37,8 +37,8 @@
             line-height: 24px;
             transition: all .2s;
         }
-        .menu-item-active { background: #eef2ff; color: #3c50e0; }
-        .menu-item-active:hover { background: #e0e7ff; }
+        .menu-item-active { background: #eaf2fb; color: #01458e; }
+        .menu-item-active:hover { background: #d2e4f7; }
         .menu-item-inactive { color: #64748b; }
         .menu-item-inactive:hover { background: #f1f5f9; color: #1e293b; }
         .menu-dropdown-item {
@@ -51,7 +51,7 @@
             border-radius: 4px;
             transition: color .2s;
         }
-        .menu-dropdown-item-active { color: #3c50e0; }
+        .menu-dropdown-item-active { color: #01458e; }
         .menu-dropdown-item-inactive { color: #64748b; }
         .menu-dropdown-item-inactive:hover { color: #1e293b; }
         /* Custom scrollbar (TailAdmin-style) */
@@ -81,12 +81,9 @@
         class="sidebar fixed top-0 left-0 z-50 flex h-screen w-[250px] flex-col overflow-y-auto border-r border-gray-200 bg-white px-5 transition-all duration-300 xl:static xl:translate-x-0">
 
         <!-- SIDEBAR HEADER -->
-        <div class="sidebar-header flex items-center gap-2 pt-7 pb-6">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
-                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EEF2FF] text-[#3c50e0]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-                </span>
-                <span class="text-base font-bold leading-tight tracking-tight text-gray-900">ABRL Test Request Form</span>
+        <div class="flex items-center px-1 pt-6 pb-6">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center">
+                <img src="{{ asset('images/admin-frontend-logo.jpg') }}" alt="ABRL Logo" class="h-auto w-full max-w-[190px] object-contain">
             </a>
         </div>
 
@@ -96,6 +93,7 @@
                 <div>
                     <h3 class="mb-4 text-xs uppercase leading-5 text-gray-400">Menu</h3>
                     <ul class="mb-6 flex flex-col gap-1">
+                        @if($currentAdmin?->hasPermission('dashboard.view'))
                         <li class="flex">
                             <a href="{{ route('admin.dashboard') }}"
                                class="menu-item {{ request()->routeIs('admin.dashboard') ? 'menu-item-active' : 'menu-item-inactive' }}">
@@ -103,13 +101,35 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
+                        @endif
+                        @if($currentAdmin?->hasPermission('quotations.view'))
                         <li class="flex">
                             <a href="{{ route('admin.quotations.index') }}"
-                               class="menu-item {{ request()->routeIs('admin.quotations.*') ? 'menu-item-active' : 'menu-item-inactive' }}">
+                               class="menu-item {{ request()->routeIs('admin.quotations.index') ? 'menu-item-active' : 'menu-item-inactive' }}">
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.6"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.6"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.6"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.6"/></svg>
                                 <span>Quotations</span>
                             </a>
                         </li>
+                        @if($currentAdmin?->hasPermission('quotations.view_accepted'))
+                        <li class="flex">
+                            <a href="{{ route('admin.quotations.accepted') }}"
+                               class="menu-item {{ request()->routeIs('admin.quotations.accepted') ? 'menu-item-active' : 'menu-item-inactive' }}">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.6"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.6"/><polyline points="9.5 14.5 11.5 16.5 15 13" stroke="currentColor" stroke-width="1.6"/></svg>
+                                <span>Accepted Quotations</span>
+                            </a>
+                        </li>
+                        @endif
+                        @endif
+                        @if($currentAdmin?->hasPermission('invoices.view'))
+                        <li class="flex">
+                            <a href="{{ route('admin.invoices.index') }}"
+                               class="menu-item {{ request()->routeIs('admin.invoices.*') ? 'menu-item-active' : 'menu-item-inactive' }}">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 2h16v20l-2.5-1.5L15 22l-2.5-1.5L10 22l-2.5-1.5L5 22V4a2 2 0 00-1-2z" stroke="currentColor" stroke-width="1.4"/><path d="M4 2a2 2 0 012 2v18" stroke="currentColor" stroke-width="1.4"/><line x1="8" y1="7" x2="17" y2="7" stroke="currentColor" stroke-width="1.4"/><line x1="8" y1="11" x2="17" y2="11" stroke="currentColor" stroke-width="1.4"/></svg>
+                                <span>Invoices</span>
+                            </a>
+                        </li>
+                        @endif
+                        @if($currentAdmin?->hasPermission('lab_tests.view'))
                         <li class="flex">
                             <a href="{{ route('admin.services.index') }}"
                                class="menu-item {{ request()->routeIs('admin.services.*') ? 'menu-item-active' : 'menu-item-inactive' }}">
@@ -117,7 +137,8 @@
                                 <span>Lab Tests</span>
                             </a>
                         </li>
-                        @if($currentAdmin?->role === 'master')
+                        @endif
+                        @if($currentAdmin?->hasPermission('users.view'))
                         <li class="flex">
                             <a href="{{ route('admin.users.index') }}"
                                class="menu-item {{ request()->routeIs('admin.users.*') ? 'menu-item-active' : 'menu-item-inactive' }}">
@@ -126,7 +147,16 @@
                             </a>
                         </li>
                         @endif
-                        @if($currentAdmin?->role === 'master')
+                        @if($currentAdmin?->hasPermission('backups.view'))
+                        <li class="flex">
+                            <a href="{{ route('admin.backups.index') }}"
+                               class="menu-item {{ request()->routeIs('admin.backups.*') ? 'menu-item-active' : 'menu-item-inactive' }}">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.6"/><path d="M12 21v-9" stroke="currentColor" stroke-width="1.6"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.6" opacity="0.35"/><polyline points="8 12 10 14 15 9" stroke="currentColor" stroke-width="1.6"/></svg>
+                                <span>Backups</span>
+                            </a>
+                        </li>
+                        @endif
+                        @if($currentAdmin?->hasPermission('settings.view'))
                         <li class="flex">
                             <a href="{{ route('admin.settings.index') }}"
                                class="menu-item {{ request()->routeIs('admin.settings.*') ? 'menu-item-active' : 'menu-item-inactive' }}">
@@ -135,13 +165,7 @@
                             </a>
                         </li>
                         @endif
-                        <li class="flex">
-                            <a href="{{ route('admin.password.change') }}"
-                               class="menu-item {{ request()->routeIs('admin.password.change*') ? 'menu-item-active' : 'menu-item-inactive' }}">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.6"/></svg>
-                                <span>Change Password</span>
-                            </a>
-                        </li>
+                        @if($currentAdmin?->hasPermission('public_site.view'))
                         <li class="flex">
                             <a href="{{ route('quotation.index') }}" target="_blank"
                                class="menu-item menu-item-inactive">
@@ -149,6 +173,7 @@
                                 <span>View Public Site</span>
                             </a>
                         </li>
+                        @endif
                     </ul>
                 </div>
             </nav>
@@ -200,10 +225,10 @@
                 @endif
 
                 <div class="flex items-center gap-2.5 pl-3 sm:pl-4 border-l border-gray-200">
-                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#3c50e0] text-xs font-bold text-white">{{ strtoupper(substr(session('admin_name', 'A'), 0, 1)) }}</div>
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#01458e] text-xs font-bold text-white">{{ strtoupper(substr(session('admin_name', 'A'), 0, 1)) }}</div>
                     <div class="hidden sm:block min-w-0">
-                        <p class="truncate text-sm font-semibold leading-tight text-gray-800">{{ session('admin_name') }}</p>
-                        <p class="truncate text-[11px] capitalize leading-tight text-gray-500">{{ session('admin_role') }}</p>
+                        <p class="truncate text-sm font-semibold leading-tight text-gray-800">{{ session('admin_name', $currentAdmin?->name) }}</p>
+                        <p class="truncate text-[11px] leading-tight text-gray-500">{{ $currentAdmin?->roleLabel() }}</p>
                     </div>
                 </div>
 

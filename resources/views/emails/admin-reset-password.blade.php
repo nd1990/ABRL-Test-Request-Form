@@ -12,7 +12,7 @@
                 <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,.06);">
                     <!-- Header -->
                     <tr>
-                        <td style="background-color:#3c50e0; padding:24px 32px;">
+                        <td style="background-color:#01458e; padding:24px 32px;">
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                 <tr>
                                     <td>
@@ -35,7 +35,7 @@
                             </p>
                             <p style="margin:0 0 24px; text-align:center;">
                                 <a href="{{ $resetUrl }}"
-                                   style="display:inline-block; background-color:#3c50e0; color:#ffffff; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:bold;">
+                                   style="display:inline-block; background-color:#01458e; color:#ffffff; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:bold;">
                                     Reset Password
                                 </a>
                             </p>
