@@ -1389,6 +1389,33 @@ function quotationApp() {
             return partial || '';
         },
 
+        firstAddressPart(addr, keys) {
+            if (!addr) return '';
+            for (const key of keys) {
+                const value = addr[key];
+                if (typeof value === 'string' && value.trim() !== '') return value.trim();
+            }
+            return '';
+        },
+
+        normalizeTaluka(value) {
+            return (value || '')
+                .replace(/\s+(talukas?|taluk|tehsils?|tahsil|sub-?districts?|subdivisions?|sub-?divisions?)$/i, '')
+                .trim();
+        },
+
+        extractDistrictTaluka(addr, state) {
+            let district = this.firstAddressPart(addr, ['state_district', 'district', 'city_district']);
+            let taluka = this.normalizeTaluka(this.firstAddressPart(addr, [
+                'taluka', 'taluk', 'tehsil', 'tahsil', 'subdistrict', 'sub_district', 'county',
+            ]));
+
+            const eq = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
+            if (eq(taluka, state)) taluka = '';
+
+            return { district, taluka };
+        },
+
         detectLocation() {
             if (!navigator.geolocation) {
                 alert('Geolocation is not supported by your browser.');
@@ -1411,16 +1438,12 @@ function quotationApp() {
                             let town = addr.city || addr.town || addr.village || addr.hamlet || addr.municipality || addr.county || '';
                             const state = addr.state || addr.province || addr.state_district || addr.region || addr.island || '';
                             const country = this.normalizeCountry(addr.country);
-                            let district = addr.state_district || addr.district || '';
-                            let taluka = addr.taluka || addr.subdistrict || addr.county_district || '';
+                            let { district, taluka } = this.extractDistrictTaluka(addr, state);
 
                             if (country === 'India') {
                                 if (!(town && this.cityStateMap.hasOwnProperty(town))) {
                                     town = addr.state_district || addr.district || addr.city_district || town || '';
                                 }
-                                if (district === town) district = '';
-                                if (taluka === town || taluka === district || taluka === state) taluka = '';
-                                if (district === taluka) taluka = '';
                             } else {
                                 district = '';
                                 taluka = '';
@@ -1519,16 +1542,12 @@ function quotationApp() {
             let city = addr.city || addr.town || addr.village || addr.hamlet || addr.municipality || addr.county || '';
             const state = addr.state || addr.province || '';
             const country = this.normalizeCountry(addr.country);
-            let district = addr.state_district || addr.district || '';
-            let taluka = addr.taluka || addr.subdistrict || '';
+            let { district, taluka } = this.extractDistrictTaluka(addr, state);
 
             if (country === 'India') {
                 if (!(city && this.cityStateMap.hasOwnProperty(city))) {
                     city = addr.county || addr.municipality || city || '';
                 }
-                if (district === city) district = '';
-                if (taluka === city || taluka === district || taluka === state) taluka = '';
-                if (district === taluka) taluka = '';
             } else {
                 city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
                 district = '';
