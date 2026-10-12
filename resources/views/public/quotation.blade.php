@@ -144,12 +144,30 @@
                         <!-- Address -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Complete Address <span class="text-gray-400">(for Report &amp; Invoice)</span> <span class="text-rose-500">*</span></label>
-                            <button type="button" @click="detectLocation()" :disabled="detectingLocation"
-                                class="inline-flex items-center gap-2 text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg px-3 py-1.5 mb-3 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                                <svg x-show="!detectingLocation" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-                                <span x-show="detectingLocation" class="spinner" style="width:12px;height:12px;border-width:1.5px;"></span>
-                                <span x-text="detectingLocation ? 'Detecting...' : 'Detect my location'"></span>
-                            </button>
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+                                <button type="button" @click="detectLocation()" :disabled="detectingLocation"
+                                    class="inline-flex items-center justify-center gap-2 text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg px-3 py-2 transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0">
+                                    <svg x-show="!detectingLocation" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+                                    <span x-show="detectingLocation" class="spinner" style="width:12px;height:12px;border-width:1.5px;"></span>
+                                    <span x-text="detectingLocation ? 'Detecting...' : 'Detect my location'"></span>
+                                </button>
+                                <div class="relative flex-1 min-w-0">
+                                    <input type="text" x-model="addressSearch" @input="onAddressSearchInput()"
+                                        placeholder="Search &amp; autofill address (e.g. GIDC Panoli, Bharuch)"
+                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                                    <div x-show="addressSearchResults.length" x-cloak
+                                        class="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
+                                        <template x-for="(r, i) in addressSearchResults" :key="i">
+                                            <button type="button" @click="selectAddressSearchResult(i)"
+                                                class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 transition border-b border-gray-100 last:border-0">
+                                                <span class="block truncate" x-text="r.display_name"></span>
+                                            </button>
+                                        </template>
+                                        <p x-show="addressSearching" class="px-3.5 py-2.5 text-xs text-gray-400">Searching...</p>
+                                        <p x-show="!addressSearching && addressSearch && addressSearchResults.length === 0" class="px-3.5 py-2.5 text-xs text-gray-400">No matches found. Please enter the address manually.</p>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <div class="sm:col-span-3">
                                     <input type="text" x-model="form.address" placeholder="Street Address"
@@ -198,23 +216,39 @@
                                         class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                         :class="shouldShowValidation(1) && !form.postal_code.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
                                 </div>
+                                <div x-show="form.country === 'India'" x-cloak>
+                                    <input type="text" id="district" x-model="form.district" placeholder="District / County"
+                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                                </div>
+                                <div x-show="form.country === 'India'" x-cloak>
+                                    <input type="text" id="taluka" x-model="form.taluka" placeholder="Taluka / Sub-district"
+                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Different Courier Address -->
+                        <!-- Address for Courier -->
                         <div>
-                            <label class="flex items-center gap-2.5 cursor-pointer select-none">
-                                <input type="checkbox" x-model="form.different_courier_address"
-                                    class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
-                                <span class="text-sm text-gray-700">Provide a different courier address for report &amp; invoice delivery</span>
-                            </label>
-                            <div x-show="form.different_courier_address" x-cloak class="mt-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Address for Courier <span class="text-gray-400">(for Report &amp; Invoice)</span></label>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                                    <input type="radio" name="courier_option" value="same" x-model="form.courier_option"
+                                        class="w-4 h-4 border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                    <span class="text-sm text-gray-700">Same as Above</span>
+                                </label>
+                                <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                                    <input type="radio" name="courier_option" value="different" x-model="form.courier_option"
+                                        class="w-4 h-4 border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                    <span class="text-sm text-gray-700">Provide Different Address</span>
+                                </label>
+                            </div>
+                            <div x-show="form.courier_option === 'different'" x-cloak class="mt-3">
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Courier Address <span class="text-gray-400">(for Report &amp; Invoice)</span> <span class="text-rose-500">*</span></label>
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                     <div class="sm:col-span-3">
                                         <input type="text" x-model="form.courier_address" placeholder="Street Address"
                                             class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="shouldShowValidation(1) && form.different_courier_address && !form.courier_address.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                            :class="shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_address.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
                                     </div>
                                     <div class="sm:col-span-3">
                                         <input type="text" x-model="form.courier_address_line2" placeholder="Street Address Line 2"
@@ -233,7 +267,7 @@
                                         <template x-if="form.courier_country === 'India'">
                                             <select id="courier_city" x-model="form.courier_city" @change="onCourierCityChange()"
                                                 class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
-                                                :class="shouldShowValidation(1) && form.different_courier_address && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                                :class="shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
                                                 <option value="">Select City</option>
                                                 <template x-for="city in cityOptions()" :key="'c-'+city">
                                                     <option x-bind:value="city" x-text="city"></option>
@@ -243,7 +277,7 @@
                                         <template x-if="form.courier_country !== 'India'">
                                             <input type="text" id="courier_city" x-model="form.courier_city" placeholder="City"
                                                 class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                                :class="shouldShowValidation(1) && form.different_courier_address && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                                :class="shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
                                         </template>
                                     </div>
                                     <div>
@@ -255,7 +289,7 @@
                                     <div>
                                         <input type="text" id="courier_postal_code" x-model="form.courier_postal_code" placeholder="Postal / Zip Code"
                                             class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="shouldShowValidation(1) && form.different_courier_address && !form.courier_postal_code.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                            :class="shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_postal_code.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
                                     </div>
                                 </div>
                             </div>
@@ -338,15 +372,11 @@
                             <p class="text-sm text-gray-500 mt-0.5">Provide details for each sample.</p>
                         </div>
                     </div>
-                    <div class="mb-5 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                    <div class="mb-5 p-4 bg-gray-50 border border-gray-200 rounded-xl">
                         <div class="flex items-start gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-                            <p class="text-sm font-medium text-amber-800">It is required to fill out the test report form separately for each sample.</p>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12.01" y2="16" /><path d="M12 8v4" /></svg>
+                            <p class="text-sm font-medium text-gray-600">It is required to fill out the test report form separately for each sample.</p>
                         </div>
-                    </div>
-                    <div x-show="shouldShowValidation(2) && !hasDocuments()" x-cloak class="mb-5 p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-rose-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
-                        <p class="text-sm font-medium text-rose-800">Please upload at least one document (MSDS or a reference document).</p>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
@@ -401,64 +431,17 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" style="width:18px;height:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" /></svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Document Uploads <span class="text-rose-500">*</span></h3>
-                                <p class="text-xs text-gray-500 mt-0.5">Upload MSDS and/or other supporting reference documents. <span class="font-medium text-gray-600">At least one document is required.</span></p>
+                                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Document Uploads <span class="text-gray-400">(If Any)</span></h3>
+                                <p class="text-xs text-gray-500 mt-0.5">Upload up to 2 documents (optional).</p>
                             </div>
                         </div>
 
-                        <!-- MSDS Report (single file) -->
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">MSDS Report <span class="font-normal text-gray-400">(Single file · PDF, DOC, DOCX · max 10 MB)</span></label>
-
-                            <!-- Dropzone when nothing selected -->
-                            <div x-show="!msdsFile" @click="$refs.msdsInput.click()"
-                                @dragover.prevent.stop="msdsDragOver = true"
-                                @dragleave.prevent.stop="msdsDragOver = false"
-                                @drop.prevent.stop="handleMsdsDrop($event)"
-                                class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition group"
-                                :class="msdsDragOver ? 'border-indigo-400 bg-indigo-50/50' : 'border-gray-300 hover:border-indigo-400 hover:bg-indigo-50/30'">
-                                <div class="flex flex-col items-center gap-2">
-                                    <span class="w-11 h-11 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-100 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
-                                    </span>
-                                    <p class="text-sm font-medium text-gray-700">Click to upload or drag &amp; drop</p>
-                                    <p class="text-xs text-gray-400">Single MSDS document · PDF, DOC, DOCX up to 10 MB</p>
-                                </div>
-                            </div>
-
-                            <!-- Selected MSDS file -->
-                            <div x-show="msdsFile" class="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <span class="w-9 h-9 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" style="width:18px;height:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-                                    </span>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-semibold text-gray-900 truncate" x-text="msdsFile ? msdsFile.name : ''"></p>
-                                        <p class="text-xs text-gray-500 mt-0.5" x-text="msdsFile && msdsFile.size ? formatFileSize(msdsFile.size) : ''"></p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <button type="button" @click="$refs.msdsInput.click()"
-                                        class="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg px-3 py-1.5 transition">
-                                        Replace
-                                    </button>
-                                    <button type="button" @click="clearMsdsFile()"
-                                        class="inline-flex items-center gap-1.5 text-xs font-medium text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg px-3 py-1.5 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-                                        Remove
-                                    </button>
-                                </div>
-                            </div>
-                            <p x-show="msdsError" class="text-xs text-rose-500 mt-1.5" x-text="msdsError"></p>
-                            <input type="file" x-ref="msdsInput" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="hidden" @change="onMsdsSelect($event)">
-                        </div>
-
-                        <!-- Other Reference Documents (multiple files) -->
+                        <!-- Documents (multiple files) -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Other Reference Documents <span class="font-normal text-gray-400">(Multiple files · PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG · max 10 MB each)</span></label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Documents <span class="font-normal text-gray-400">(Up to 2 files · PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG · max 10 MB each)</span></label>
 
                             <!-- Dropzone -->
-                            <div @click="$refs.otherDocsInput.click()"
+                            <div x-show="otherFiles.length < 2" @click="$refs.otherDocsInput.click()"
                                 @dragover.prevent.stop="otherDragOver = true"
                                 @dragleave.prevent.stop="otherDragOver = false"
                                 @drop.prevent.stop="handleOtherDrop($event)"
@@ -468,8 +451,8 @@
                                     <span class="w-11 h-11 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-100 transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                                     </span>
-                                    <p class="text-sm font-medium text-gray-700">Click to upload or drag &amp; drop multiple files</p>
-                                    <p class="text-xs text-gray-400">PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG up to 10 MB each</p>
+                                    <p class="text-sm font-medium text-gray-700">Click to upload or drag &amp; drop</p>
+                                    <p class="text-xs text-gray-400">Up to 2 files · PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG · max 10 MB each</p>
                                 </div>
                             </div>
 
@@ -516,13 +499,10 @@
 
             <!-- ================= STEP 3: SELECT TESTS ================= -->
             <section x-show="step === 3" x-cloak class="step-enter">
-                <div class="flex items-center justify-between mb-5">
-                    <div>
-                        <h2 class="text-lg sm:text-xl font-bold text-gray-900">Select Tests</h2>
-                        <p class="text-sm text-gray-500 mt-0.5" x-text="'Choose the tests you need. (' + selectedTests.length + '/' + maxTests + ' selected)'"></p>
+                <div class="mb-5">
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-900">Select Tests to Be Performed</h2>
+                        <p class="text-sm text-gray-500 mt-0.5" x-text="'Select the parameters to be tested. (' + selectedTests.length + '/' + maxTests + ' selected)'"></p>
                     </div>
-                    <span x-show="selectedTests.length > 0" class="text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full" x-text="selectedTests.length + ' test(s) selected'"></span>
-                </div>
 
                 <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div class="flex items-center gap-2">
@@ -543,102 +523,73 @@
                     <span class="w-1.5 h-1.5 bg-rose-500 rounded-full shrink-0"></span>Please select at least one test.
                 </div>
 
-                <div class="space-y-4">
-                    <template x-if="activeSlot()">
-                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
-                            <div class="flex items-center justify-between gap-3 mb-4">
-                                <span class="text-sm font-bold text-gray-800">Select the Parameter to be Tested</span>
-                                <span x-show="activeSlot().parameter" class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full" x-text="activeSlot().parameter ? 'Selected: ' + activeSlot().parameter.parameter : ''"></span>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">NABL / NON NABL</label>
-                                    <select x-model="activeSlot().nabl" @change="onSlotNabl(currentSlotIndex)"
-                                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
-                                        <option value="">Select</option>
-                                        <template x-for="t in nablOptions" :key="t"><option :value="t" x-text="t"></option></template>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Discipline</label>
-                                    <select x-model="activeSlot().discipline" @change="onSlotDiscipline(currentSlotIndex)" :disabled="!activeSlot().nabl"
-                                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white disabled:bg-gray-50 disabled:text-gray-400">
-                                        <option value="">Select</option>
-                                        <template x-for="d in activeSlot().disciplineOptions" :key="d"><option :value="d" x-text="d"></option></template>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Material / Product</label>
-                                    <select x-model="activeSlot().material" @change="onSlotMaterial(currentSlotIndex)" :disabled="!activeSlot().discipline"
-                                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white disabled:bg-gray-50 disabled:text-gray-400">
-                                        <option value="">Select</option>
-                                        <template x-for="m in activeSlot().materialOptions" :key="m"><option :value="m" x-text="m"></option></template>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Parameter / Test</label>
-                                    <select @change="onSlotParameter(currentSlotIndex, $event)" :disabled="!activeSlot().material || activeSlot().parameterOptions.length === 0"
-                                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white disabled:bg-gray-50 disabled:text-gray-400">
-                                        <option value="">Select</option>
-                                        <template x-for="p in activeSlot().parameterOptions" :key="p.id"><option :value="p.id" x-text="p.parameter"></option></template>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="mt-4 flex items-center justify-between gap-3">
-                                <span class="text-xs text-gray-400" x-text="activeSlot().loading ? 'Loading options...' : ''"></span>
-                                <button type="button" @click="addFromSlot(currentSlotIndex)" :disabled="!activeSlot().parameter"
-                                    class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-4 py-2 rounded-lg shadow transition disabled:opacity-40 disabled:cursor-not-allowed">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14" /><path d="M5 12h14" /></svg>
-                                    Add to Quotation
-                                </button>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Selected tests summary inside step 3 -->
-                <div x-show="selectedTests.length > 0" x-cloak class="mt-5 bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-                    <p class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-3">Selected Tests</p>
+                <!-- Confirmed test selections (inline) -->
+                <div class="space-y-3" x-show="selectedTests.length > 0" x-cloak>
                     <template x-for="(t, idx) in selectedTests" :key="'sel-' + t.id + '-' + idx">
-                        <div class="flex items-start justify-between gap-3 py-2 border-b border-gray-100 last:border-0">
-                            <div class="min-w-0 flex items-start gap-2.5">
-                                <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5" x-text="idx + 1"></span>
-                                <div>
-                                    <p class="text-sm leading-relaxed">
-                                        <span class="font-semibold text-gray-700">Parameter / Test:</span>
-                                        <span class="font-semibold text-gray-800" x-text="t.parameter"></span>
-                                    </p>
-                                    <div class="mt-1 space-y-1 text-xs leading-relaxed">
-                                        <p>
-                                            <span class="font-semibold text-gray-700">Discipline:</span>
-                                            <span class="text-gray-800" x-text="t.discipline"></span>
-                                        </p>
-                                        <p x-show="t.material">
-                                            <span class="font-semibold text-gray-700">Material / Product:</span>
-                                            <span class="text-gray-800" x-text="t.material"></span>
-                                        </p>
-                                        <p x-show="t.nabl">
-                                            <span class="font-semibold text-gray-700">NABL Selection:</span>
-                                            <span class="text-gray-800" x-text="t.nabl"></span>
-                                        </p>
-                                        <p x-show="t.method">
-                                            <span class="font-semibold text-gray-700">Method:</span>
-                                            <span class="text-gray-800 break-words" x-text="t.method"></span>
-                                        </p>
-                                    </div>
+                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex items-start justify-between gap-3">
+                            <div class="min-w-0 flex items-start gap-3">
+                                <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5" x-text="idx + 1"></span>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-gray-900 leading-snug" x-text="t.parameter"></p>
+                                    <p class="mt-1 text-xs text-gray-600" x-text="[t.discipline, t.nabl].filter(Boolean).join(' · ')"></p>
+                                    <p class="text-xs text-gray-400 mt-0.5" x-text="t.method || ''"></p>
                                 </div>
                             </div>
-                            <button type="button" @click="removeTest(idx)" class="text-gray-400 hover:text-rose-500 transition shrink-0">
+                            <button type="button" @click="removeTest(idx)" class="text-gray-400 hover:text-rose-500 transition shrink-0" title="Remove this test">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" /></svg>
                             </button>
                         </div>
                     </template>
                 </div>
 
-                <div x-show="selectedTests.length === 0" class="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-700 mt-5">
-                    No tests selected yet. Choose your tests from the NABL Testing Selection dropdowns above, then click "Add to Quotation".
+                <!-- Active slot: cascading dropdowns (parameter -> discipline -> nabl) -->
+                <div x-show="selectedTests.length < maxTests" class="mt-4 bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
+                    <div class="mb-4">
+                        <p class="text-sm font-bold text-gray-800" x-text="selectedTests.length > 0 ? 'Add Another Test' : 'Select a Test'"></p>
+                        <p class="text-xs text-gray-500 mt-0.5">Choose a parameter first, then its Discipline / Group, then NABL / NON NABL.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Parameter / Test</label>
+                            <select x-model="slot.parameter" @change="onSlotParameterChange()"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                <option value="">Select Parameter</option>
+                                <template x-for="p in slot.parameterOptions" :key="p">
+                                    <option :value="p" x-text="p"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <div x-show="slot.parameter" x-cloak>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Discipline / Group</label>
+                            <select x-model="slot.discipline" @change="onSlotDisciplineChange()"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                <option value="">Select Discipline / Group</option>
+                                <template x-for="d in slot.disciplineOptions" :key="d">
+                                    <option :value="d" x-text="d"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <div x-show="slot.discipline" x-cloak>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">NABL / NON NABL</label>
+                            <select x-model="slot.nabl" @change="onSlotNablChange()"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                <option value="">Select NABL / NON NABL</option>
+                                <template x-for="n in slot.nablOptions" :key="n">
+                                    <option :value="n" x-text="n"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <p x-show="slot.loading" class="text-xs text-gray-400">Loading options...</p>
+                        <p x-show="slotMessage" x-cloak class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2" x-text="slotMessage"></p>
+                    </div>
+                </div>
+
+                <div x-show="selectedTests.length >= maxTests" class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-600 mt-4">
+                    You have selected the maximum of <span class="font-bold text-gray-800" x-text="maxTests"></span> tests for this quotation.
                 </div>
 
                 <div class="mt-6 flex items-center justify-between">
@@ -705,9 +656,9 @@
                                     </div>
                                     <div class="sm:col-span-2">
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Address</p>
-                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.address, form.address_line2, form.city, form.state, form.postal_code, form.country].filter(Boolean).join(', ') || '—'"></p>
+                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.address, form.address_line2, form.city, form.district, form.taluka, form.state, form.postal_code, form.country].filter(Boolean).join(', ') || '—'"></p>
                                     </div>
-                                    <div class="sm:col-span-2" x-show="form.different_courier_address">
+                                    <div class="sm:col-span-2" x-show="form.courier_option === 'different'">
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Courier Address</p>
                                         <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.courier_address, form.courier_address_line2, form.courier_city, form.courier_state, form.courier_postal_code, form.courier_country].filter(Boolean).join(', ') || '—'"></p>
                                     </div>
@@ -754,7 +705,7 @@
                         </div>
 
                         <!-- Documents Attached (review) -->
-                        <div x-show="msdsFile || otherFiles.length || msdsFileName || otherFileNames.length" class="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/60 via-white to-white shadow-sm overflow-hidden">
+                        <div x-show="otherFiles.length > 0 || otherFileNames.length > 0" class="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/60 via-white to-white shadow-sm overflow-hidden">
                             <div class="px-4 sm:px-5 py-3.5 flex items-center gap-3 bg-gradient-to-r from-amber-500 to-orange-500">
                                 <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" /></svg>
@@ -762,23 +713,16 @@
                                 <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">Documents</h3>
                                 <span class="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-100 bg-amber-500/25 rounded-full px-2.5 py-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                                    <span x-text="fileCount() + ' file' + (fileCount() === 1 ? '' : 's')"></span>
+                                    <span x-text="otherFiles.length + ' file' + (otherFiles.length === 1 ? '' : 's')"></span>
                                 </span>
                             </div>
                             <div class="p-4 sm:p-5 space-y-3">
-                                <div x-show="msdsFile || msdsFileName">
-                                    <p class="text-[11px] uppercase tracking-wider text-amber-500 font-semibold">MSDS Report</p>
-                                    <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="msdsName()"></p>
-                                </div>
-                                <div x-show="otherFiles.length || otherFileNames.length">
-                                    <p class="text-[11px] uppercase tracking-wider text-amber-500 font-semibold">Other Documents</p>
-                                    <ul class="mt-1 space-y-1">
-                                        <template x-for="(fname, i) in otherFileList()" :key="'rf-' + i">
-                                            <li class="text-sm font-medium text-gray-900" x-text="fname"></li>
-                                        </template>
-                                    </ul>
-                                </div>
-                                <p x-show="!msdsFile && !otherFiles.length && (msdsFileName || otherFileNames.length)" class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                                <ul class="space-y-1">
+                                    <template x-for="(f, i) in otherFiles" :key="'rf-' + i">
+                                        <li class="text-sm font-medium text-gray-900" x-text="f.name"></li>
+                                    </template>
+                                </ul>
+                                <p x-show="otherFileNames.length" class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                                     These documents were attached earlier, but this page was reloaded so they can no longer be sent. Please go to Sample Details and re-upload them before submitting.
                                 </p>
                             </div>
@@ -812,7 +756,6 @@
                                                 <td class="py-3 px-4 sm:px-5 pr-3">
                                                     <p class="font-semibold text-gray-900" x-text="t.parameter"></p>
                                                     <p class="text-xs text-gray-500 mt-0.5" x-text="[t.discipline, t.material].filter(Boolean).join(' — ')"></p>
-                                                    <p class="text-xs text-gray-400" x-text="t.protocol_no ? 'Protocol: ' + t.protocol_no : ''"></p>
                                                 </td>
                                                 <td class="py-3 px-3 text-xs text-center">
                                                     <span x-show="t.nabl" class="inline-block text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-full px-2 py-0.5 font-bold text-[10px] uppercase tracking-wide" x-text="t.nabl"></span>
@@ -849,15 +792,6 @@
 
                 <!-- ===== TERMS & CONDITIONS ===== -->
                 <div class="mt-6 bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" id="accept_terms" x-model="acceptTerms"
-                            class="mt-0.5 w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                            :class="shouldShowTermsError ? 'border-rose-400 ring-2 ring-rose-200' : ''">
-                        <label for="accept_terms" class="block text-sm text-gray-700 cursor-pointer select-none">
-                            I have reviewed the preview above and <span class="font-semibold text-gray-900">accept the Terms &amp; Conditions</span>. I understand that by continuing, an official quotation will be generated and a copy will be emailed to <span class="font-semibold text-gray-900" x-text="form.email || 'my email address'"></span>.
-                        </label>
-                    </div>
-                    <p x-show="shouldShowTermsError" x-cloak class="mt-2 text-xs text-rose-500">Please accept the Terms &amp; Conditions to continue.</p>
 
                     <div class="mt-4 border-t border-gray-100 pt-4 text-xs leading-relaxed text-gray-500">
                         <p class="font-semibold text-gray-700 mb-2">TERMS &amp; CONDITIONS</p>
@@ -881,6 +815,18 @@
                             <li>The information provided by you will be kept confidential and not shared with anybody.</li>
                             <li>The sample to be delivered at: Agri Biochem Research Lab, Plot No. 906/13, Near Ganesh Anand Chokdi, G.I.D.C., Panoli - 394 116, Tal. Ankleshwar, District Bharuch, Gujarat, India. Mob No - +91-9925549313.</li>
                         </ol>
+                    </div>
+
+                    <div class="mt-5 border-t border-gray-100 pt-5">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" id="accept_terms" x-model="acceptTerms"
+                                class="mt-0.5 w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                :class="shouldShowTermsError ? 'border-rose-400 ring-2 ring-rose-200' : ''">
+                            <label for="accept_terms" class="block text-sm text-gray-700 cursor-pointer select-none">
+                                I confirm that I have read, understood, and agreed to the above <span class="font-semibold text-gray-900">Terms and Conditions</span>.
+                            </label>
+                        </div>
+                        <p x-show="shouldShowTermsError" x-cloak class="mt-2 text-xs text-rose-500">Please accept the Terms &amp; Conditions to continue.</p>
                     </div>
                 </div>
 
@@ -1000,9 +946,9 @@ function quotationApp() {
 
         form: {
             client_name: '', company_name: '', email: '', phone: '', mobile_country: '+91', mobile: '',
-            address: '', address_line2: '', city: '', state: '', postal_code: '', country: 'India',
+            address: '', address_line2: '', city: '', district: '', taluka: '', state: '', postal_code: '', country: 'India',
             gst_number: '',
-            different_courier_address: false, courier_address: '', courier_address_line2: '',
+            courier_option: 'same', different_courier_address: false, courier_address: '', courier_address_line2: '',
             courier_city: '', courier_state: '', courier_postal_code: '', courier_country: 'India',
             sample_name: '', sample_batch_no: '', sample_physical_form: '', sample_storage_condition: '',
             notes: ''
@@ -1010,17 +956,16 @@ function quotationApp() {
 
         detectingLocation: false,
 
-        msdsFile: null,
-        msdsError: '',
-        msdsDragOver: false,
-        msdsFileName: '',
-        msdsFileSize: 0,
+        addressSearch: '',
+        addressSearchResults: [],
+        addressSearching: false,
+        _addressSearchTimer: null,
+        _addressSearchSeq: 0,
         otherFiles: [],
         otherError: '',
         otherDragOver: false,
         otherFileNames: [],
         fileSizeLimitMB: 10,
-        msdsExts: ['pdf', 'doc', 'docx'],
         otherExts: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png'],
 
         mobileCodes: [
@@ -1335,51 +1280,6 @@ function quotationApp() {
             return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
         },
 
-        validateMsdsFile(file) {
-            if (!file) return null;
-            const ext = this.fileExtension(file.name);
-            if (!file.name || !this.msdsExts.includes(ext)) {
-                return 'Unsupported file type. Only PDF, DOC and DOCX are allowed.';
-            }
-            if (file.size > this.fileSizeLimitMB * 1024 * 1024) {
-                return `File is too large. Maximum allowed size is ${this.fileSizeLimitMB} MB.`;
-            }
-            return null;
-        },
-
-        onMsdsSelect(event) {
-            const file = event.target.files && event.target.files[0];
-            if (file) this.setMsdsFile(file);
-            event.target.value = '';
-        },
-
-        setMsdsFile(file) {
-            const err = this.validateMsdsFile(file);
-            if (err) {
-                this.msdsFile = null;
-                this.msdsError = err;
-                return;
-            }
-            this.msdsFile = file;
-            this.msdsFileName = file.name;
-            this.msdsFileSize = file.size;
-            this.msdsError = '';
-        },
-
-        handleMsdsDrop(event) {
-            this.msdsDragOver = false;
-            const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
-            if (file) this.setMsdsFile(file);
-        },
-
-        clearMsdsFile() {
-            this.msdsFile = null;
-            this.msdsFileName = '';
-            this.msdsFileSize = 0;
-            this.msdsError = '';
-            this.saveState();
-        },
-
         validateOtherFile(file) {
             if (!file) return null;
             const ext = this.fileExtension(file.name);
@@ -1406,8 +1306,13 @@ function quotationApp() {
 
         addOtherFiles(files) {
             let err = '';
+            const maxFiles = 2;
             const accepted = [];
             for (const f of files) {
+                if (this.otherFiles.length + accepted.length >= maxFiles) {
+                    err = `You can upload a maximum of ${maxFiles} documents.`;
+                    break;
+                }
                 const e = this.validateOtherFile(f);
                 if (e) {
                     if (!err) err = e;
@@ -1421,6 +1326,7 @@ function quotationApp() {
                 this.otherError = '';
             }
             if (err) this.otherError = err;
+            else this.otherError = '';
         },
 
         removeOtherFile(index) {
@@ -1430,25 +1336,6 @@ function quotationApp() {
             }
             this.otherError = '';
             this.saveState();
-        },
-
-        hasDocuments() {
-            return !!(this.msdsFile || this.otherFiles.length || this.msdsFileName || this.otherFileNames.length);
-        },
-
-        fileCount() {
-            let count = 0;
-            if (this.msdsFile || this.msdsFileName) count += 1;
-            count += this.otherFiles.length ? this.otherFiles.length : this.otherFileNames.length;
-            return count;
-        },
-
-        msdsName() {
-            return this.msdsFile ? this.msdsFile.name : (this.msdsFileName || '—');
-        },
-
-        otherFileList() {
-            return this.otherFiles.length ? this.otherFiles.map(f => f.name) : this.otherFileNames;
         },
 
         normalizeCountry(value) {
@@ -1524,16 +1411,26 @@ function quotationApp() {
                             let town = addr.city || addr.town || addr.village || addr.hamlet || addr.municipality || addr.county || '';
                             const state = addr.state || addr.province || addr.state_district || addr.region || addr.island || '';
                             const country = this.normalizeCountry(addr.country);
+                            let district = addr.state_district || addr.district || '';
+                            let taluka = addr.taluka || addr.subdistrict || addr.county_district || '';
 
                             if (country === 'India') {
                                 if (!(town && this.cityStateMap.hasOwnProperty(town))) {
                                     town = addr.state_district || addr.district || addr.city_district || town || '';
                                 }
+                                if (district === town) district = '';
+                                if (taluka === town || taluka === district || taluka === state) taluka = '';
+                                if (district === taluka) taluka = '';
+                            } else {
+                                district = '';
+                                taluka = '';
                             }
 
                             if (house || road) this.form.address = (house + road).trim();
                             if (sub) this.form.address_line2 = sub;
                             this.form.city = town;
+                            this.form.district = district;
+                            this.form.taluka = taluka;
                             this.form.state = state;
                             this.form.country = country;
                             this.onCountryChange();
@@ -1569,35 +1466,101 @@ function quotationApp() {
             );
         },
 
+        onAddressSearchInput() {
+            const q = (this.addressSearch || '').trim();
+            if (this._addressSearchTimer) {
+                clearTimeout(this._addressSearchTimer);
+                this._addressSearchTimer = null;
+            }
+            if (q.length < 3) {
+                this.addressSearchResults = [];
+                this.addressSearching = false;
+                return;
+            }
+            this.addressSearching = true;
+            this._addressSearchTimer = setTimeout(() => this.runAddressSearch(q), 350);
+        },
+
+        async runAddressSearch(q) {
+            const seq = ++this._addressSearchSeq;
+            try {
+                const params = new URLSearchParams({
+                    format: 'jsonv2', q, addressdetails: 1, limit: 8, 'accept-language': 'en'
+                });
+                const res = await fetch('https://nominatim.openstreetmap.org/search?' + params.toString(), {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                if (seq !== this._addressSearchSeq) return;
+                this.addressSearchResults = Array.isArray(data)
+                    ? data.map(r => ({ display_name: r.display_name, address: r.address || {} }))
+                    : [];
+            } catch (e) {
+                if (seq === this._addressSearchSeq) this.addressSearchResults = [];
+            } finally {
+                if (seq === this._addressSearchSeq) this.addressSearching = false;
+            }
+        },
+
+        selectAddressSearchResult(i) {
+            const item = this.addressSearchResults[i];
+            if (!item) return;
+            this.applyAddress(item.address);
+            this.addressSearch = item.display_name;
+            this.addressSearchResults = [];
+            this.addressSearching = false;
+        },
+
+        applyAddress(addr) {
+            if (!addr) return;
+            const road = [addr.road, addr.pedestrian, addr.footway, addr.path, addr.highway].filter(Boolean)[0] || '';
+            const house = addr.house_number ? addr.house_number + ', ' : '';
+            const sub = addr.neighbourhood || addr.suburb || addr.quarter || addr.locality || '';
+            let city = addr.city || addr.town || addr.village || addr.hamlet || addr.municipality || addr.county || '';
+            const state = addr.state || addr.province || '';
+            const country = this.normalizeCountry(addr.country);
+            let district = addr.state_district || addr.district || '';
+            let taluka = addr.taluka || addr.subdistrict || '';
+
+            if (country === 'India') {
+                if (!(city && this.cityStateMap.hasOwnProperty(city))) {
+                    city = addr.county || addr.municipality || city || '';
+                }
+                if (district === city) district = '';
+                if (taluka === city || taluka === district || taluka === state) taluka = '';
+                if (district === taluka) taluka = '';
+            } else {
+                city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
+                district = '';
+                taluka = '';
+            }
+
+            if (house || road) this.form.address = (house + road).trim();
+            this.form.address_line2 = sub;
+            this.form.city = city;
+            this.form.district = country === 'India' ? district : '';
+            this.form.taluka = country === 'India' ? taluka : '';
+            this.form.state = state;
+            this.form.postal_code = addr.postcode || '';
+            this.form.country = country;
+            this.onCountryChange();
+            if (country === 'India' && city && this.cityStateMap.hasOwnProperty(city)) {
+                this.form.state = this.cityStateMap[city];
+            }
+        },
+
         optionsUrl: '{{ route("lab-tests.options", [], false) }}',
 
-        nablOptions: [],
-        disciplineOptions: [],
-        materialOptions: [],
-        parameterOptions: [],
-
-        currentNabl: '',
-        currentDiscipline: '',
-        currentMaterial: '',
-        currentParameter: null,
-        noOfSamples: 1,
-        loadingCascade: false,
-        cascadeSeq: 0,
+        slot: {
+            parameter: '', discipline: '', nabl: '',
+            parameterOptions: [], disciplineOptions: [], nablOptions: [], tests: [],
+            loading: false, _seq: 0
+        },
+        slotMessage: '',
 
         selectedTests: [],
 
         maxTests: 5,
-        currentSlotIndex: 0,
-        slots: Array.from({ length: 5 }, (_, i) => ({
-            nabl: '', discipline: '', material: '', parameter: null,
-            disciplineOptions: [], materialOptions: [], parameterOptions: [],
-            loading: false, _seq: 0, index: i + 1
-        })),
-
-        activeSlot() {
-            if (this.currentSlotIndex >= this.maxTests) return null;
-            return this.slots[this.currentSlotIndex];
-        },
 
         _saveKey: 'abrl_quotation_form',
 
@@ -1612,11 +1575,8 @@ function quotationApp() {
                     limit_of_quantification: t.limit_of_quantification, remarks: t.remarks,
                     protocol_link: t.protocol_link, no_of_samples: t.no_of_samples
                 })),
-                currentSlotIndex: this.currentSlotIndex,
                 acceptTerms: this.acceptTerms,
                 submittedSteps: [...this.submittedSteps],
-                msdsFileName: this.msdsFile ? this.msdsFile.name : this.msdsFileName,
-                msdsFileSize: this.msdsFile ? this.msdsFile.size : this.msdsFileSize,
                 otherFileNames: this.otherFiles.length ? this.otherFiles.map(f => f.name) : this.otherFileNames,
             };
             try { localStorage.setItem(this._saveKey, JSON.stringify(state)); } catch (e) {}
@@ -1629,12 +1589,10 @@ function quotationApp() {
                 const state = JSON.parse(raw);
                 if (state.step) this.step = state.step;
                 if (state.form) Object.assign(this.form, state.form);
+                if (!this.form.courier_option) this.form.courier_option = 'same';
                 if (state.selectedTests) this.selectedTests = state.selectedTests;
-                if (state.currentSlotIndex !== undefined) this.currentSlotIndex = state.currentSlotIndex;
                 if (state.acceptTerms) this.acceptTerms = state.acceptTerms;
                 if (state.submittedSteps) this.submittedSteps = state.submittedSteps;
-                if (state.msdsFileName) this.msdsFileName = state.msdsFileName;
-                if (state.msdsFileSize) this.msdsFileSize = state.msdsFileSize;
                 if (state.otherFileNames) this.otherFileNames = state.otherFileNames;
                 return true;
             } catch (e) { return false; }
@@ -1656,132 +1614,17 @@ function quotationApp() {
 
         initApp() {
             this.restoreState();
-            this.loadOptions({});
+            this.slotLoad();
         },
 
-        async loadOptions(params, level) {
-            const seq = ++this.cascadeSeq;
-            this.loadingCascade = true;
-            this.serverError = '';
-            try {
-                const qs = new URLSearchParams(params).toString();
-                const res = await fetch(this.optionsUrl + (qs ? '?' + qs : ''), {
-                    headers: { 'Accept': 'application/json' }
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.message || 'Failed to load options');
-                if (seq !== this.cascadeSeq) return;
-                if (data.level === 'nabl') {
-                    this.nablOptions = data.options || [];
-                } else if (data.level === 'discipline') {
-                    this.disciplineOptions = data.options || [];
-                } else if (data.level === 'material') {
-                    this.materialOptions = data.options || [];
-                } else if (data.level === 'parameter') {
-                    this.parameterOptions = data.options || [];
-                }
-            } catch (e) {
-                if (seq === this.cascadeSeq) this.serverError = 'Unable to load options right now. Please refresh the page.';
-            } finally {
-                if (seq === this.cascadeSeq) this.loadingCascade = false;
-            }
-        },
-
-        selectNabl(type) {
-            if (this.currentNabl === type) { this.resetAfter('nabl'); return; }
-            this.currentNabl = type;
-            this.resetChildren('discipline');
-            this.loadOptions({ nabl: type });
-        },
-
-        selectDiscipline(d) {
-            if (this.currentDiscipline === d) { this.resetAfter('discipline'); return; }
-            this.currentDiscipline = d;
-            this.resetChildren('material');
-            this.loadOptions({ nabl: this.currentNabl, discipline: d });
-        },
-
-        selectMaterial(m) {
-            if (this.currentMaterial === m) { this.resetAfter('material'); return; }
-            this.currentMaterial = m;
-            this.resetChildren('parameter');
-            this.loadOptions({ nabl: this.currentNabl, discipline: this.currentDiscipline, material: m });
-        },
-
-        resetAfter(level) {
-            if (level === 'nabl') { this.resetChildren('discipline'); }
-            else if (level === 'discipline') { this.resetChildren('material'); }
-            else if (level === 'material') { this.resetChildren('parameter'); }
-        },
-
-        resetChildren(level) {
-            if (level === 'discipline') {
-                this.currentDiscipline = '';
-                this.disciplineOptions = [];
-            }
-            if (level === 'discipline' || level === 'material') {
-                this.currentMaterial = '';
-                this.materialOptions = [];
-            }
-            if (level === 'discipline' || level === 'material' || level === 'parameter') {
-                this.currentParameter = null;
-                this.parameterOptions = [];
-                this.noOfSamples = 1;
-            }
-        },
-
-        addTest() {
-            if (!this.currentParameter) return;
-            if (this.selectedTests.length >= this.maxTests) {
-                this.stepErrors[3] = [`Maximum ${this.maxTests} tests allowed per quotation. Please submit this form and create a new one for additional tests.`];
-                return;
-            }
-            const samples = Math.max(1, Number(this.noOfSamples) || 1);
-            this.selectedTests.push({
-                id: this.currentParameter.id,
-                parameter: this.currentParameter.parameter,
-                discipline: this.currentParameter.discipline,
-                material: this.currentParameter.material,
-                method: this.currentParameter.method,
-                sample_quantity: this.currentParameter.sample_quantity,
-                lead_time: this.currentParameter.lead_time,
-                protocol_no: this.currentParameter.protocol_no,
-                nabl_range: this.currentParameter.nabl_range,
-                limit_of_quantification: this.currentParameter.limit_of_quantification,
-                remarks: this.currentParameter.remarks,
-                protocol_link: this.currentParameter.protocol_link,
-                no_of_samples: samples
-            });
-            this.currentParameter = null;
-            this.noOfSamples = 1;
-            if (this.currentSlotIndex < this.maxTests - 1) {
-                this.currentSlotIndex++;
-            }
-            this.stepErrors[2] = [];
-            this.stepErrors[3] = [];
-            this.saveState();
-        },
-
-        removeTest(idx) {
-            this.selectedTests.splice(idx, 1);
-            const next = this.selectedTests.length;
-            if (next < this.currentSlotIndex) {
-                const s = this.slots[next];
-                s.nabl = ''; s.discipline = ''; s.material = ''; s.parameter = null;
-                s.disciplineOptions = []; s.materialOptions = []; s.parameterOptions = [];
-            }
-            this.currentSlotIndex = Math.min(next, this.maxTests - 1);
-            this.saveState();
-        },
-
-        async slotLoad(kind, i) {
-            const s = this.slots[i];
+        async slotLoad() {
+            const s = this.slot;
             const seq = ++s._seq;
             s.loading = true;
             const params = {};
-            if (s.nabl) params.nabl = s.nabl;
+            if (s.parameter) params.parameter = s.parameter;
             if (s.discipline) params.discipline = s.discipline;
-            if (s.material) params.material = s.material;
+            if (s.nabl) params.nabl = s.nabl;
             const qs = new URLSearchParams(params).toString();
             try {
                 const res = await fetch(this.optionsUrl + (qs ? '?' + qs : ''), {
@@ -1790,9 +1633,20 @@ function quotationApp() {
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.message || 'Failed to load options');
                 if (seq !== s._seq) return;
-                if (data.level === 'discipline') s.disciplineOptions = data.options || [];
-                else if (data.level === 'material') s.materialOptions = data.options || [];
-                else if (data.level === 'parameter') s.parameterOptions = data.options || [];
+                if (data.level === 'parameter') {
+                    s.parameterOptions = data.options || [];
+                } else if (data.level === 'discipline') {
+                    s.disciplineOptions = data.options || [];
+                } else if (data.level === 'nabl') {
+                    s.nablOptions = data.options || [];
+                } else if (data.level === 'test') {
+                    s.tests = data.tests || [];
+                    if (s.tests.length) {
+                        this.confirmTest(s.tests[0]);
+                    } else {
+                        this.slotMessage = 'No tests found for the selected Parameter, Discipline and NABL combination.';
+                    }
+                }
             } catch (e) {
                 if (seq === s._seq) this.serverError = 'Unable to load options right now. Please refresh the page.';
             } finally {
@@ -1800,52 +1654,67 @@ function quotationApp() {
             }
         },
 
-        onSlotNabl(i) {
-            const s = this.slots[i];
-            s.discipline = ''; s.material = ''; s.parameter = null;
-            s.disciplineOptions = []; s.materialOptions = []; s.parameterOptions = [];
-            if (s.nabl) this.slotLoad('discipline', i);
+        onSlotParameterChange() {
+            const s = this.slot;
+            s.discipline = ''; s.nabl = '';
+            s.disciplineOptions = []; s.nablOptions = []; s.tests = [];
+            this.slotMessage = '';
+            if (s.parameter) this.slotLoad();
         },
 
-        onSlotDiscipline(i) {
-            const s = this.slots[i];
-            s.material = ''; s.parameter = null;
-            s.materialOptions = []; s.parameterOptions = [];
-            if (s.discipline) this.slotLoad('material', i);
+        onSlotDisciplineChange() {
+            const s = this.slot;
+            s.nabl = '';
+            s.nablOptions = []; s.tests = [];
+            this.slotMessage = '';
+            if (s.discipline) this.slotLoad();
         },
 
-        onSlotMaterial(i) {
-            const s = this.slots[i];
-            s.parameter = null;
-            s.parameterOptions = [];
-            if (s.material) this.slotLoad('parameter', i);
+        onSlotNablChange() {
+            const s = this.slot;
+            s.tests = [];
+            this.slotMessage = '';
+            if (s.nabl) this.slotLoad();
         },
 
-        onSlotParameter(i, event) {
-            const s = this.slots[i];
-            const id = parseInt(event.target.value, 10);
-            s.parameter = (s.parameterOptions || []).find(p => p.id === id) || null;
-        },
-
-        addFromSlot(i) {
-            const s = this.slots[i];
-            if (!s.parameter) return;
+        confirmTest(t) {
+            if (!t) return;
             if (this.selectedTests.length >= this.maxTests) {
-                this.stepErrors[3] = [`Maximum ${this.maxTests} tests allowed per quotation. Please submit this form and create a new one for additional tests.`];
+                this.slotMessage = `Maximum ${this.maxTests} tests allowed per quotation. Please submit this form and create a new one for additional tests.`;
+                this.resetSlot();
                 return;
             }
-            const t = s.parameter;
-            this.selectedTests.push({
-                id: t.id, parameter: t.parameter, discipline: t.discipline, material: t.material,
-                nabl: s.nabl, method: t.method, sample_quantity: t.sample_quantity, lead_time: t.lead_time,
-                protocol_no: t.protocol_no, nabl_range: t.nabl_range,
-                limit_of_quantification: t.limit_of_quantification, remarks: t.remarks,
-                protocol_link: t.protocol_link, no_of_samples: 1
-            });
-            if (this.currentSlotIndex < this.maxTests - 1) {
-                this.currentSlotIndex++;
+            const key = [t.parameter, t.discipline, t.nabl].join('|');
+            const duplicate = this.selectedTests.some(x => [x.parameter, x.discipline, x.nabl].join('|') === key);
+            if (duplicate) {
+                this.slotMessage = 'This Parameter, Discipline and NABL combination is already in your selection. Please choose another Parameter.';
+                return;
             }
+            this.selectedTests.push({
+                id: t.id, parameter: t.parameter, discipline: t.discipline, material: t.material || '',
+                nabl: t.nabl, method: t.method || '', sample_quantity: t.sample_quantity || '',
+                lead_time: t.lead_time || '', protocol_no: t.protocol_no || '', nabl_range: t.nabl_range || '',
+                limit_of_quantification: t.limit_of_quantification || '', remarks: t.remarks || '',
+                protocol_link: t.protocol_link || '', no_of_samples: 1
+            });
             this.stepErrors[2] = [];
+            this.stepErrors[3] = [];
+            this.resetSlot();
+            this.saveState();
+        },
+
+        resetSlot() {
+            const s = this.slot;
+            s._seq++;
+            s.parameter = ''; s.discipline = ''; s.nabl = '';
+            s.disciplineOptions = []; s.nablOptions = []; s.tests = [];
+            this.slotMessage = '';
+        },
+
+        removeTest(idx) {
+            if (idx >= 0 && idx < this.selectedTests.length) {
+                this.selectedTests.splice(idx, 1);
+            }
             this.stepErrors[3] = [];
             this.saveState();
         },
@@ -1866,7 +1735,7 @@ function quotationApp() {
                 else if (this.form.country === 'India' && !this.form.state) { this.stepErrors[1].push('Please enter state.'); if (!this.firstErrorId) this.firstErrorId = 'state'; }
                 if (!this.form.city) { this.stepErrors[1].push('Please enter city.'); if (!this.firstErrorId) this.firstErrorId = 'city'; }
                 if (!this.form.postal_code.trim()) { this.stepErrors[1].push('Please enter postal code.'); if (!this.firstErrorId) this.firstErrorId = 'postal_code'; }
-                if (this.form.different_courier_address) {
+                if (this.form.courier_option === 'different') {
                     if (!this.form.courier_address.trim()) { this.stepErrors[1].push('Please enter courier address.'); if (!this.firstErrorId) this.firstErrorId = 'courier_address'; }
                     if (!this.form.courier_country) { this.stepErrors[1].push('Please select courier country.'); if (!this.firstErrorId) this.firstErrorId = 'courier_country'; }
                     if (!this.form.courier_city.trim()) { this.stepErrors[1].push('Please enter courier city.'); if (!this.firstErrorId) this.firstErrorId = 'courier_city'; }
@@ -1888,7 +1757,6 @@ function quotationApp() {
                 if (!this.form.sample_batch_no.trim()) { this.stepErrors[2].push('Please enter sample batch no.'); if (!this.firstErrorId) this.firstErrorId = 'sample_batch_no'; }
                 if (!this.form.sample_physical_form) { this.stepErrors[2].push('Please select sample physical form.'); if (!this.firstErrorId) this.firstErrorId = 'sample_physical_form'; }
                 if (!this.form.sample_storage_condition) { this.stepErrors[2].push('Please select storage condition.'); if (!this.firstErrorId) this.firstErrorId = 'sample_storage_condition'; }
-                if (!this.hasDocuments()) { this.stepErrors[2].push('Please upload at least one document (MSDS or a reference document).'); }
             }
 
             if (n === 3) {
@@ -1936,26 +1804,28 @@ function quotationApp() {
             formData.append('address', this.form.address || '');
             formData.append('address_line2', this.form.address_line2 || '');
             formData.append('city', this.form.city || '');
+            formData.append('district', this.form.district || '');
+            formData.append('taluka', this.form.taluka || '');
             formData.append('state', this.form.state || '');
             formData.append('postal_code', this.form.postal_code || '');
             formData.append('country', this.form.country || '');
-            formData.append('different_courier_address', this.form.different_courier_address ? '1' : '0');
-            formData.append('courier_address', this.form.different_courier_address ? (this.form.courier_address || '') : '');
-            formData.append('courier_address_line2', this.form.different_courier_address ? (this.form.courier_address_line2 || '') : '');
-            formData.append('courier_city', this.form.different_courier_address ? (this.form.courier_city || '') : '');
-            formData.append('courier_state', this.form.different_courier_address ? (this.form.courier_state || '') : '');
-            formData.append('courier_postal_code', this.form.different_courier_address ? (this.form.courier_postal_code || '') : '');
-            formData.append('courier_country', this.form.different_courier_address ? (this.form.courier_country || '') : '');
+            const courierDifferent = this.form.courier_option === 'different';
+            formData.append('courier_option', this.form.courier_option || 'same');
+            formData.append('different_courier_address', courierDifferent ? '1' : '0');
+            formData.append('courier_address', courierDifferent ? (this.form.courier_address || '') : '');
+            formData.append('courier_address_line2', courierDifferent ? (this.form.courier_address_line2 || '') : '');
+            formData.append('courier_city', courierDifferent ? (this.form.courier_city || '') : '');
+            formData.append('courier_state', courierDifferent ? (this.form.courier_state || '') : '');
+            formData.append('courier_postal_code', courierDifferent ? (this.form.courier_postal_code || '') : '');
+            formData.append('courier_country', courierDifferent ? (this.form.courier_country || '') : '');
             formData.append('gst_number', this.form.gst_number || '');
             formData.append('sample_name', this.form.sample_name || '');
             formData.append('sample_batch_no', this.form.sample_batch_no || '');
             formData.append('sample_physical_form', this.form.sample_physical_form || '');
             formData.append('sample_storage_condition', this.form.sample_storage_condition || '');
             formData.append('notes', this.form.notes || '');
+            formData.append('accept_terms', this.acceptTerms ? '1' : '0');
 
-            if (this.msdsFile) {
-                formData.append('msds_report', this.msdsFile, this.msdsFile.name);
-            }
             this.otherFiles.forEach((f, i) => {
                 formData.append('other_documents[]', f, f.name);
             });
@@ -2049,9 +1919,11 @@ function quotationApp() {
                     this.clearState();
                     window.location.href = data.redirect;
                 } else {
-                    this.serverError = data.message || data.errors
-                        ? (data.errors && data.errors.lab_tests ? data.errors.lab_tests[0] : (data.errors && data.errors.documents ? data.errors.documents[0] : (data.message || 'Something went wrong. Please try again.')))
-                        : 'Something went wrong. Please try again.';
+                    const errors = data.errors || {};
+                    const firstError = errors.lab_tests?.[0] || errors.other_documents?.[0] || errors.accept_terms?.[0]
+                        || errors.services?.[0] || Object.values(errors)[0]?.[0] || data.message
+                        || 'Something went wrong. Please try again.';
+                    this.serverError = firstError;
                     this.stopSubmitProgress();
                 }
             })

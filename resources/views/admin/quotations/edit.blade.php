@@ -72,6 +72,16 @@
                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
                     </div>
                     <div>
+                        <label for="district" class="block text-xs font-medium text-gray-700 mb-1">District</label>
+                        <input type="text" id="district" name="district" value="{{ old('district', $quotation->district) }}"
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+                    </div>
+                    <div>
+                        <label for="taluka" class="block text-xs font-medium text-gray-700 mb-1">Taluka</label>
+                        <input type="text" id="taluka" name="taluka" value="{{ old('taluka', $quotation->taluka) }}"
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+                    </div>
+                    <div>
                         <label for="state" class="block text-xs font-medium text-gray-700 mb-1">State</label>
                         <input type="text" id="state" name="state" value="{{ old('state', $quotation->state) }}"
                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">

@@ -111,7 +111,7 @@
                     <div class="sm:col-span-2">
                         <p class="text-xs text-gray-500">Address</p>
                         <p class="text-sm font-medium text-gray-900">
-                            {{ $quotation->address ?: '' }}{{ $quotation->address_line2 ? ', ' . $quotation->address_line2 : '' }}{{ $quotation->city ? ', ' . $quotation->city : '' }}{{ $quotation->state ? ', ' . $quotation->state : '' }}{{ $quotation->postal_code ? ', ' . $quotation->postal_code : '' }}{{ $quotation->country ? ', ' . $quotation->country : '' }}
+                            {{ $quotation->address ?: '' }}{{ $quotation->address_line2 ? ', ' . $quotation->address_line2 : '' }}{{ $quotation->city ? ', ' . $quotation->city : '' }}{{ $quotation->district ? ', ' . $quotation->district : '' }}{{ $quotation->taluka ? ', ' . $quotation->taluka : '' }}{{ $quotation->state ? ', ' . $quotation->state : '' }}{{ $quotation->postal_code ? ', ' . $quotation->postal_code : '' }}{{ $quotation->country ? ', ' . $quotation->country : '' }}
                             @if(!$quotation->address && !$quotation->city && !$quotation->state && !$quotation->country && !$quotation->postal_code) — @endif
                         </p>
                     </div>

@@ -50,14 +50,17 @@ class StoreQuotationRequest extends FormRequest
             'mobile_country' => ['required', 'string', 'max:6'],
             'address' => ['nullable', 'string', 'max:500'],
             'city' => ['nullable', 'string', 'max:191'],
+            'district' => ['nullable', 'string', 'max:191'],
+            'taluka' => ['nullable', 'string', 'max:191'],
             'state' => ['nullable', 'string', 'max:191'],
             'postal_code' => ['nullable', 'string', 'max:20'],
             'different_courier_address' => ['sometimes', 'boolean'],
-            'courier_address' => ['nullable', 'string', 'max:500'],
-            'courier_city' => ['nullable', 'string', 'max:191'],
+            'courier_option' => ['sometimes', 'string', 'in:same,different'],
+            'courier_address' => ['nullable', 'string', 'max:500', 'required_if:different_courier_address,1'],
+            'courier_city' => ['nullable', 'string', 'max:191', 'required_if:different_courier_address,1'],
             'courier_state' => ['nullable', 'string', 'max:191'],
-            'courier_postal_code' => ['nullable', 'string', 'max:20'],
-            'courier_country' => ['nullable', 'string', 'max:191'],
+            'courier_postal_code' => ['nullable', 'string', 'max:20', 'required_if:different_courier_address,1'],
+            'courier_country' => ['nullable', 'string', 'max:191', 'required_if:different_courier_address,1'],
             'country' => ['nullable', 'string', 'max:191'],
             'gst_number' => $gstRules,
             'services' => ['sometimes', 'array', 'min:1'],
@@ -74,9 +77,11 @@ class StoreQuotationRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:5000'],
             'expected_timeline' => ['nullable', 'string', 'max:191'],
             'preferred_contact_method' => ['nullable', 'string', 'max:191'],
-            'msds_report' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
-            'other_documents' => ['nullable', 'array', 'max:10'],
+            'documents' => ['nullable', 'array', 'max:2'],
+            'documents.*' => ['file', 'mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png', 'max:10240'],
+            'other_documents' => ['nullable', 'array', 'max:2'],
             'other_documents.*' => ['file', 'mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png', 'max:10240'],
+            'accept_terms' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -89,6 +94,9 @@ class StoreQuotationRequest extends FormRequest
             'services.required' => 'Please select at least one service.',
             'services.*.quantity.min' => 'Quantity must be at least 1.',
             'lab_tests.required' => 'Please select at least one test.',
+            'other_documents.max' => 'You can upload up to 2 documents.',
+            'documents.max' => 'You can upload up to 2 documents.',
+            'accept_terms.accepted' => 'Please accept the Terms & Conditions to continue.',
         ];
     }
 
@@ -102,10 +110,8 @@ class StoreQuotationRequest extends FormRequest
                 $validator->errors()->add('lab_tests', 'Please select at least one item.');
             }
 
-            $hasMsds = $this->hasFile('msds_report');
-            $hasOther = $this->hasFile('other_documents');
-            if (!$hasMsds && !$hasOther) {
-                $validator->errors()->add('documents', 'Please upload at least one document (MSDS or a reference document).');
+            if (!$this->boolean('accept_terms')) {
+                $validator->errors()->add('accept_terms', 'Please accept the Terms & Conditions to continue.');
             }
         });
     }

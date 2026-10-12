@@ -25,6 +25,8 @@ class UpdateQuotationRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:500'],
             'address_line2' => ['nullable', 'string', 'max:500'],
             'city' => ['nullable', 'string', 'max:191'],
+            'district' => ['nullable', 'string', 'max:191'],
+            'taluka' => ['nullable', 'string', 'max:191'],
             'state' => ['nullable', 'string', 'max:191'],
             'postal_code' => ['nullable', 'string', 'max:20'],
             'country' => ['nullable', 'string', 'max:191'],

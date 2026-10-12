@@ -62,13 +62,6 @@ class PublicQuotationController extends Controller
 
             $fileUpdates = [];
 
-            if ($request->hasFile('msds_report')) {
-                $uploaded = $request->file('msds_report');
-                $path = $uploaded->store('quotation-docs/' . $quotation->id, 'public');
-                $fileUpdates['msds_report_path'] = $path;
-                $fileUpdates['msds_report_name'] = $uploaded->getClientOriginalName();
-            }
-
             if ($request->hasFile('other_documents')) {
                 $docs = [];
                 foreach ($request->file('other_documents') as $file) {
@@ -149,6 +142,8 @@ class PublicQuotationController extends Controller
                 'address' => $data['address'] ?? null,
                 'address_line2' => $data['address_line2'] ?? null,
                 'city' => $data['city'] ?? null,
+                'district' => $data['district'] ?? null,
+                'taluka' => $data['taluka'] ?? null,
                 'state' => $data['state'] ?? null,
                 'country' => $data['country'] ?? null,
                 'postal_code' => $data['postal_code'] ?? null,

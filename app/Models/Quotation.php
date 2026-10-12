@@ -12,7 +12,7 @@ class Quotation extends Model
         'quotation_number', 'client_name', 'company_name', 'sample_name', 'sample_batch_no',
         'sample_physical_form', 'sample_storage_condition',
         'email', 'phone',
-        'address', 'address_line2', 'city', 'state', 'country', 'gst_number', 'pan_number',
+        'address', 'address_line2', 'city', 'district', 'taluka', 'state', 'country', 'gst_number', 'pan_number',
         'courier_address', 'courier_address_line2', 'courier_city', 'courier_state', 'courier_postal_code', 'courier_country',
         'quotation_date', 'valid_until', 'subtotal', 'discount', 'tax', 'grand_total',
         'status', 'pdf_path', 'email_status', 'email_sent_at',
