@@ -33,18 +33,6 @@ return [
             ],
         ],
 
-        'invoices' => [
-            'label' => 'Invoices',
-            'view' => 'invoices.view',
-            'permissions' => [
-                'invoices.view' => 'View invoices',
-                'invoices.create' => 'Create invoices',
-                'invoices.edit' => 'Edit invoices',
-                'invoices.delete' => 'Delete invoices',
-                'invoices.send_email' => 'Send invoice emails',
-            ],
-        ],
-
         'services' => [
             'label' => 'Lab Tests',
             'view' => 'lab_tests.view',
@@ -105,11 +93,6 @@ return [
         'quotations.edit',
         'quotations.delete',
         'quotations.send_email',
-        'invoices.view',
-        'invoices.create',
-        'invoices.edit',
-        'invoices.delete',
-        'invoices.send_email',
         'lab_tests.view',
         'lab_tests.create',
         'lab_tests.edit',
