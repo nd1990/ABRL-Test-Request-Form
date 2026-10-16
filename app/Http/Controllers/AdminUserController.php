@@ -18,6 +18,7 @@ class AdminUserController extends Controller
     {
         $users = Admin::with('permissions')
             ->where('is_hidden', false)
+            ->where('role', '!=', Admin::ROLE_MASTER)
             ->latest()
             ->paginate(20);
 
