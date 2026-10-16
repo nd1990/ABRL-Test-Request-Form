@@ -200,7 +200,7 @@
             x-transition:leave="ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
             class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" style="display:none;">
             <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl flex items-center justify-between z-10">
-                <h3 class="text-lg font-bold text-gray-900">Import Lab Tests from CSV</h3>
+                <h3 class="text-lg font-bold text-gray-900">Import Master Sheet</h3>
                 <button @click="closeImport()" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
@@ -213,7 +213,7 @@
                     <div class="flex items-start gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         <p class="text-sm text-amber-800">
-                            Existing lab tests <span class="font-semibold">will remain unchanged</span>. Only new tests (not already present with the same NABL type, Discipline, Material, and Parameter) will be added from the CSV.
+                            Existing lab tests <span class="font-semibold">will remain unchanged</span>. Only new tests (not already present with the same NABL type, Discipline, Material, and Parameter) will be added from the Master Sheet.
                         </p>
                     </div>
                 </div>
@@ -224,8 +224,8 @@
                 </div>
 
                 <div>
-                    <label for="file" class="block text-sm font-medium text-gray-700 mb-1.5">CSV File <span class="text-rose-500">*</span></label>
-                    <input type="file" id="file" name="file" accept=".csv,.txt" required
+                    <label for="file" class="block text-sm font-medium text-gray-700 mb-1.5">Master Sheet File <span class="text-rose-500">*</span></label>
+                    <input type="file" id="file" name="file" accept=".csv,.txt,.xlsx,.xls,.ods" required
                         class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100">
                 </div>
 
@@ -237,7 +237,7 @@
                     <button type="submit" :disabled="importing"
                         class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-brand-500/25 transition">
                         <span x-show="importing" class="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
-                        <span x-text="importing ? 'Importing...' : 'Import CSV'"></span>
+                        <span x-text="importing ? 'Importing...' : 'Import Master Sheet'"></span>
                     </button>
                 </div>
             </form>

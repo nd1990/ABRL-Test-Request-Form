@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
 class LabTestCatalogService
 {
@@ -143,6 +145,57 @@ class LabTestCatalogService
         }
 
         return $inserted;
+    }
+
+    /**
+     * Import lab tests from a Master Sheet file (.xlsx, .xls, .ods or .csv).
+     */
+    public function importFromFile(string $path, bool $replaceExisting = false): int
+    {
+        if (!is_file($path)) {
+            throw new \RuntimeException('Master sheet not found at ' . $path);
+        }
+
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        if (in_array($extension, ['xlsx', 'xls', 'ods'], true)) {
+            return $this->importFromXlsx($path, $replaceExisting);
+        }
+
+        $csv = file_get_contents($path);
+        if ($csv === false || $csv === '') {
+            throw new \RuntimeException('The file at ' . $path . ' is empty or unreadable.');
+        }
+
+        return $this->importFromString($csv, $replaceExisting);
+    }
+
+    /**
+     * Import lab tests from an Excel workbook, reusing the CSV column detection.
+     */
+    public function importFromXlsx(string $path, bool $replaceExisting = false): int
+    {
+        if (!is_file($path)) {
+            throw new \RuntimeException('Master sheet not found at ' . $path);
+        }
+
+        $reader = IOFactory::createReaderForFile($path);
+        $reader->setReadDataOnly(true);
+        $spreadsheet = $reader->load($path);
+
+        $writer = new Csv($spreadsheet);
+        $writer->setSheetIndex(0);
+        $writer->setDelimiter(',');
+        $writer->setEnclosure('"');
+        $writer->setLineEnding("\r\n");
+
+        ob_start();
+        $writer->save('php://output');
+        $csv = (string) ob_get_clean();
+
+        $spreadsheet->disconnectWorksheets();
+
+        return $this->importFromString($csv, $replaceExisting);
     }
 
     public function reSync(): int

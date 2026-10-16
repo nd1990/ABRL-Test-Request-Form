@@ -150,26 +150,35 @@ class AdminServicesController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => ['required', 'file', 'mimes:csv,txt', 'max:10240'],
+            'file' => ['required', 'file', 'mimes:csv,txt,xlsx,xls,ods', 'max:20480'],
         ]);
 
         $admin = app('admin');
 
-        $csv = (string) $request->file('file')->get();
+        $file = $request->file('file');
+        $realPath = $file->getRealPath();
 
-        if (trim($csv) === '') {
-            return back()->with('error', 'The uploaded file is empty.');
+        if ($realPath === false) {
+            return back()->with('error', 'The uploaded file could not be read.');
         }
 
+        // Keep the original extension so the Excel reader can detect the format.
+        $extension = strtolower($file->getClientOriginalExtension() ?: 'csv');
+        $tempPath = $realPath . '.' . $extension;
+        copy($realPath, $tempPath);
+
         try {
-            $count = app(LabTestCatalogService::class)->importFromString($csv);
+            $count = app(LabTestCatalogService::class)->importFromFile($tempPath);
         } catch (\Throwable $e) {
+            @unlink($tempPath);
             return back()->with('error', 'Import failed: ' . $e->getMessage());
         }
 
+        @unlink($tempPath);
+
         $this->auditLog->log($admin, 'lab_tests.imported', 'LabTest', null, null, ['count' => $count], $request);
 
-        return back()->with('success', "CSV imported successfully. {$count} lab tests imported.");
+        return back()->with('success', "Master sheet imported successfully. {$count} lab tests imported.");
     }
 
     protected function validated(Request $request): array

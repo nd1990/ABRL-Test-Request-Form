@@ -552,13 +552,31 @@
                     <div class="space-y-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Parameter / Test</label>
-                            <select x-model="slot.parameter" @change="onSlotParameterChange()"
-                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
-                                <option value="">Select Parameter</option>
-                                <template x-for="p in slot.parameterOptions" :key="p">
-                                    <option :value="p" x-text="p"></option>
-                                </template>
-                            </select>
+                            <div class="relative" @click.outside="slot.parameterOpen = false">
+                                <input type="text"
+                                    x-model="slot.parameterSearch"
+                                    @focus="openSlotParameter(); $event.target.select()"
+                                    @input="slot.parameterOpen = true; slot.parameter = ''"
+                                    @keydown.escape="slot.parameterOpen = false"
+                                    @keydown.enter.prevent="selectFirstSlotParameter()"
+                                    placeholder="Select Parameter"
+                                    autocomplete="off"
+                                    class="w-full rounded-lg border border-gray-300 pl-3 pr-9 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                <button type="button" tabindex="-1" @click="openSlotParameter()"
+                                    class="absolute inset-y-0 right-2 flex items-center text-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" /></svg>
+                                </button>
+                                <div x-show="slot.parameterOpen" x-cloak
+                                    class="absolute z-30 mt-1 w-full max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+                                    <template x-for="p in filteredParameterOptions()" :key="p">
+                                        <button type="button" @click="selectSlotParameter(p)"
+                                            class="w-full text-left px-3 py-2 text-sm transition hover:bg-indigo-50"
+                                            :class="p === slot.parameter ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700'"
+                                            x-text="p"></button>
+                                    </template>
+                                    <p x-show="!filteredParameterOptions().length" class="px-3 py-2 text-xs text-gray-400">No parameters found</p>
+                                </div>
+                            </div>
                         </div>
 
                         <div x-show="slot.parameter" x-cloak>
@@ -1573,6 +1591,7 @@ function quotationApp() {
         slot: {
             parameter: '', discipline: '', nabl: '',
             parameterOptions: [], disciplineOptions: [], nablOptions: [], tests: [],
+            parameterSearch: '', parameterOpen: false,
             loading: false, _seq: 0
         },
         slotMessage: '',
@@ -1681,6 +1700,30 @@ function quotationApp() {
             if (s.parameter) this.slotLoad();
         },
 
+        openSlotParameter() {
+            this.slot.parameterOpen = true;
+        },
+
+        filteredParameterOptions() {
+            const query = (this.slot.parameterSearch || '').trim().toLowerCase();
+            const options = this.slot.parameterOptions || [];
+            if (!query) return options;
+            return options.filter(p => String(p).toLowerCase().includes(query));
+        },
+
+        selectSlotParameter(parameter) {
+            const s = this.slot;
+            s.parameter = parameter;
+            s.parameterSearch = parameter;
+            s.parameterOpen = false;
+            this.onSlotParameterChange();
+        },
+
+        selectFirstSlotParameter() {
+            const list = this.filteredParameterOptions();
+            if (list.length) this.selectSlotParameter(list[0]);
+        },
+
         onSlotDisciplineChange() {
             const s = this.slot;
             s.nabl = '';
@@ -1727,6 +1770,7 @@ function quotationApp() {
             s._seq++;
             s.parameter = ''; s.discipline = ''; s.nabl = '';
             s.disciplineOptions = []; s.nablOptions = []; s.tests = [];
+            s.parameterSearch = ''; s.parameterOpen = false;
             this.slotMessage = '';
         },
 
