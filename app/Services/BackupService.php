@@ -234,8 +234,6 @@ class BackupService
 
     protected function findBinaryFor(array $names): ?string
     {
-        $executables = array_map(fn ($name) => $name . '.exe', $names);
-
         $candidates = [];
 
         if ($names === ['mysqldump'] && env('MYSQLDUMP_PATH')) {
@@ -246,16 +244,33 @@ class BackupService
             $candidates[] = env('MYSQL_PATH');
         }
 
-        $patterns = [
-            'D:\wamp\bin\mysql\mysql*\bin',
-            'C:\wamp\bin\mysql\mysql*\bin',
-            'E:\wamp\bin\mysql\mysql*\bin',
-        ];
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $patterns = [
+                'D:\wamp\bin\mysql\mysql*\bin',
+                'C:\wamp\bin\mysql\mysql*\bin',
+                'E:\wamp\bin\mysql\mysql*\bin',
+            ];
 
-        foreach ($patterns as $pattern) {
-            foreach ($names as $name) {
-                foreach ((array) glob($pattern . DIRECTORY_SEPARATOR . $name . '.exe') as $candidate) {
-                    $candidates[] = $candidate;
+            foreach ($patterns as $pattern) {
+                foreach ($names as $name) {
+                    foreach ((array) glob($pattern . DIRECTORY_SEPARATOR . $name . '.exe') as $candidate) {
+                        $candidates[] = $candidate;
+                    }
+                }
+            }
+        } else {
+            $directories = [
+                '/usr/bin',
+                '/usr/local/bin',
+                '/usr/local/mysql/bin',
+                '/opt/mysql/bin',
+                '/opt/homebrew/bin',
+                '/opt/local/bin',
+            ];
+
+            foreach ($directories as $directory) {
+                foreach ($names as $name) {
+                    $candidates[] = $directory . '/' . $name;
                 }
             }
         }
@@ -277,8 +292,17 @@ class BackupService
 
     protected function commandExists(string $command): bool
     {
+        if (!function_exists('exec')) {
+            return false;
+        }
+
         $result = null;
-        @exec('where ' . $command . ' 2>NUL', $result);
+
+        if (DIRECTORY_SEPARATOR === '\\') {
+            @exec('where ' . escapeshellarg($command) . ' 2>NUL', $result);
+        } else {
+            @exec('command -v ' . escapeshellarg($command) . ' 2>/dev/null', $result);
+        }
 
         return is_array($result) && count(array_filter($result)) > 0;
     }
