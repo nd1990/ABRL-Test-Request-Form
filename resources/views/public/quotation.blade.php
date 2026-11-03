@@ -202,10 +202,10 @@
                                 </div>
                                 <div>
                                     <div class="relative">
-                                        <input type="text" id="district" x-model="form.district" placeholder="District / County"
+                                        <input type="text" id="district" x-model="form.district" placeholder="District"
                                             class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                             :class="form.district ? 'pt-4 pb-1' : ''">
-                                        <label for="district" x-show="form.district" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">District / County</label>
+                                        <label for="district" x-show="form.district" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">District</label>
                                     </div>
                                 </div>
                                 <div>
@@ -286,10 +286,10 @@
                                         <label for="courier_taluka" x-show="form.courier_taluka" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Taluka / Sub-district</label>
                                     </div>
                                     <div class="relative">
-                                        <input type="text" id="courier_district" x-model="form.courier_district" placeholder="District / County"
+                                        <input type="text" id="courier_district" x-model="form.courier_district" placeholder="District"
                                             class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                             :class="form.courier_district ? 'pt-4 pb-1' : ''">
-                                        <label for="courier_district" x-show="form.courier_district" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">District / County</label>
+                                        <label for="courier_district" x-show="form.courier_district" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">District</label>
                                     </div>
                                     <div class="relative">
                                         <input type="text" id="courier_postal_code" x-model="form.courier_postal_code" placeholder="Postal / Zip Code"
