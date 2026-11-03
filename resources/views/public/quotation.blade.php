@@ -673,11 +673,7 @@
                                 <h2 class="text-lg sm:text-xl font-bold text-gray-900">Preview Your Quotation</h2>
                                 <p class="text-sm text-gray-500 mt-0.5">Review the details below, then accept the terms to download and send.</p>
                             </div>
-                            <button type="button" @click="previewOpen = true; loadPreview();"
-                                class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl border transition bg-indigo-600 hover:bg-indigo-700 text-white border-indigo-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                                <span>Preview</span>
-                            </button>
+                            {{-- Preview action is provided below to avoid duplicate preview buttons --}}
                         </div>
                     </div>
 

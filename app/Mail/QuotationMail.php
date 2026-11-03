@@ -67,17 +67,26 @@ class QuotationMail extends Mailable
 
     public function attachments(): array
     {
+        $attachments = [];
+
         if (
             $this->quotation->pdf_path &&
             Storage::disk('local')->exists($this->quotation->pdf_path)
         ) {
-            return [
-                Attachment::fromPath(Storage::disk('local')->path($this->quotation->pdf_path))
-                    ->as($this->quotation->quotation_number . '.pdf')
-                    ->withMime('application/pdf'),
-            ];
+            $attachments[] = Attachment::fromPath(Storage::disk('local')->path($this->quotation->pdf_path))
+                ->as($this->quotation->quotation_number . '.pdf')
+                ->withMime('application/pdf');
         }
 
-        return [];
+        // Attach any reference documents uploaded by the client.
+        foreach (($this->quotation->other_documents ?? []) as $doc) {
+            $path = $doc['path'] ?? null;
+            if ($path && Storage::disk('public')->exists($path)) {
+                $attachments[] = Attachment::fromPath(Storage::disk('public')->path($path))
+                    ->as($doc['name'] ?? basename($path));
+            }
+        }
+
+        return $attachments;
     }
 }
