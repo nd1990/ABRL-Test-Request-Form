@@ -513,7 +513,7 @@
                 <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div class="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12.01" y2="16" /><path d="M12 8v4" /></svg>
-                        <p class="text-sm font-medium text-blue-800">Maximum <span class="font-bold" x-text="maxTests"></span> tests are allowed per quotation. If you need more than <span class="font-bold" x-text="maxTests"></span> tests, please submit this form again and fill out a new one.</p>
+                        <p class="text-sm font-medium text-blue-800">A maximum of five tests can be requested per Quotation/Test Request Form. If more than five tests are required, please submit a separate form for the additional tests.</p>
                     </div>
                 </div>
 
@@ -1541,7 +1541,7 @@ function quotationApp() {
         confirmTest(t) {
             if (!t) return;
             if (this.selectedTests.length >= this.maxTests) {
-                this.slotMessage = `Maximum ${this.maxTests} tests are allowed per quotation. If you need more than ${this.maxTests} tests, please submit this form again and fill out a new one.`;
+                this.slotMessage = 'A maximum of five tests can be requested per Quotation/Test Request Form. If more than five tests are required, please submit a separate form for the additional tests.';
                 this.resetSlot();
                 return;
             }

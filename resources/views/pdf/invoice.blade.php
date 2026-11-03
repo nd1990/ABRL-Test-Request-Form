@@ -174,10 +174,12 @@
         <td class="label">Email</td>
         <td>{{ $inv->email }}</td>
     </tr>
+    @if(trim((string) $inv->gst_number))
     <tr>
         <td class="label">GST Number</td>
         <td>{{ $inv->gst_number }}</td>
     </tr>
+    @endif
     @if($inv->pan_number)
     <tr>
         <td class="label">PAN Number</td>

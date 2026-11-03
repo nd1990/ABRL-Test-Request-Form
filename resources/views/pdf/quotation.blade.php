@@ -174,10 +174,12 @@
         <td class="label">Email</td>
         <td>{{ $quot->email }}</td>
     </tr>
+    @if(trim((string) $quot->gst_number))
     <tr>
         <td class="label">GST Number</td>
         <td>{{ $quot->gst_number }}</td>
     </tr>
+    @endif
     <tr>
         <td class="label">Address on Report and Invoice</td>
         <td>{{ $clientAddr }}</td>
