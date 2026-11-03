@@ -166,6 +166,17 @@
                                         <label for="address_line2" x-show="form.address_line2" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Street Address Line 2</label>
                                     </div>
                                 </div>
+                                <div class="relative">
+                                    <select id="country" x-model="form.country" @change="onAddressCountryChange()"
+                                        class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                        :class="[form.country ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.country ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                        <option value="">Select Country</option>
+                                        <template x-for="c in countries" :key="'country-' + c">
+                                            <option :value="c" x-text="c"></option>
+                                        </template>
+                                    </select>
+                                    <label for="country" x-show="form.country" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Country</label>
+                                </div>
                                 <div>
                                     <div class="relative">
                                         <input type="text" id="state" x-model="form.state" @input="onAddressStateInput()" placeholder="State"
@@ -252,6 +263,17 @@
                                                 :class="form.courier_address_line2 ? 'pt-4 pb-1' : ''">
                                             <label for="courier_address_line2" x-show="form.courier_address_line2" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Street Address Line 2</label>
                                         </div>
+                                    </div>
+                                    <div class="relative">
+                                        <select id="courier_country" x-model="form.courier_country" @change="onCourierCountryChange()"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                            :class="[form.courier_country ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_country ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                            <option value="">Select Country</option>
+                                            <template x-for="c in countries" :key="'courier-country-' + c">
+                                                <option :value="c" x-text="c"></option>
+                                            </template>
+                                        </select>
+                                        <label for="courier_country" x-show="form.courier_country" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Country</label>
                                     </div>
                                     <div>
                                         <div class="relative">
@@ -692,11 +714,11 @@
                                     </div>
                                     <div class="sm:col-span-2">
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Address</p>
-                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.address, form.address_line2, form.state, form.city, form.taluka, form.district, form.postal_code].filter(Boolean).join(', ') || '—'"></p>
+                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.address, form.address_line2, form.state, form.city, form.taluka, form.district, form.postal_code, form.country].filter(Boolean).join(', ') || '—'"></p>
                                     </div>
                                     <div class="sm:col-span-2" x-show="form.courier_option === 'different'">
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Courier Address</p>
-                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.courier_address, form.courier_address_line2, form.courier_state, form.courier_city, form.courier_taluka, form.courier_district, form.courier_postal_code].filter(Boolean).join(', ') || '—'"></p>
+                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.courier_address, form.courier_address_line2, form.courier_state, form.courier_city, form.courier_taluka, form.courier_district, form.courier_postal_code, form.courier_country].filter(Boolean).join(', ') || '—'"></p>
                                     </div>
                                     <div>
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">GST Number</p>
@@ -1107,7 +1129,7 @@ function quotationApp() {
             'Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei',
             'Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada',
             'Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica',
-            'Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominica','Dominican Republic',
+            'Croatia','Cuba','Cyprus','Czech Republic','Democratic Republic of the Congo','Denmark','Djibouti','Dominica','Dominican Republic',
             'Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia',
             'Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada',
             'Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India',
@@ -1250,6 +1272,7 @@ function quotationApp() {
         },
 
         addressCityOptions() {
+            if ((this.form.country || '').trim().toLowerCase() !== 'india') return [];
             const state = (this.form.state || '').trim().toLowerCase();
             if (!state) return [];
             return Object.entries(this.cityStateMap)
@@ -1259,12 +1282,23 @@ function quotationApp() {
         },
 
         courierCityOptions() {
+            if ((this.form.courier_country || '').trim().toLowerCase() !== 'india') return [];
             const state = (this.form.courier_state || '').trim().toLowerCase();
             if (!state) return [];
             return Object.entries(this.cityStateMap)
                 .filter(([, cityState]) => cityState.toLowerCase() === state)
                 .map(([city]) => city)
                 .sort();
+        },
+
+        onAddressCountryChange() {
+            this.form.state = '';
+            this.form.city = '';
+        },
+
+        onCourierCountryChange() {
+            this.form.courier_state = '';
+            this.form.courier_city = '';
         },
 
         onAddressStateInput() {
@@ -1429,8 +1463,8 @@ function quotationApp() {
 
         initApp() {
             this.restoreState();
-            this.form.country = 'India';
-            this.form.courier_country = 'India';
+            if (!this.form.country) this.form.country = 'India';
+            if (!this.form.courier_country) this.form.courier_country = 'India';
             this.slotLoad();
         },
 
@@ -1594,11 +1628,13 @@ function quotationApp() {
             if (n === 1) {
                 if (!this.form.company_name.trim()) { this.stepErrors[1].push('Please enter company name.'); if (!this.firstErrorId) this.firstErrorId = 'company_name'; }
                 if (!this.form.address.trim()) { this.stepErrors[1].push('Please enter complete address.'); if (!this.firstErrorId) this.firstErrorId = 'address'; }
+                if (!this.form.country) { this.stepErrors[1].push('Please select country.'); if (!this.firstErrorId) this.firstErrorId = 'country'; }
                 if (!this.form.state.trim()) { this.stepErrors[1].push('Please enter state.'); if (!this.firstErrorId) this.firstErrorId = 'state'; }
                 if (!this.form.city) { this.stepErrors[1].push('Please enter city.'); if (!this.firstErrorId) this.firstErrorId = 'city'; }
                 if (!this.form.postal_code.trim()) { this.stepErrors[1].push('Please enter postal code.'); if (!this.firstErrorId) this.firstErrorId = 'postal_code'; }
                 if (this.form.courier_option === 'different') {
                     if (!this.form.courier_address.trim()) { this.stepErrors[1].push('Please enter courier address.'); if (!this.firstErrorId) this.firstErrorId = 'courier_address'; }
+                    if (!this.form.courier_country) { this.stepErrors[1].push('Please select courier country.'); if (!this.firstErrorId) this.firstErrorId = 'courier_country'; }
                     if (!this.form.courier_state.trim()) { this.stepErrors[1].push('Please enter courier state.'); if (!this.firstErrorId) this.firstErrorId = 'courier_state'; }
                     if (!this.form.courier_city.trim()) { this.stepErrors[1].push('Please enter courier city.'); if (!this.firstErrorId) this.firstErrorId = 'courier_city'; }
                     if (!this.form.courier_postal_code.trim()) { this.stepErrors[1].push('Please enter courier postal code.'); if (!this.firstErrorId) this.firstErrorId = 'courier_postal_code'; }

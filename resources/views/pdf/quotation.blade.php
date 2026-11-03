@@ -109,7 +109,7 @@
     $clientCompany = $quot->company_name ?: $quot->client_name;
     $clientAddr = trim(implode(', ', array_filter([$quot->address, $quot->address_line2, $quot->city, $quot->district, $quot->taluka, $quot->state, $quot->postal_code, $quot->country])));
     $courierAddr = $quot->courier_address
-        ? trim(implode(', ', array_filter([$quot->courier_address, $quot->courier_address_line2, $quot->courier_state, $quot->courier_city, $quot->courier_taluka, $quot->courier_district, $quot->courier_postal_code])))
+        ? trim(implode(', ', array_filter([$quot->courier_address, $quot->courier_address_line2, $quot->courier_state, $quot->courier_city, $quot->courier_taluka, $quot->courier_district, $quot->courier_postal_code, $quot->courier_country])))
         : '';
     $taxPct = $quot->subtotal > 0 ? (round(((float)$quot->tax / (float)$quot->subtotal) * 100)) : 0;
     $quot->loadMissing('items.labTest');
