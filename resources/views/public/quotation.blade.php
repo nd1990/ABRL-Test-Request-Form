@@ -118,7 +118,7 @@
             <div x-show="serverError" x-cloak x-transition
                 class="mb-6 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl px-4 py-3 text-sm flex items-start gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-                <div>
+                <div class="relative">
                     <p class="font-semibold" x-text="serverError"></p>
                 </div>
             </div>
@@ -149,85 +149,72 @@
                         <!-- Address -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Complete Address <span class="text-gray-400">(for Report &amp; Invoice)</span> <span class="text-rose-500">*</span></label>
-                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
-                                <button type="button" @click="detectLocation()" :disabled="detectingLocation"
-                                    class="inline-flex items-center justify-center gap-2 text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg px-3 py-2 transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0">
-                                    <svg x-show="!detectingLocation" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-                                    <span x-show="detectingLocation" class="spinner" style="width:12px;height:12px;border-width:1.5px;"></span>
-                                    <span x-text="detectingLocation ? 'Detecting...' : 'Detect my location'"></span>
-                                </button>
-                                <div class="relative flex-1 min-w-0">
-                                    <input type="text" x-model="addressSearch" @input="onAddressSearchInput()"
-                                        placeholder="Search &amp; autofill address (e.g. GIDC Panoli, Bharuch)"
-                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                                    <div x-show="addressSearchResults.length" x-cloak
-                                        class="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
-                                        <template x-for="(r, i) in addressSearchResults" :key="i">
-                                            <button type="button" @click="selectAddressSearchResult(i)"
-                                                class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 transition border-b border-gray-100 last:border-0">
-                                                <span class="block truncate" x-text="r.display_name"></span>
-                                            </button>
-                                        </template>
-                                        <p x-show="addressSearching" class="px-3.5 py-2.5 text-xs text-gray-400">Searching...</p>
-                                        <p x-show="!addressSearching && addressSearch && addressSearchResults.length === 0" class="px-3.5 py-2.5 text-xs text-gray-400">No matches found. Please enter the address manually.</p>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <div class="sm:col-span-3">
-                                    <input type="text" x-model="form.address" placeholder="Street Address"
-                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                        :class="shouldShowValidation(1) && !form.address.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                    <div class="relative">
+                                        <input type="text" id="address" x-model="form.address" placeholder="Street Address"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="[form.address ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.address.trim() ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                        <label for="address" x-show="form.address" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Street Address</label>
+                                    </div>
                                 </div>
                                 <div class="sm:col-span-3">
-                                    <input type="text" x-model="form.address_line2" placeholder="Street Address Line 2"
-                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                                </div>
-                                <div class="sm:col-span-3">
-                                    <select id="country" x-model="form.country" @change="onCountryChange()"
-                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
-                                        :class="shouldShowValidation(1) && !form.country ? 'border-rose-400 ring-1 ring-rose-200' : ''">
-                                        <option value="">Select Country</option>
-                                        <template x-for="c in countries" :key="c">
-                                            <option :value="c" x-text="c"></option>
-                                        </template>
-                                    </select>
+                                    <div class="relative">
+                                        <input type="text" id="address_line2" x-model="form.address_line2" placeholder="Street Address Line 2"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="form.address_line2 ? 'pt-4 pb-1' : ''">
+                                        <label for="address_line2" x-show="form.address_line2" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Street Address Line 2</label>
+                                    </div>
                                 </div>
                                 <div>
-                                    <template x-if="form.country === 'India'">
-                                        <select id="city" x-model="form.city" @change="onCityChange()"
-                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
-                                            :class="shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                    <div class="relative">
+                                        <input type="text" id="state" x-model="form.state" @input="onAddressStateInput()" placeholder="State"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="form.state ? 'pt-4 pb-1' : ''">
+                                        <label for="state" x-show="form.state" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">State / Province / Region</label>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <template x-if="addressCityOptions().length">
+                                        <select id="city" x-model="form.city"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                            :class="[form.city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
                                             <option value="">Select City</option>
-                                            <template x-for="city in cityOptions()" :key="city">
+                                            <template x-for="city in addressCityOptions()" :key="city">
                                                 <option x-bind:value="city" x-text="city"></option>
                                             </template>
                                         </select>
                                     </template>
-                                    <template x-if="form.country !== 'India'">
+                                    <template x-if="!addressCityOptions().length">
                                         <input type="text" id="city" x-model="form.city" placeholder="City"
-                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="[form.city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
                                     </template>
+                                    <label for="city" x-show="form.city" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">City</label>
                                 </div>
                                 <div>
-                                    <input type="text" id="state" x-model="form.state" placeholder="State / Province / Region"
-                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                        :class="form.country === 'India' ? 'bg-gray-100' : ''"
-                                        :readonly="form.country === 'India' && form.city && cityStateMap[form.city]">
+                                    <div class="relative">
+                                        <input type="text" id="taluka" x-model="form.taluka" placeholder="Taluka / Sub-district"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="form.taluka ? 'pt-4 pb-1' : ''">
+                                        <label for="taluka" x-show="form.taluka" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Taluka / Sub-district</label>
+                                    </div>
                                 </div>
                                 <div>
-                                    <input type="text" id="postal_code" x-model="form.postal_code" placeholder="Postal / Zip Code"
-                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                        :class="shouldShowValidation(1) && !form.postal_code.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                    <div class="relative">
+                                        <input type="text" id="district" x-model="form.district" placeholder="District / County"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="form.district ? 'pt-4 pb-1' : ''">
+                                        <label for="district" x-show="form.district" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">District / County</label>
+                                    </div>
                                 </div>
-                                <div x-show="form.country === 'India'" x-cloak>
-                                    <input type="text" id="district" x-model="form.district" placeholder="District / County"
-                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                                </div>
-                                <div x-show="form.country === 'India'" x-cloak>
-                                    <input type="text" id="taluka" x-model="form.taluka" placeholder="Taluka / Sub-district"
-                                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                                <div>
+                                    <div class="relative">
+                                        <input type="text" id="postal_code" x-model="form.postal_code" placeholder="Postal / Zip Code"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="[form.postal_code ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.postal_code.trim() ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                        <label for="postal_code" x-show="form.postal_code" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Postal / Zip Code</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -251,50 +238,64 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Courier Address <span class="text-gray-400">(for Report &amp; Invoice)</span> <span class="text-rose-500">*</span></label>
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                     <div class="sm:col-span-3">
-                                        <input type="text" x-model="form.courier_address" placeholder="Street Address"
-                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_address.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                        <div class="relative">
+                                            <input type="text" id="courier_address" x-model="form.courier_address" placeholder="Street Address"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="[form.courier_address ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_address.trim() ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                            <label for="courier_address" x-show="form.courier_address" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Street Address</label>
+                                        </div>
                                     </div>
                                     <div class="sm:col-span-3">
-                                        <input type="text" x-model="form.courier_address_line2" placeholder="Street Address Line 2"
-                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                                    </div>
-                                    <div class="sm:col-span-3">
-                                        <select id="courier_country" x-model="form.courier_country" @change="onCourierCountryChange()"
-                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
-                                            <option value="">Select Country</option>
-                                            <template x-for="c in countries" :key="'courier-'+c">
-                                                <option :value="c" x-text="c"></option>
-                                            </template>
-                                        </select>
+                                        <div class="relative">
+                                            <input type="text" id="courier_address_line2" x-model="form.courier_address_line2" placeholder="Street Address Line 2"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="form.courier_address_line2 ? 'pt-4 pb-1' : ''">
+                                            <label for="courier_address_line2" x-show="form.courier_address_line2" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Street Address Line 2</label>
+                                        </div>
                                     </div>
                                     <div>
-                                        <template x-if="form.courier_country === 'India'">
-                                            <select id="courier_city" x-model="form.courier_city" @change="onCourierCityChange()"
-                                                class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
-                                                :class="shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                        <div class="relative">
+                                            <input type="text" id="courier_state" x-model="form.courier_state" @input="onCourierStateInput()" placeholder="State"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="form.courier_state ? 'pt-4 pb-1' : ''">
+                                            <label for="courier_state" x-show="form.courier_state" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">State / Province / Region</label>
+                                        </div>
+                                    </div>
+                                    <div class="relative">
+                                        <template x-if="courierCityOptions().length">
+                                            <select id="courier_city" x-model="form.courier_city"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                                :class="[form.courier_city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
                                                 <option value="">Select City</option>
-                                                <template x-for="city in cityOptions()" :key="'c-'+city">
+                                                <template x-for="city in courierCityOptions()" :key="city">
                                                     <option x-bind:value="city" x-text="city"></option>
                                                 </template>
                                             </select>
                                         </template>
-                                        <template x-if="form.courier_country !== 'India'">
+                                        <template x-if="!courierCityOptions().length">
                                             <input type="text" id="courier_city" x-model="form.courier_city" placeholder="City"
-                                                class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                                :class="shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="[form.courier_city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
                                         </template>
+                                        <label for="courier_city" x-show="form.courier_city" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">City</label>
                                     </div>
-                                    <div>
-                                        <input type="text" id="courier_state" x-model="form.courier_state" placeholder="State / Province / Region"
-                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="form.courier_country === 'India' ? 'bg-gray-100' : ''"
-                                            :readonly="form.courier_country === 'India' && form.courier_city && cityStateMap[form.courier_city]">
+                                    <div class="relative">
+                                        <input type="text" id="courier_taluka" x-model="form.courier_taluka" placeholder="Taluka / Sub-district"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="form.courier_taluka ? 'pt-4 pb-1' : ''">
+                                        <label for="courier_taluka" x-show="form.courier_taluka" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Taluka / Sub-district</label>
                                     </div>
-                                    <div>
+                                    <div class="relative">
+                                        <input type="text" id="courier_district" x-model="form.courier_district" placeholder="District / County"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="form.courier_district ? 'pt-4 pb-1' : ''">
+                                        <label for="courier_district" x-show="form.courier_district" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">District / County</label>
+                                    </div>
+                                    <div class="relative">
                                         <input type="text" id="courier_postal_code" x-model="form.courier_postal_code" placeholder="Postal / Zip Code"
-                                            class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_postal_code.trim() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="[form.courier_postal_code ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_postal_code.trim() ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                        <label for="courier_postal_code" x-show="form.courier_postal_code" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Postal / Zip Code</label>
                                     </div>
                                 </div>
                             </div>
@@ -321,14 +322,14 @@
                                         </template>
                                     </select>
                                     <input type="tel" id="mobile" x-model="form.mobile"
-                                        :placeholder="form.country === 'India' ? 'Enter 10-digit mobile number' : 'Enter mobile number'"
-                                        :maxlength="form.country === 'India' ? 10 : 20"
+                                        :placeholder="form.mobile_country === '+91' ? 'Enter 10-digit mobile number' : 'Enter mobile number'"
+                                        :maxlength="form.mobile_country === '+91' ? 10 : 20"
                                         class="w-full min-w-0 rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                         :class="shouldShowValidation(1) && form.mobile.trim() && !isValidMobile() ? 'border-rose-400 ring-1 ring-rose-200' : ''">
                                 </div>
                                 <p x-show="shouldShowValidation(1) && !form.mobile.trim()" class="text-xs text-rose-500 mt-1">Please enter mobile number</p>
                                 <p x-show="shouldShowValidation(1) && form.mobile.trim() && !form.mobile_country" class="text-xs text-rose-500 mt-1">Please select country code</p>
-                                <p x-show="shouldShowValidation(1) && form.mobile.trim() && form.mobile_country && !isValidMobile()" class="text-xs text-rose-500 mt-1" x-text="form.country === 'India' ? 'Please enter a valid 10-digit Indian mobile number' : 'Please enter a valid mobile number'"></p>
+                                <p x-show="shouldShowValidation(1) && form.mobile.trim() && form.mobile_country && !isValidMobile()" class="text-xs text-rose-500 mt-1" x-text="form.mobile_country === '+91' ? 'Please enter a valid 10-digit Indian mobile number' : 'Please enter a valid mobile number'"></p>
                             </div>
                         </div>
 
@@ -380,7 +381,7 @@
                     <div class="mb-5 p-4 bg-gray-50 border border-gray-200 rounded-xl">
                         <div class="flex items-start gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12.01" y2="16" /><path d="M12 8v4" /></svg>
-                            <p class="text-sm font-medium text-gray-600">It is required to fill out the test report form separately for each sample.</p>
+                            <p class="text-sm font-medium text-gray-600">A separate Test Request Form must be filled out for each sample.</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -512,7 +513,7 @@
                 <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div class="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12.01" y2="16" /><path d="M12 8v4" /></svg>
-                        <p class="text-sm font-medium text-blue-800">Maximum <span class="font-bold" x-text="maxTests"></span> tests allowed per quotation. If you need more, please submit this form and fill out a new one.</p>
+                        <p class="text-sm font-medium text-blue-800">Maximum <span class="font-bold" x-text="maxTests"></span> tests are allowed per quotation. If you need more than <span class="font-bold" x-text="maxTests"></span> tests, please submit this form again and fill out a new one.</p>
                     </div>
                 </div>
 
@@ -606,6 +607,18 @@
                             </select>
                         </div>
 
+                        <div x-show="slot.nabl && slot.tests.length > 1" x-cloak>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Method</label>
+                            <select x-model="slot.testId" @change="onSlotTestChange()"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                <option value="">Select Method</option>
+                                <template x-for="t in slot.tests" :key="'method-' + t.id">
+                                    <option :value="t.id" x-text="slotTestLabel(t)"></option>
+                                </template>
+                            </select>
+                            <p class="mt-1 text-xs text-gray-400">Multiple methods are available for this parameter.</p>
+                        </div>
+
                         <p x-show="slot.loading" class="text-xs text-gray-400">Loading options...</p>
                         <p x-show="slotMessage" x-cloak class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2" x-text="slotMessage"></p>
                     </div>
@@ -679,11 +692,11 @@
                                     </div>
                                     <div class="sm:col-span-2">
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Address</p>
-                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.address, form.address_line2, form.city, form.district, form.taluka, form.state, form.postal_code, form.country].filter(Boolean).join(', ') || '—'"></p>
+                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.address, form.address_line2, form.state, form.city, form.taluka, form.district, form.postal_code].filter(Boolean).join(', ') || '—'"></p>
                                     </div>
                                     <div class="sm:col-span-2" x-show="form.courier_option === 'different'">
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Courier Address</p>
-                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.courier_address, form.courier_address_line2, form.courier_city, form.courier_state, form.courier_postal_code, form.courier_country].filter(Boolean).join(', ') || '—'"></p>
+                                        <p class="text-sm font-semibold text-gray-900 mt-0.5" x-text="[form.courier_address, form.courier_address_line2, form.courier_state, form.courier_city, form.courier_taluka, form.courier_district, form.courier_postal_code].filter(Boolean).join(', ') || '—'"></p>
                                     </div>
                                     <div>
                                         <p class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">GST Number</p>
@@ -767,10 +780,9 @@
                                 <table class="w-full text-sm">
                                     <thead>
 <tr class="text-left text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100 bg-gray-50/60">
-                                        <th class="py-3 px-4 sm:px-5 font-semibold">Test / Parameter</th>
-                                        <th class="py-3 px-3 font-semibold">NABL Selection</th>
-                                        <th class="py-3 px-3 font-semibold">Method</th>
-                                        <th class="py-3 px-4 sm:px-5 font-semibold text-right">No. of Samples</th>
+                                        <th class="w-1/2 py-3 px-4 sm:px-5 font-semibold">Test / Parameter</th>
+                                        <th class="w-1/4 py-3 px-3 font-semibold">NABL Selection</th>
+                                        <th class="w-1/4 py-3 px-3 font-semibold">Method</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -785,17 +797,23 @@
                                                     <span x-show="!t.nabl" class="text-gray-300">—</span>
                                                 </td>
                                                 <td class="py-3 px-3 text-xs text-gray-600" x-text="t.method || '—'"></td>
-                                                <td class="py-3 px-4 sm:px-5 text-right">
-                                                    <span class="inline-flex items-center gap-1 font-bold text-violet-700 bg-violet-50 rounded-full px-2.5 py-0.5" x-text="t.no_of_samples"></span>
-                                                </td>
                                             </tr>
                                         </template>
                                         <tr x-show="!selectedTests.length">
-                                            <td class="py-6 text-center text-sm text-gray-400" colspan="4">No tests selected.</td>
+                                            <td class="py-6 text-center text-sm text-gray-400" colspan="3">No tests selected.</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+
+                        <!-- Preview action: below Selected Tests, right aligned -->
+                        <div class="flex justify-end">
+                            <button type="button" @click="previewOpen = true; loadPreview();"
+                                class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-lg shadow-indigo-500/25 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                                <span>Preview Your Quotation</span>
+                            </button>
                         </div>
 
                         <!-- Requirements -->
@@ -821,7 +839,7 @@
                         <ol class="list-decimal pl-5 space-y-1.5 text-gray-600">
                             <li>Payment must be made 100% in advance via NEFT, RTGS, or any online payment mode. Cash or cheque payments are not accepted.</li>
                             <li>The analysis will commence only after receipt of full payment. The lead time will begin only after the full advance payment has been received.</li>
-                            <li>The estimated timeframe for Test Report delivery is 15 working days under normal conditions. In case of any unforeseen circumstances, the delay will be communicated accordingly.</li>
+                            <li>The estimated timeframe for Test Report delivery is <strong>15 working days</strong> under normal conditions. In case of any unforeseen circumstances, the delay will be communicated accordingly.</li>
                             <li>Except for the Test Report, no raw data or additional supporting documents related to the analysis of samples will be provided.</li>
                             <li>Test Reports will be issued in the name specified on the Party Registration &amp; Test Request form, with the same sample name and batch number as mentioned on the received samples.</li>
                             <li>Once the Test Report is generated, no corrections or removal of any parameters will be entertained. Any retesting or reconfirmation of parameters will incur additional charges, subject to the availability of the sample.</li>
@@ -972,18 +990,11 @@ function quotationApp() {
             address: '', address_line2: '', city: '', district: '', taluka: '', state: '', postal_code: '', country: 'India',
             gst_number: '',
             courier_option: 'same', different_courier_address: false, courier_address: '', courier_address_line2: '',
-            courier_city: '', courier_state: '', courier_postal_code: '', courier_country: 'India',
+            courier_city: '', courier_district: '', courier_taluka: '', courier_state: '', courier_postal_code: '', courier_country: 'India',
             sample_name: '', sample_batch_no: '', sample_physical_form: '', sample_storage_condition: '',
             notes: ''
         },
 
-        detectingLocation: false,
-
-        addressSearch: '',
-        addressSearchResults: [],
-        addressSearching: false,
-        _addressSearchTimer: null,
-        _addressSearchSeq: 0,
         otherFiles: [],
         otherError: '',
         otherDragOver: false,
@@ -1238,40 +1249,31 @@ function quotationApp() {
             'Port Blair': 'Andaman and Nicobar Islands', 'Kavaratti': 'Lakshadweep', 'Silvassa': 'Dadra and Nagar Haveli and Daman and Diu', 'Daman': 'Dadra and Nagar Haveli and Daman and Diu', 'Diu': 'Dadra and Nagar Haveli and Daman and Diu'
         },
 
-        cityOptions() {
-            const list = Object.keys(this.cityStateMap);
-            if (this.form.city && !this.cityStateMap.hasOwnProperty(this.form.city)) {
-                list.push(this.form.city);
-            }
-            if (this.form.courier_city && !this.cityStateMap.hasOwnProperty(this.form.courier_city)) {
-                list.push(this.form.courier_city);
-            }
-            return list.sort();
+        addressCityOptions() {
+            const state = (this.form.state || '').trim().toLowerCase();
+            if (!state) return [];
+            return Object.entries(this.cityStateMap)
+                .filter(([, cityState]) => cityState.toLowerCase() === state)
+                .map(([city]) => city)
+                .sort();
         },
 
-        onCityChange() {
-            if (this.form.city && this.cityStateMap.hasOwnProperty(this.form.city)) {
-                this.form.state = this.cityStateMap[this.form.city];
-            } else {
-                this.form.state = '';
-            }
+        courierCityOptions() {
+            const state = (this.form.courier_state || '').trim().toLowerCase();
+            if (!state) return [];
+            return Object.entries(this.cityStateMap)
+                .filter(([, cityState]) => cityState.toLowerCase() === state)
+                .map(([city]) => city)
+                .sort();
         },
 
-        onCourierCityChange() {
-            if (this.form.courier_city && this.cityStateMap.hasOwnProperty(this.form.courier_city)) {
-                this.form.courier_state = this.cityStateMap[this.form.courier_city];
-            } else {
-                this.form.courier_state = '';
-            }
+        onAddressStateInput() {
+            this.form.city = '';
         },
 
-        onCountryChange() {
-            if (!this.form.country) return;
-            const code = this.countryCodeMap[this.form.country];
-            if (code) this.form.mobile_country = code;
+        onCourierStateInput() {
+            this.form.courier_city = '';
         },
-
-        onCourierCountryChange() {},
 
         onMobileCountryChange() {},
 
@@ -1285,7 +1287,7 @@ function quotationApp() {
         isValidMobile() {
             const m = this.form.mobile.trim();
             if (!m || !this.form.mobile_country) return false;
-            if (this.form.country === 'India') {
+            if (this.form.mobile_country === '+91') {
                 return /^[6-9]\d{9}$/.test(m);
             }
             return /^[0-9][0-9\s\-()]{5,19}$/.test(m);
@@ -1361,240 +1363,10 @@ function quotationApp() {
             this.saveState();
         },
 
-        normalizeCountry(value) {
-            if (!value) return 'India';
-            const aliases = {
-                'united states': 'United States',
-                'united states of america': 'United States',
-                'usa': 'United States',
-                'us': 'United States',
-                'uk': 'United Kingdom',
-                'great britain': 'United Kingdom',
-                'england': 'United Kingdom',
-                'scotland': 'United Kingdom',
-                'wales': 'United Kingdom',
-                'northern ireland': 'United Kingdom',
-                'russia': 'Russia',
-                'russian federation': 'Russia',
-                'iran': 'Iran',
-                'south korea': 'South Korea',
-                'republic of korea': 'South Korea',
-                'vietnam': 'Vietnam',
-                'laos': 'Laos',
-                'brunei': 'Brunei',
-                'syria': 'Syria',
-                'venezuela': 'Venezuela',
-                'bolivia': 'Bolivia',
-                'tanzania': 'Tanzania',
-                'moldova': 'Moldova',
-                'macedonia': 'North Macedonia',
-                'czechia': 'Czech Republic',
-                'dominican republic': 'Dominican Republic',
-                'congo (kinshasa)': 'Congo',
-                'congo (brazzaville)': 'Congo',
-                'ivory coast': 'Ivory Coast',
-                'cote d\'ivoire': 'Ivory Coast',
-                'eswatini': 'Eswatini',
-                'swaziland': 'Eswatini',
-                'east timor': 'Timor-Leste',
-                'palestine': 'Palestine',
-                'vatican': 'Vatican City',
-                'myanmar': 'Myanmar',
-                'burma': 'Myanmar'
-            };
-            const lower = value.trim();
-            const key = lower.toLowerCase();
-            if (aliases.hasOwnProperty(key)) return aliases[key];
-            if (this.countries.includes(lower)) return lower;
-            const found = this.countries.find(c => c.toLowerCase() === key);
-            if (found) return found;
-            const partial = this.countries.find(c => c.toLowerCase().includes(key) || key.includes(c.toLowerCase()));
-            return partial || '';
-        },
-
-        firstAddressPart(addr, keys) {
-            if (!addr) return '';
-            for (const key of keys) {
-                const value = addr[key];
-                if (typeof value === 'string' && value.trim() !== '') return value.trim();
-            }
-            return '';
-        },
-
-        normalizeTaluka(value) {
-            return (value || '')
-                .replace(/\s+(talukas?|taluk|tehsils?|tahsil|sub-?districts?|subdivisions?|sub-?divisions?)$/i, '')
-                .trim();
-        },
-
-        extractDistrictTaluka(addr, state) {
-            let district = this.firstAddressPart(addr, ['state_district', 'district', 'city_district']);
-            let taluka = this.normalizeTaluka(this.firstAddressPart(addr, [
-                'taluka', 'taluk', 'tehsil', 'tahsil', 'subdistrict', 'sub_district', 'county',
-            ]));
-
-            const eq = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
-            if (eq(taluka, state)) taluka = '';
-
-            return { district, taluka };
-        },
-
-        detectLocation() {
-            if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser.');
-                return;
-            }
-            this.detectingLocation = true;
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`, {
-                        headers: { 'Accept': 'application/json' }
-                    })
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data && data.address) {
-                            const addr = data.address;
-                            const house = addr.house_number ? addr.house_number + ', ' : '';
-                            const road = addr.road || addr.pedestrian || addr.footway || addr.path || addr.highway || '';
-                            const sub = addr.neighbourhood || addr.suburb || addr.quarter || addr.locality || '';
-                            let town = addr.city || addr.town || addr.village || addr.hamlet || addr.municipality || addr.county || '';
-                            const state = addr.state || addr.province || addr.state_district || addr.region || addr.island || '';
-                            const country = this.normalizeCountry(addr.country);
-                            let { district, taluka } = this.extractDistrictTaluka(addr, state);
-
-                            if (country === 'India') {
-                                if (!(town && this.cityStateMap.hasOwnProperty(town))) {
-                                    town = addr.state_district || addr.district || addr.city_district || town || '';
-                                }
-                            } else {
-                                district = '';
-                                taluka = '';
-                            }
-
-                            if (house || road) this.form.address = (house + road).trim();
-                            if (sub) this.form.address_line2 = sub;
-                            this.form.city = town;
-                            this.form.district = district;
-                            this.form.taluka = taluka;
-                            this.form.state = state;
-                            this.form.country = country;
-                            this.onCountryChange();
-                            if (this.form.city === this.form.address_line2) this.form.address_line2 = '';
-                            if (this.form.country === 'India' && this.form.city && this.cityStateMap.hasOwnProperty(this.form.city)) {
-                                this.form.state = this.cityStateMap[this.form.city];
-                            }
-                            if (this.form.city && this.form.city.toLowerCase() === this.form.state.toLowerCase()) {
-                                this.form.state = '';
-                            }
-                            if (addr.postcode) this.form.postal_code = addr.postcode;
-                            if (!this.form.country) {
-                                alert('Could not identify your country. Please select it from the dropdown.');
-                            }
-                        }
-                    })
-                    .catch(() => {
-                        alert('Could not determine your address. Please fill in manually.');
-                    })
-                    .finally(() => {
-                        this.detectingLocation = false;
-                    });
-                },
-                (error) => {
-                    this.detectingLocation = false;
-                    if (error.code === 1) {
-                        alert('Location permission denied. Please allow location access or fill in manually.');
-                    } else {
-                        alert('Unable to get your location. Please fill in manually.');
-                    }
-                },
-                { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
-            );
-        },
-
-        onAddressSearchInput() {
-            const q = (this.addressSearch || '').trim();
-            if (this._addressSearchTimer) {
-                clearTimeout(this._addressSearchTimer);
-                this._addressSearchTimer = null;
-            }
-            if (q.length < 3) {
-                this.addressSearchResults = [];
-                this.addressSearching = false;
-                return;
-            }
-            this.addressSearching = true;
-            this._addressSearchTimer = setTimeout(() => this.runAddressSearch(q), 350);
-        },
-
-        async runAddressSearch(q) {
-            const seq = ++this._addressSearchSeq;
-            try {
-                const params = new URLSearchParams({
-                    format: 'jsonv2', q, addressdetails: 1, limit: 8, 'accept-language': 'en'
-                });
-                const res = await fetch('https://nominatim.openstreetmap.org/search?' + params.toString(), {
-                    headers: { 'Accept': 'application/json' }
-                });
-                const data = await res.json();
-                if (seq !== this._addressSearchSeq) return;
-                this.addressSearchResults = Array.isArray(data)
-                    ? data.map(r => ({ display_name: r.display_name, address: r.address || {} }))
-                    : [];
-            } catch (e) {
-                if (seq === this._addressSearchSeq) this.addressSearchResults = [];
-            } finally {
-                if (seq === this._addressSearchSeq) this.addressSearching = false;
-            }
-        },
-
-        selectAddressSearchResult(i) {
-            const item = this.addressSearchResults[i];
-            if (!item) return;
-            this.applyAddress(item.address);
-            this.addressSearch = item.display_name;
-            this.addressSearchResults = [];
-            this.addressSearching = false;
-        },
-
-        applyAddress(addr) {
-            if (!addr) return;
-            const road = [addr.road, addr.pedestrian, addr.footway, addr.path, addr.highway].filter(Boolean)[0] || '';
-            const house = addr.house_number ? addr.house_number + ', ' : '';
-            const sub = addr.neighbourhood || addr.suburb || addr.quarter || addr.locality || '';
-            let city = addr.city || addr.town || addr.village || addr.hamlet || addr.municipality || addr.county || '';
-            const state = addr.state || addr.province || '';
-            const country = this.normalizeCountry(addr.country);
-            let { district, taluka } = this.extractDistrictTaluka(addr, state);
-
-            if (country === 'India') {
-                if (!(city && this.cityStateMap.hasOwnProperty(city))) {
-                    city = addr.county || addr.municipality || city || '';
-                }
-            } else {
-                city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
-                district = '';
-                taluka = '';
-            }
-
-            if (house || road) this.form.address = (house + road).trim();
-            this.form.address_line2 = sub;
-            this.form.city = city;
-            this.form.district = country === 'India' ? district : '';
-            this.form.taluka = country === 'India' ? taluka : '';
-            this.form.state = state;
-            this.form.postal_code = addr.postcode || '';
-            this.form.country = country;
-            this.onCountryChange();
-            if (country === 'India' && city && this.cityStateMap.hasOwnProperty(city)) {
-                this.form.state = this.cityStateMap[city];
-            }
-        },
-
         optionsUrl: '{{ route("lab-tests.options", [], false) }}',
 
         slot: {
-            parameter: '', discipline: '', nabl: '',
+            parameter: '', discipline: '', nabl: '', testId: '',
             parameterOptions: [], disciplineOptions: [], nablOptions: [], tests: [],
             parameterSearch: '', parameterOpen: false,
             loading: false, _seq: 0
@@ -1657,6 +1429,8 @@ function quotationApp() {
 
         initApp() {
             this.restoreState();
+            this.form.country = 'India';
+            this.form.courier_country = 'India';
             this.slotLoad();
         },
 
@@ -1684,9 +1458,10 @@ function quotationApp() {
                     s.nablOptions = data.options || [];
                 } else if (data.level === 'test') {
                     s.tests = data.tests || [];
-                    if (s.tests.length) {
+                    s.testId = '';
+                    if (s.tests.length === 1) {
                         this.confirmTest(s.tests[0]);
-                    } else {
+                    } else if (!s.tests.length) {
                         this.slotMessage = 'No tests found for the selected Parameter, Discipline and NABL combination.';
                     }
                 }
@@ -1699,7 +1474,7 @@ function quotationApp() {
 
         onSlotParameterChange() {
             const s = this.slot;
-            s.discipline = ''; s.nabl = '';
+            s.discipline = ''; s.nabl = ''; s.testId = '';
             s.disciplineOptions = []; s.nablOptions = []; s.tests = [];
             this.slotMessage = '';
             if (s.parameter) this.slotLoad();
@@ -1731,7 +1506,7 @@ function quotationApp() {
 
         onSlotDisciplineChange() {
             const s = this.slot;
-            s.nabl = '';
+            s.nabl = ''; s.testId = '';
             s.nablOptions = []; s.tests = [];
             this.slotMessage = '';
             if (s.discipline) this.slotLoad();
@@ -1739,27 +1514,47 @@ function quotationApp() {
 
         onSlotNablChange() {
             const s = this.slot;
+            s.testId = '';
             s.tests = [];
             this.slotMessage = '';
             if (s.nabl) this.slotLoad();
         },
 
+        onSlotTestChange() {
+            const s = this.slot;
+            const test = (s.tests || []).find(t => String(t.id) === String(s.testId));
+            if (test) this.confirmTest(test);
+        },
+
+        slotTestLabel(t) {
+            const label = t.method || 'Method not specified';
+
+            return t.charges_per_sample != null ? `${label} — ₹${t.charges_per_sample}` : label;
+        },
+
+        testSelectionKey(t) {
+            return [t.parameter, t.nabl ?? t.nabl_type, t.method]
+                .map(value => String(value ?? '').trim())
+                .join('|');
+        },
+
         confirmTest(t) {
             if (!t) return;
             if (this.selectedTests.length >= this.maxTests) {
-                this.slotMessage = `Maximum ${this.maxTests} tests allowed per quotation. Please submit this form and create a new one for additional tests.`;
+                this.slotMessage = `Maximum ${this.maxTests} tests are allowed per quotation. If you need more than ${this.maxTests} tests, please submit this form again and fill out a new one.`;
                 this.resetSlot();
                 return;
             }
-            const key = [t.parameter, t.discipline, t.nabl].join('|');
-            const duplicate = this.selectedTests.some(x => [x.parameter, x.discipline, x.nabl].join('|') === key);
+            const nabl = t.nabl || t.nabl_type || this.slot.nabl || '';
+            const key = this.testSelectionKey({ ...t, nabl });
+            const duplicate = this.selectedTests.some(x => this.testSelectionKey(x) === key);
             if (duplicate) {
-                this.slotMessage = 'This Parameter, Discipline and NABL combination is already in your selection. Please choose another Parameter.';
+                this.slotMessage = 'This Test / Parameter, NABL / NON NABL selection and Method combination is already in your selection. Please choose another Parameter.';
                 return;
             }
             this.selectedTests.push({
                 id: t.id, parameter: t.parameter, discipline: t.discipline, material: t.material || '',
-                nabl: t.nabl, method: t.method || '', sample_quantity: t.sample_quantity || '',
+                nabl: nabl, method: t.method || '', sample_quantity: t.sample_quantity || '',
                 lead_time: t.lead_time || '', protocol_no: t.protocol_no || '', nabl_range: t.nabl_range || '',
                 limit_of_quantification: t.limit_of_quantification || '', remarks: t.remarks || '',
                 protocol_link: t.protocol_link || '', no_of_samples: 1
@@ -1773,7 +1568,7 @@ function quotationApp() {
         resetSlot() {
             const s = this.slot;
             s._seq++;
-            s.parameter = ''; s.discipline = ''; s.nabl = '';
+            s.parameter = ''; s.discipline = ''; s.nabl = ''; s.testId = '';
             s.disciplineOptions = []; s.nablOptions = []; s.tests = [];
             s.parameterSearch = ''; s.parameterOpen = false;
             this.slotMessage = '';
@@ -1799,13 +1594,12 @@ function quotationApp() {
             if (n === 1) {
                 if (!this.form.company_name.trim()) { this.stepErrors[1].push('Please enter company name.'); if (!this.firstErrorId) this.firstErrorId = 'company_name'; }
                 if (!this.form.address.trim()) { this.stepErrors[1].push('Please enter complete address.'); if (!this.firstErrorId) this.firstErrorId = 'address'; }
-                if (!this.form.country) { this.stepErrors[1].push('Please select country.'); if (!this.firstErrorId) this.firstErrorId = 'country'; }
-                else if (this.form.country === 'India' && !this.form.state) { this.stepErrors[1].push('Please enter state.'); if (!this.firstErrorId) this.firstErrorId = 'state'; }
+                if (!this.form.state.trim()) { this.stepErrors[1].push('Please enter state.'); if (!this.firstErrorId) this.firstErrorId = 'state'; }
                 if (!this.form.city) { this.stepErrors[1].push('Please enter city.'); if (!this.firstErrorId) this.firstErrorId = 'city'; }
                 if (!this.form.postal_code.trim()) { this.stepErrors[1].push('Please enter postal code.'); if (!this.firstErrorId) this.firstErrorId = 'postal_code'; }
                 if (this.form.courier_option === 'different') {
                     if (!this.form.courier_address.trim()) { this.stepErrors[1].push('Please enter courier address.'); if (!this.firstErrorId) this.firstErrorId = 'courier_address'; }
-                    if (!this.form.courier_country) { this.stepErrors[1].push('Please select courier country.'); if (!this.firstErrorId) this.firstErrorId = 'courier_country'; }
+                    if (!this.form.courier_state.trim()) { this.stepErrors[1].push('Please enter courier state.'); if (!this.firstErrorId) this.firstErrorId = 'courier_state'; }
                     if (!this.form.courier_city.trim()) { this.stepErrors[1].push('Please enter courier city.'); if (!this.firstErrorId) this.firstErrorId = 'courier_city'; }
                     if (!this.form.courier_postal_code.trim()) { this.stepErrors[1].push('Please enter courier postal code.'); if (!this.firstErrorId) this.firstErrorId = 'courier_postal_code'; }
                 }
@@ -1813,7 +1607,7 @@ function quotationApp() {
                 if (!this.form.mobile.trim()) { this.stepErrors[1].push('Please enter mobile number.'); if (!this.firstErrorId) this.firstErrorId = 'mobile'; }
                 else if (!this.form.mobile_country) { this.stepErrors[1].push('Please select country code.'); if (!this.firstErrorId) this.firstErrorId = 'mobile_country'; }
                 else if (!this.isValidMobile()) {
-                    this.stepErrors[1].push(this.form.country === 'India' ? 'Please enter a valid 10-digit Indian mobile number.' : 'Please enter a valid mobile number.');
+                    this.stepErrors[1].push(this.form.mobile_country === '+91' ? 'Please enter a valid 10-digit Indian mobile number.' : 'Please enter a valid mobile number.');
                     if (!this.firstErrorId) this.firstErrorId = 'mobile';
                 }
                 if (!this.form.email.trim()) { this.stepErrors[1].push('Please enter your email address.'); if (!this.firstErrorId) this.firstErrorId = 'email'; }
@@ -1882,6 +1676,8 @@ function quotationApp() {
             formData.append('different_courier_address', courierDifferent ? '1' : '0');
             formData.append('courier_address', courierDifferent ? (this.form.courier_address || '') : '');
             formData.append('courier_address_line2', courierDifferent ? (this.form.courier_address_line2 || '') : '');
+            formData.append('courier_taluka', courierDifferent ? (this.form.courier_taluka || '') : '');
+            formData.append('courier_district', courierDifferent ? (this.form.courier_district || '') : '');
             formData.append('courier_city', courierDifferent ? (this.form.courier_city || '') : '');
             formData.append('courier_state', courierDifferent ? (this.form.courier_state || '') : '');
             formData.append('courier_postal_code', courierDifferent ? (this.form.courier_postal_code || '') : '');

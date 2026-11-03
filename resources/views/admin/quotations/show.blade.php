@@ -119,7 +119,7 @@
                     <div class="sm:col-span-2">
                         <p class="text-xs text-gray-500">Courier Address</p>
                         <p class="text-sm font-medium text-gray-900">
-                            {{ $quotation->courier_address }}{{ $quotation->courier_address_line2 ? ', ' . $quotation->courier_address_line2 : '' }}{{ $quotation->courier_city ? ', ' . $quotation->courier_city : '' }}{{ $quotation->courier_state ? ', ' . $quotation->courier_state : '' }}{{ $quotation->courier_postal_code ? ', ' . $quotation->courier_postal_code : '' }}{{ $quotation->courier_country ? ', ' . $quotation->courier_country : '' }}
+                            {{ $quotation->courier_address }}{{ $quotation->courier_address_line2 ? ', ' . $quotation->courier_address_line2 : '' }}{{ $quotation->courier_state ? ', ' . $quotation->courier_state : '' }}{{ $quotation->courier_city ? ', ' . $quotation->courier_city : '' }}{{ $quotation->courier_taluka ? ', ' . $quotation->courier_taluka : '' }}{{ $quotation->courier_district ? ', ' . $quotation->courier_district : '' }}{{ $quotation->courier_postal_code ? ', ' . $quotation->courier_postal_code : '' }}
                         </p>
                     </div>
                     @endif

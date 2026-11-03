@@ -117,6 +117,8 @@ class InvoiceService
                 'courier_address' => $quotation->courier_address,
                 'courier_address_line2' => $quotation->courier_address_line2,
                 'courier_city' => $quotation->courier_city,
+                'courier_taluka' => $quotation->courier_taluka,
+                'courier_district' => $quotation->courier_district,
                 'courier_state' => $quotation->courier_state,
                 'courier_postal_code' => $quotation->courier_postal_code,
                 'courier_country' => $quotation->courier_country,

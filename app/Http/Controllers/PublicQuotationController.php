@@ -151,6 +151,8 @@ class PublicQuotationController extends Controller
                 'courier_address' => ($data['different_courier_address'] ?? false) ? ($data['courier_address'] ?? null) : null,
                 'courier_address_line2' => ($data['different_courier_address'] ?? false) ? ($data['courier_address_line2'] ?? null) : null,
                 'courier_city' => ($data['different_courier_address'] ?? false) ? ($data['courier_city'] ?? null) : null,
+                'courier_taluka' => ($data['different_courier_address'] ?? false) ? ($data['courier_taluka'] ?? null) : null,
+                'courier_district' => ($data['different_courier_address'] ?? false) ? ($data['courier_district'] ?? null) : null,
                 'courier_state' => ($data['different_courier_address'] ?? false) ? ($data['courier_state'] ?? null) : null,
                 'courier_postal_code' => ($data['different_courier_address'] ?? false) ? ($data['courier_postal_code'] ?? null) : null,
                 'courier_country' => ($data['different_courier_address'] ?? false) ? ($data['courier_country'] ?? null) : null,

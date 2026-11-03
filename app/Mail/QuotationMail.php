@@ -45,6 +45,9 @@ class QuotationMail extends Mailable
 
         $amount = $currency . number_format((float) $this->quotation->grand_total, 2);
 
+        // Calculate validity date: quotation date + 1 calendar month
+        $validUntil = $this->quotation->quotation_date->copy()->addMonthNoOverflow()->format('d M Y');
+
         $replacements = [
             '{{client_name}}' => $this->quotation->client_name,
             '{{company_name}}' => $company['name'] ?? '',
@@ -52,6 +55,7 @@ class QuotationMail extends Mailable
             '{{date}}' => $this->quotation->quotation_date->format('d M Y'),
             '{{amount}}' => $amount,
             '{{grand_total}}' => $amount,
+            '{{valid_until}}' => $validUntil,
         ];
 
         foreach ($replacements as $k => $v) {

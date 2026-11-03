@@ -106,14 +106,29 @@
                         <input type="text" id="courier_address" name="courier_address" value="{{ old('courier_address', $quotation->courier_address) }}"
                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
                     </div>
+                    <div class="sm:col-span-2">
+                        <label for="courier_address_line2" class="block text-xs font-medium text-gray-700 mb-1">Courier Address Line 2</label>
+                        <input type="text" id="courier_address_line2" name="courier_address_line2" value="{{ old('courier_address_line2', $quotation->courier_address_line2) }}"
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+                    </div>
+                    <div>
+                        <label for="courier_state" class="block text-xs font-medium text-gray-700 mb-1">Courier State</label>
+                        <input type="text" id="courier_state" name="courier_state" value="{{ old('courier_state', $quotation->courier_state) }}"
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+                    </div>
                     <div>
                         <label for="courier_city" class="block text-xs font-medium text-gray-700 mb-1">Courier City</label>
                         <input type="text" id="courier_city" name="courier_city" value="{{ old('courier_city', $quotation->courier_city) }}"
                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
                     </div>
                     <div>
-                        <label for="courier_state" class="block text-xs font-medium text-gray-700 mb-1">Courier State</label>
-                        <input type="text" id="courier_state" name="courier_state" value="{{ old('courier_state', $quotation->courier_state) }}"
+                        <label for="courier_taluka" class="block text-xs font-medium text-gray-700 mb-1">Courier Taluka</label>
+                        <input type="text" id="courier_taluka" name="courier_taluka" value="{{ old('courier_taluka', $quotation->courier_taluka) }}"
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+                    </div>
+                    <div>
+                        <label for="courier_district" class="block text-xs font-medium text-gray-700 mb-1">Courier District</label>
+                        <input type="text" id="courier_district" name="courier_district" value="{{ old('courier_district', $quotation->courier_district) }}"
                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
                     </div>
                     <div>

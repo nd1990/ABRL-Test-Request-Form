@@ -121,6 +121,7 @@ class LabTestController extends Controller
         $tests = collect($unique)->sortBy(fn ($t) => $t->id)->values()
             ->map(fn ($t) => [
                 'id' => $t->id,
+                'nabl' => $t->nabl_type,
                 'nabl_type' => $t->nabl_type,
                 'discipline' => $t->discipline,
                 'material' => $t->material,
@@ -217,6 +218,7 @@ class LabTestController extends Controller
             'level' => 'parameter',
             'options' => $tests->map(fn ($t) => [
                 'id' => $t->id,
+                'nabl' => $t->nabl_type,
                 'nabl_type' => $t->nabl_type,
                 'discipline' => $t->discipline,
                 'material' => $t->material,

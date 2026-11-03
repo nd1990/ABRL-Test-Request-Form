@@ -75,7 +75,7 @@ class DatabaseSeeder extends Seeder
                 'sender_name' => 'Your Company Pvt Ltd',
                 'sender_email' => 'quotes@yourcompany.com',
                 'subject' => 'Quotation {{quotation_number}} from {{company_name}}',
-                'body' => "Dear {{client_name}},\n\nThank you for your interest in our services.\n\nPlease find attached your quotation {{quotation_number}} dated {{date}} for a total of {{amount}}.\n\nThe quotation is valid until the date mentioned in the document.\n\nIf you have any questions, feel free to reach out to us.\n\nBest regards,\n{{company_name}}",
+                'body' => "Dear {{client_name}},\n\nThank you for your interest in our services.\n\nPlease find attached your quotation {{quotation_number}} dated {{date}} for a total of {{amount}}.\n\nThe quotation is valid until {{valid_until}}.\n\nIf you have any questions, feel free to reach out to us.\n\nBest regards,\n{{company_name}}",
                 'notify_new_quotation' => '1',
                 'notify_new_quotation_subject' => 'New Quotation Request {{quotation_number}}',
             ],

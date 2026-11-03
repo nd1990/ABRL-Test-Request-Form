@@ -14,7 +14,8 @@ class Invoice extends Model
         'client_name', 'company_name', 'email', 'phone',
         'address', 'address_line2', 'city', 'state', 'country', 'postal_code',
         'gst_number', 'pan_number',
-        'courier_address', 'courier_address_line2', 'courier_city', 'courier_state', 'courier_postal_code', 'courier_country',
+        'courier_address', 'courier_address_line2', 'courier_city', 'courier_taluka', 'courier_district',
+        'courier_state', 'courier_postal_code', 'courier_country',
         'invoice_date', 'subtotal', 'discount', 'tax', 'grand_total',
         'status', 'notes', 'pdf_path', 'created_by',
     ];

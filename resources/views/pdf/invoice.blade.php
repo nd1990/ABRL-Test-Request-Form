@@ -102,7 +102,7 @@
     $clientCompany = $inv->company_name ?: $inv->client_name;
     $clientAddr = trim(implode(', ', array_filter([$inv->address, $inv->address_line2, $inv->city, $inv->state, $inv->postal_code, $inv->country])));
     $courierAddr = $inv->courier_address
-        ? trim(implode(', ', array_filter([$inv->courier_address, $inv->courier_address_line2, $inv->courier_city, $inv->courier_state, $inv->courier_postal_code, $inv->courier_country])))
+        ? trim(implode(', ', array_filter([$inv->courier_address, $inv->courier_address_line2, $inv->courier_state, $inv->courier_city, $inv->courier_taluka, $inv->courier_district, $inv->courier_postal_code])))
         : '';
     $taxPct = $inv->subtotal > 0 ? (round(((float)$inv->tax / (float)$inv->subtotal) * 100)) : 0;
     $currencyFormat = fn($n) => $currency . number_format((float) $n, 2);

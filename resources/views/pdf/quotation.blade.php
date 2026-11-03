@@ -55,7 +55,7 @@
         .bordered.party td { border: 1px solid #d3d3d3; }
 
         /* ---------- Table headers (sample + quotation) ---------- */
-        .thead td, .thead th { background-color: #3a3f47; color: #ffffff; font-weight: bold; font-size: 7.5pt; }
+        .thead td, .thead th { background-color: #e4e7eb; color: #1f2937; font-weight: bold; font-size: 7.5pt; }
 
         .sample-head td, .sample-head th { font-size: 7.5pt; }
 
@@ -109,7 +109,7 @@
     $clientCompany = $quot->company_name ?: $quot->client_name;
     $clientAddr = trim(implode(', ', array_filter([$quot->address, $quot->address_line2, $quot->city, $quot->district, $quot->taluka, $quot->state, $quot->postal_code, $quot->country])));
     $courierAddr = $quot->courier_address
-        ? trim(implode(', ', array_filter([$quot->courier_address, $quot->courier_address_line2, $quot->courier_city, $quot->courier_state, $quot->courier_postal_code, $quot->courier_country])))
+        ? trim(implode(', ', array_filter([$quot->courier_address, $quot->courier_address_line2, $quot->courier_state, $quot->courier_city, $quot->courier_taluka, $quot->courier_district, $quot->courier_postal_code])))
         : '';
     $taxPct = $quot->subtotal > 0 ? (round(((float)$quot->tax / (float)$quot->subtotal) * 100)) : 0;
     $quot->loadMissing('items.labTest');
@@ -305,7 +305,7 @@
 
     <div class="terms-row"><span class="num">1.</span> Payment must be made 100% in advance via NEFT, RTGS, or any online payment mode. Cash or cheque payments are not accepted.</div>
     <div class="terms-row"><span class="num">2.</span> The analysis will commence only after receipt of full payment. The lead time will begin only after the full advance payment has been received.</div>
-    <div class="terms-row"><span class="num">3.</span> The estimated timeframe for Test Report delivery is 15 working days under normal conditions. In case of any unforeseen circumstances, the delay will be communicated accordingly.</div>
+    <div class="terms-row"><span class="num">3.</span> The estimated timeframe for Test Report delivery is <strong>15 working days</strong> under normal conditions. In case of any unforeseen circumstances, the delay will be communicated accordingly.</div>
     <div class="terms-row"><span class="num">4.</span> Except for the Test Report, no raw data or additional supporting documents related to the analysis of samples will be provided.</div>
     <div class="terms-row"><span class="num">5.</span> Test Reports will be issued in the name specified on the Party Registration &amp; Test Request form, with the same sample name and batch number as mentioned on the received samples.</div>
     <div class="terms-row"><span class="num">6.</span> Once the Test Report is generated, no corrections or removal of any parameters will be entertained. Any retesting or reconfirmation of parameters will incur additional charges, subject to the availability of the sample.</div>
