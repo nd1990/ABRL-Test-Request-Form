@@ -759,15 +759,15 @@
                         </div>
 
                         <!-- Documents Attached (review) -->
-                        <div x-show="otherFiles.length > 0 || otherFileNames.length > 0" class="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/60 via-white to-white shadow-sm overflow-hidden">
-                            <div class="px-4 sm:px-5 py-3.5 flex items-center gap-3 bg-gradient-to-r from-amber-500 to-orange-500">
+                        <div x-show="otherFiles.length > 0 || otherFileNames.length > 0" class="rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50/60 via-white to-white shadow-sm overflow-hidden">
+                            <div class="px-4 sm:px-5 py-3.5 flex items-center gap-3 bg-gradient-to-r from-sky-600 to-cyan-600">
                                 <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" /></svg>
                                 </span>
                                 <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">Documents</h3>
-                                <span class="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-100 bg-amber-500/25 rounded-full px-2.5 py-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                                    <span x-text="otherFiles.length + ' file' + (otherFiles.length === 1 ? '' : 's')"></span>
+                                <span class="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-sky-100 bg-sky-500/25 rounded-full px-2.5 py-1">
+                                    <svg x-show="otherFiles.length > 0" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                                    <span x-text="otherFiles.length ? otherFiles.length + ' file' + (otherFiles.length === 1 ? '' : 's') + ' attached' : 'Not attached'"></span>
                                 </span>
                             </div>
                             <div class="p-4 sm:p-5 space-y-3">
@@ -775,9 +775,14 @@
                                     <template x-for="(f, i) in otherFiles" :key="'rf-' + i">
                                         <li class="text-sm font-medium text-gray-900" x-text="f.name"></li>
                                     </template>
+                                    <template x-if="otherFiles.length === 0">
+                                        <template x-for="(name, i) in otherFileNames" :key="'saved-rf-' + i">
+                                            <li class="text-sm text-gray-600" x-text="name"></li>
+                                        </template>
+                                    </template>
                                 </ul>
-                                <p x-show="otherFileNames.length" class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                                    These documents were attached earlier, but this page was reloaded so they can no longer be sent. Please go to Sample Details and re-upload them before submitting.
+                                <p x-show="otherFiles.length === 0 && otherFileNames.length > 0" class="text-sm text-sky-800 bg-sky-50 border border-sky-100 rounded-lg px-3 py-2">
+                                    These filenames are from a saved draft; the files aren't attached right now. If you'd like to include them, upload them again in Sample Details. You can also continue without them.
                                 </p>
                             </div>
                         </div>
