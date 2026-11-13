@@ -549,7 +549,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Documents <span class="font-normal text-gray-400">(Up to 2 files · PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG · max 10 MB each)</span></label>
 
                             <!-- Dropzone -->
-                            <div x-show="otherFiles.length < 2" @click="$refs.otherDocsInput.click()"
+                            <div x-show="!filesRestoring && otherFiles.length < 2" @click="$refs.otherDocsInput.click()"
                                 @dragover.prevent.stop="otherDragOver = true"
                                 @dragleave.prevent.stop="otherDragOver = false"
                                 @drop.prevent.stop="handleOtherDrop($event)"
@@ -839,31 +839,23 @@
                         </div>
 
                         <!-- Documents Attached (review) -->
-                        <div x-show="otherFiles.length > 0 || otherFileNames.length > 0" class="rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50/60 via-white to-white shadow-sm overflow-hidden">
+                        <div x-show="otherFiles.length > 0" class="rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50/60 via-white to-white shadow-sm overflow-hidden">
                             <div class="px-4 sm:px-5 py-3.5 flex items-center gap-3 bg-gradient-to-r from-sky-600 to-cyan-600">
                                 <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" /></svg>
                                 </span>
                                 <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">Documents</h3>
                                 <span class="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-sky-100 bg-sky-500/25 rounded-full px-2.5 py-1">
-                                    <svg x-show="otherFiles.length > 0" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                                    <span x-text="otherFiles.length ? otherFiles.length + ' file' + (otherFiles.length === 1 ? '' : 's') + ' attached' : 'Not attached'"></span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                                    <span x-text="otherFiles.length + ' file' + (otherFiles.length === 1 ? '' : 's') + ' attached'"></span>
                                 </span>
                             </div>
-                            <div class="p-4 sm:p-5 space-y-3">
+                            <div class="p-4 sm:p-5">
                                 <ul class="space-y-1">
                                     <template x-for="(f, i) in otherFiles" :key="'rf-' + i">
                                         <li class="text-sm font-medium text-gray-900" x-text="f.name"></li>
                                     </template>
-                                    <template x-if="otherFiles.length === 0">
-                                        <template x-for="(name, i) in otherFileNames" :key="'saved-rf-' + i">
-                                            <li class="text-sm text-gray-600" x-text="name"></li>
-                                        </template>
-                                    </template>
                                 </ul>
-                                <p x-show="otherFiles.length === 0 && otherFileNames.length > 0" class="text-sm text-sky-800 bg-sky-50 border border-sky-100 rounded-lg px-3 py-2">
-                                    These filenames are from a saved draft; the files aren't attached right now. If you'd like to include them, upload them again in Sample Details. You can also continue without them.
-                                </p>
                             </div>
                         </div>
 
@@ -1101,9 +1093,14 @@ function quotationApp() {
         otherFiles: [],
         otherError: '',
         otherDragOver: false,
-        otherFileNames: [],
+        filesRestoring: true,
         fileSizeLimitMB: 10,
         otherExts: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png'],
+
+        _filesDbName: 'abrl_quotation_files',
+        _filesStoreName: 'documents',
+        _filesDbPromise: null,
+        _filesPersistChain: Promise.resolve(),
 
         mobileCodes: [
             { code: '+91', name: 'India' },
@@ -1546,6 +1543,95 @@ function quotationApp() {
             if (files.length) this.addOtherFiles(files);
         },
 
+        openFilesDb() {
+            if (this._filesDbPromise) return this._filesDbPromise;
+            this._filesDbPromise = new Promise((resolve, reject) => {
+                if (!('indexedDB' in window)) {
+                    reject(new Error('IndexedDB is not available'));
+                    return;
+                }
+                const req = indexedDB.open(this._filesDbName, 1);
+                req.onupgradeneeded = () => {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains(this._filesStoreName)) {
+                        db.createObjectStore(this._filesStoreName);
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => {
+                    this._filesDbPromise = null;
+                    reject(req.error);
+                };
+            });
+            return this._filesDbPromise;
+        },
+
+        persistOtherFiles() {
+            const snapshot = this.otherFiles.map(f => ({
+                name: f.name,
+                type: f.type || '',
+                lastModified: f.lastModified || Date.now(),
+                blob: f,
+            }));
+            this._filesPersistChain = this._filesPersistChain
+                .catch(() => {})
+                .then(() => this.writeOtherFiles(snapshot))
+                .catch(() => {});
+        },
+
+        async writeOtherFiles(snapshot) {
+            const db = await this.openFilesDb();
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(this._filesStoreName, 'readwrite');
+                tx.objectStore(this._filesStoreName).put(snapshot, 'other');
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+                tx.onabort = () => reject(tx.error);
+            });
+        },
+
+        async readOtherFiles() {
+            const db = await this.openFilesDb();
+            const stored = await new Promise((resolve, reject) => {
+                const tx = db.transaction(this._filesStoreName, 'readonly');
+                const req = tx.objectStore(this._filesStoreName).get('other');
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => reject(req.error);
+            });
+            return (Array.isArray(stored) ? stored : [])
+                .filter(item => item && item.name && item.blob)
+                .map(item => new File(
+                    [item.blob],
+                    item.name,
+                    { type: item.type || item.blob.type || '', lastModified: item.lastModified || Date.now() }
+                ));
+        },
+
+        async restoreOtherFiles() {
+            try {
+                const files = await this.readOtherFiles();
+                if (files.length && this.otherFiles.length === 0) {
+                    this.otherFiles = files;
+                }
+            } catch (e) {
+                // IndexedDB may be unavailable (private mode / old browser); upload still works.
+            } finally {
+                this.filesRestoring = false;
+            }
+        },
+
+        async clearStoredOtherFiles() {
+            try {
+                const db = await this.openFilesDb();
+                await new Promise((resolve, reject) => {
+                    const tx = db.transaction(this._filesStoreName, 'readwrite');
+                    tx.objectStore(this._filesStoreName).delete('other');
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
+                });
+            } catch (e) {}
+        },
+
         addOtherFiles(files) {
             let err = '';
             const maxFiles = 2;
@@ -1564,7 +1650,7 @@ function quotationApp() {
             }
             if (accepted.length) {
                 this.otherFiles = this.otherFiles.concat(accepted);
-                this.otherFileNames = this.otherFiles.map(f => f.name);
+                this.persistOtherFiles();
                 this.otherError = '';
             }
             if (err) this.otherError = err;
@@ -1574,7 +1660,7 @@ function quotationApp() {
         removeOtherFile(index) {
             if (index >= 0 && index < this.otherFiles.length) {
                 this.otherFiles.splice(index, 1);
-                this.otherFileNames = this.otherFiles.map(f => f.name);
+                this.persistOtherFiles();
             }
             this.otherError = '';
             this.saveState();
@@ -1609,7 +1695,6 @@ function quotationApp() {
                 })),
                 acceptTerms: this.acceptTerms,
                 submittedSteps: [...this.submittedSteps],
-                otherFileNames: this.otherFiles.length ? this.otherFiles.map(f => f.name) : this.otherFileNames,
             };
             try { localStorage.setItem(this._saveKey, JSON.stringify(state)); } catch (e) {}
         },
@@ -1625,7 +1710,6 @@ function quotationApp() {
                 if (state.selectedTests) this.selectedTests = state.selectedTests;
                 if (state.acceptTerms) this.acceptTerms = state.acceptTerms;
                 if (state.submittedSteps) this.submittedSteps = state.submittedSteps;
-                if (state.otherFileNames) this.otherFileNames = state.otherFileNames;
                 return true;
             } catch (e) { return false; }
         },
@@ -1638,16 +1722,23 @@ function quotationApp() {
             try { return !!localStorage.getItem(this._saveKey); } catch (e) { return false; }
         },
 
-        resetForm() {
+        async resetForm() {
             if (!confirm('Start over and clear all entered details?')) return;
             this.clearState();
+            await this.clearStoredOtherFiles();
             window.location.reload();
         },
 
         initApp() {
-            this.restoreState();
+            const restored = this.restoreState();
             if (!this.form.country) this.form.country = 'India';
             if (!this.form.courier_country) this.form.courier_country = 'India';
+            if (restored) {
+                this.restoreOtherFiles();
+            } else {
+                this.filesRestoring = false;
+                this.clearStoredOtherFiles();
+            }
             this.loadLocationData();
             this.slotLoad();
         },
@@ -2001,7 +2092,9 @@ function quotationApp() {
             .then(({ ok, status, data }) => {
                 if (ok && data.redirect) {
                     this.clearState();
-                    window.location.href = data.redirect;
+                    this.clearStoredOtherFiles().finally(() => {
+                        window.location.href = data.redirect;
+                    });
                 } else {
                     const errors = data.errors || {};
                     const firstError = errors.lab_tests?.[0] || errors.other_documents?.[0] || errors.accept_terms?.[0]
