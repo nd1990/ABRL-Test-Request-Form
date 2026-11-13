@@ -1842,7 +1842,7 @@ function quotationApp() {
         },
 
         testSelectionKey(t) {
-            return [t.parameter, t.nabl ?? t.nabl_type, t.method]
+            return [t.parameter, t.discipline, t.nabl ?? t.nabl_type, t.method]
                 .map(value => String(value ?? '').trim())
                 .join('|');
         },
