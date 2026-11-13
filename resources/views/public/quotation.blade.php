@@ -198,6 +198,25 @@
                                         <label for="state" x-show="form.state" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">State / Province / Region</label>
                                     </div>
                                 </div>
+                                <div class="relative">
+                                    <template x-if="addressCityOptions().length && !manualAddress.city">
+                                        <select id="city" x-model="form.city" @change="onAddressCityChange($event.target.value)"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                            :class="[form.city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                            <option value="">Select City</option>
+                                            <template x-for="city in addressCityOptions()" :key="'city-' + city">
+                                                <option x-bind:value="city" x-text="city"></option>
+                                            </template>
+                                            <option value="__other__">Other (type manually)</option>
+                                        </select>
+                                    </template>
+                                    <template x-if="!addressCityOptions().length || manualAddress.city">
+                                        <input type="text" id="city" x-model="form.city" @input="onAddressCityInput()" placeholder="City"
+                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            :class="[form.city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                    </template>
+                                    <label for="city" x-show="form.city" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">City</label>
+                                </div>
                                 <div>
                                     <div class="relative">
                                         <template x-if="addressDistrictOptions().length && !manualAddress.district">
@@ -239,25 +258,6 @@
                                         </template>
                                         <label for="taluka" x-show="form.taluka" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Taluka / Sub-district</label>
                                     </div>
-                                </div>
-                                <div class="relative">
-                                    <template x-if="addressCityOptions().length && !manualAddress.city">
-                                        <select id="city" x-model="form.city" @change="onAddressCityChange($event.target.value)"
-                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
-                                            :class="[form.city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
-                                            <option value="">Select City</option>
-                                            <template x-for="city in addressCityOptions()" :key="'city-' + city">
-                                                <option x-bind:value="city" x-text="city"></option>
-                                            </template>
-                                            <option value="__other__">Other (type manually)</option>
-                                        </select>
-                                    </template>
-                                    <template x-if="!addressCityOptions().length || manualAddress.city">
-                                        <input type="text" id="city" x-model="form.city" @input="onAddressCityInput()" placeholder="City"
-                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="[form.city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
-                                    </template>
-                                    <label for="city" x-show="form.city" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">City</label>
                                 </div>
                                 <div>
                                     <div class="relative">
@@ -337,6 +337,25 @@
                                         </div>
                                     </div>
                                     <div class="relative">
+                                        <template x-if="courierCityOptions().length && !manualCourier.city">
+                                            <select id="courier_city" x-model="form.courier_city" @change="onCourierCityChange($event.target.value)"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                                :class="[form.courier_city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                                <option value="">Select City</option>
+                                                <template x-for="city in courierCityOptions()" :key="'courier-city-' + city">
+                                                    <option x-bind:value="city" x-text="city"></option>
+                                                </template>
+                                                <option value="__other__">Other (type manually)</option>
+                                            </select>
+                                        </template>
+                                        <template x-if="!courierCityOptions().length || manualCourier.city">
+                                            <input type="text" id="courier_city" x-model="form.courier_city" placeholder="City"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="[form.courier_city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
+                                        </template>
+                                        <label for="courier_city" x-show="form.courier_city" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">City</label>
+                                    </div>
+                                    <div class="relative">
                                         <template x-if="courierDistrictOptions().length && !manualCourier.district">
                                             <select id="courier_district" x-model="form.courier_district" @change="onCourierDistrictChange($event.target.value)"
                                                 class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
@@ -373,25 +392,6 @@
                                                 :class="form.courier_taluka ? 'pt-4 pb-1' : ''">
                                         </template>
                                         <label for="courier_taluka" x-show="form.courier_taluka" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Taluka / Sub-district</label>
-                                    </div>
-                                    <div class="relative">
-                                        <template x-if="courierCityOptions().length && !manualCourier.city">
-                                            <select id="courier_city" x-model="form.courier_city" @change="onCourierCityChange($event.target.value)"
-                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
-                                                :class="[form.courier_city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
-                                                <option value="">Select City</option>
-                                                <template x-for="city in courierCityOptions()" :key="'courier-city-' + city">
-                                                    <option x-bind:value="city" x-text="city"></option>
-                                                </template>
-                                                <option value="__other__">Other (type manually)</option>
-                                            </select>
-                                        </template>
-                                        <template x-if="!courierCityOptions().length || manualCourier.city">
-                                            <input type="text" id="courier_city" x-model="form.courier_city" placeholder="City"
-                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                                :class="[form.courier_city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
-                                        </template>
-                                        <label for="courier_city" x-show="form.courier_city" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">City</label>
                                     </div>
                                     <div class="relative">
                                         <input type="text" id="courier_postal_code" x-model="form.courier_postal_code" placeholder="Postal / Zip Code"
