@@ -179,25 +179,39 @@
                                 </div>
                                 <div>
                                     <div class="relative">
-                                        <input type="text" id="state" x-model="form.state" @input="onAddressStateInput()" placeholder="State"
-                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="form.state ? 'pt-4 pb-1' : ''">
+                                        <template x-if="addressStateOptions().length && !manualAddress.state">
+                                            <select id="state" x-model="form.state" @change="onAddressStateChange($event.target.value)"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                                :class="form.state ? 'pt-4 pb-1' : ''">
+                                                <option value="">Select State</option>
+                                                <template x-for="s in addressStateOptions()" :key="'state-' + s">
+                                                    <option :value="s" x-text="s"></option>
+                                                </template>
+                                                <option value="__other__">Other (type manually)</option>
+                                            </select>
+                                        </template>
+                                        <template x-if="!addressStateOptions().length || manualAddress.state">
+                                            <input type="text" id="state" x-model="form.state" @input="onAddressStateInput()" placeholder="State"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="form.state ? 'pt-4 pb-1' : ''">
+                                        </template>
                                         <label for="state" x-show="form.state" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">State / Province / Region</label>
                                     </div>
                                 </div>
                                 <div class="relative">
-                                    <template x-if="addressCityOptions().length">
-                                        <select id="city" x-model="form.city"
+                                    <template x-if="addressCityOptions().length && !manualAddress.city">
+                                        <select id="city" x-model="form.city" @change="onAddressCityChange($event.target.value)"
                                             class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
                                             :class="[form.city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
                                             <option value="">Select City</option>
-                                            <template x-for="city in addressCityOptions()" :key="city">
+                                            <template x-for="city in addressCityOptions()" :key="'city-' + city">
                                                 <option x-bind:value="city" x-text="city"></option>
                                             </template>
+                                            <option value="__other__">Other (type manually)</option>
                                         </select>
                                     </template>
-                                    <template x-if="!addressCityOptions().length">
-                                        <input type="text" id="city" x-model="form.city" placeholder="City"
+                                    <template x-if="!addressCityOptions().length || manualAddress.city">
+                                        <input type="text" id="city" x-model="form.city" @input="onAddressCityInput()" placeholder="City"
                                             class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                             :class="[form.city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && !form.city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
                                     </template>
@@ -205,17 +219,43 @@
                                 </div>
                                 <div>
                                     <div class="relative">
-                                        <input type="text" id="taluka" x-model="form.taluka" placeholder="Taluka / Sub-district"
-                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="form.taluka ? 'pt-4 pb-1' : ''">
+                                        <template x-if="addressTalukaOptions().length && !manualAddress.taluka">
+                                            <select id="taluka" x-model="form.taluka" @change="onAddressTalukaChange($event.target.value)"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                                :class="form.taluka ? 'pt-4 pb-1' : ''">
+                                                <option value="">Select Taluka / Sub-district</option>
+                                                <template x-for="t in addressTalukaOptions()" :key="'taluka-' + t">
+                                                    <option :value="t" x-text="t"></option>
+                                                </template>
+                                                <option value="__other__">Other (type manually)</option>
+                                            </select>
+                                        </template>
+                                        <template x-if="!addressTalukaOptions().length || manualAddress.taluka">
+                                            <input type="text" id="taluka" x-model="form.taluka" placeholder="Taluka / Sub-district"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="form.taluka ? 'pt-4 pb-1' : ''">
+                                        </template>
                                         <label for="taluka" x-show="form.taluka" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Taluka / Sub-district</label>
                                     </div>
                                 </div>
                                 <div>
                                     <div class="relative">
-                                        <input type="text" id="district" x-model="form.district" placeholder="District"
-                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="form.district ? 'pt-4 pb-1' : ''">
+                                        <template x-if="addressDistrictOptions().length && !manualAddress.district">
+                                            <select id="district" x-model="form.district" @change="onAddressDistrictChange($event.target.value)"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                                :class="form.district ? 'pt-4 pb-1' : ''">
+                                                <option value="">Select District</option>
+                                                <template x-for="d in addressDistrictOptions()" :key="'district-' + d">
+                                                    <option :value="d" x-text="d"></option>
+                                                </template>
+                                                <option value="__other__">Other (type manually)</option>
+                                            </select>
+                                        </template>
+                                        <template x-if="!addressDistrictOptions().length || manualAddress.district">
+                                            <input type="text" id="district" x-model="form.district" placeholder="District"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="form.district ? 'pt-4 pb-1' : ''">
+                                        </template>
                                         <label for="district" x-show="form.district" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">District</label>
                                     </div>
                                 </div>
@@ -277,24 +317,38 @@
                                     </div>
                                     <div>
                                         <div class="relative">
-                                            <input type="text" id="courier_state" x-model="form.courier_state" @input="onCourierStateInput()" placeholder="State"
-                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                                :class="form.courier_state ? 'pt-4 pb-1' : ''">
+                                            <template x-if="courierStateOptions().length && !manualCourier.state">
+                                                <select id="courier_state" x-model="form.courier_state" @change="onCourierStateChange($event.target.value)"
+                                                    class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                                    :class="form.courier_state ? 'pt-4 pb-1' : ''">
+                                                    <option value="">Select State</option>
+                                                    <template x-for="s in courierStateOptions()" :key="'courier-state-' + s">
+                                                        <option :value="s" x-text="s"></option>
+                                                    </template>
+                                                    <option value="__other__">Other (type manually)</option>
+                                                </select>
+                                            </template>
+                                            <template x-if="!courierStateOptions().length || manualCourier.state">
+                                                <input type="text" id="courier_state" x-model="form.courier_state" @input="onCourierStateInput()" placeholder="State"
+                                                    class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                    :class="form.courier_state ? 'pt-4 pb-1' : ''">
+                                            </template>
                                             <label for="courier_state" x-show="form.courier_state" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">State / Province / Region</label>
                                         </div>
                                     </div>
                                     <div class="relative">
-                                        <template x-if="courierCityOptions().length">
-                                            <select id="courier_city" x-model="form.courier_city"
+                                        <template x-if="courierCityOptions().length && !manualCourier.city">
+                                            <select id="courier_city" x-model="form.courier_city" @change="onCourierCityChange($event.target.value)"
                                                 class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
                                                 :class="[form.courier_city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
                                                 <option value="">Select City</option>
-                                                <template x-for="city in courierCityOptions()" :key="city">
+                                                <template x-for="city in courierCityOptions()" :key="'courier-city-' + city">
                                                     <option x-bind:value="city" x-text="city"></option>
                                                 </template>
+                                                <option value="__other__">Other (type manually)</option>
                                             </select>
                                         </template>
-                                        <template x-if="!courierCityOptions().length">
+                                        <template x-if="!courierCityOptions().length || manualCourier.city">
                                             <input type="text" id="courier_city" x-model="form.courier_city" placeholder="City"
                                                 class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                                 :class="[form.courier_city ? 'pt-4 pb-1' : '', shouldShowValidation(1) && form.courier_option === 'different' && !form.courier_city ? 'border-rose-400 ring-1 ring-rose-200' : '']">
@@ -302,15 +356,41 @@
                                         <label for="courier_city" x-show="form.courier_city" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">City</label>
                                     </div>
                                     <div class="relative">
-                                        <input type="text" id="courier_taluka" x-model="form.courier_taluka" placeholder="Taluka / Sub-district"
-                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="form.courier_taluka ? 'pt-4 pb-1' : ''">
+                                        <template x-if="courierTalukaOptions().length && !manualCourier.taluka">
+                                            <select id="courier_taluka" x-model="form.courier_taluka" @change="onCourierTalukaChange($event.target.value)"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                                :class="form.courier_taluka ? 'pt-4 pb-1' : ''">
+                                                <option value="">Select Taluka / Sub-district</option>
+                                                <template x-for="t in courierTalukaOptions()" :key="'courier-taluka-' + t">
+                                                    <option :value="t" x-text="t"></option>
+                                                </template>
+                                                <option value="__other__">Other (type manually)</option>
+                                            </select>
+                                        </template>
+                                        <template x-if="!courierTalukaOptions().length || manualCourier.taluka">
+                                            <input type="text" id="courier_taluka" x-model="form.courier_taluka" placeholder="Taluka / Sub-district"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="form.courier_taluka ? 'pt-4 pb-1' : ''">
+                                        </template>
                                         <label for="courier_taluka" x-show="form.courier_taluka" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">Taluka / Sub-district</label>
                                     </div>
                                     <div class="relative">
-                                        <input type="text" id="courier_district" x-model="form.courier_district" placeholder="District"
-                                            class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                            :class="form.courier_district ? 'pt-4 pb-1' : ''">
+                                        <template x-if="courierDistrictOptions().length && !manualCourier.district">
+                                            <select id="courier_district" x-model="form.courier_district" @change="onCourierDistrictChange($event.target.value)"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white"
+                                                :class="form.courier_district ? 'pt-4 pb-1' : ''">
+                                                <option value="">Select District</option>
+                                                <template x-for="d in courierDistrictOptions()" :key="'courier-district-' + d">
+                                                    <option :value="d" x-text="d"></option>
+                                                </template>
+                                                <option value="__other__">Other (type manually)</option>
+                                            </select>
+                                        </template>
+                                        <template x-if="!courierDistrictOptions().length || manualCourier.district">
+                                            <input type="text" id="courier_district" x-model="form.courier_district" placeholder="District"
+                                                class="w-full h-11 rounded-xl border border-gray-300 px-3.5 py-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                :class="form.courier_district ? 'pt-4 pb-1' : ''">
+                                        </template>
                                         <label for="courier_district" x-show="form.courier_district" x-cloak class="absolute left-3 top-1 bg-white px-1 text-[10px] leading-3 text-gray-500">District</label>
                                     </div>
                                     <div class="relative">
@@ -1151,164 +1231,266 @@ function quotationApp() {
             'Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'
         ],
 
-        cityStateMap: {
-            'Ahmedabad': 'Gujarat', 'Surat': 'Gujarat', 'Vadodara': 'Gujarat', 'Rajkot': 'Gujarat',
-            'Bhavnagar': 'Gujarat', 'Jamnagar': 'Gujarat', 'Gandhinagar': 'Gujarat', 'Junagadh': 'Gujarat',
-            'Gandhidham': 'Gujarat', 'Anand': 'Gujarat', 'Navsari': 'Gujarat', 'Morbi': 'Gujarat',
-            'Mehsana': 'Gujarat', 'Nadiad': 'Gujarat', 'Surendranagar': 'Gujarat', 'Bharuch': 'Gujarat',
-            'Vapi': 'Gujarat', 'Porbandar': 'Gujarat', 'Amreli': 'Gujarat', 'Valsad': 'Gujarat',
-            'Palanpur': 'Gujarat', 'Godhra': 'Gujarat', 'Patan': 'Gujarat', 'Veraval': 'Gujarat',
-            'Jetpur': 'Gujarat', 'Botad': 'Gujarat', 'Dahod': 'Gujarat', 'Bhuj': 'Gujarat',
-            'Ankleshwar': 'Gujarat', 'Kalol': 'Gujarat', 'Himatnagar': 'Gujarat', 'Dhoraji': 'Gujarat',
-            'Dhrangadhra': 'Gujarat', 'Visnagar': 'Gujarat', 'Unjha': 'Gujarat', 'Sidhpur': 'Gujarat',
-            'Deesa': 'Gujarat', 'Kadi': 'Gujarat', 'Keshod': 'Gujarat', 'Modasa': 'Gujarat',
-            'Pardi': 'Gujarat', 'Sanand': 'Gujarat', 'Vijapur': 'Gujarat', 'Limbdi': 'Gujarat',
-            'Wadhwan': 'Gujarat', 'Rajpipla': 'Gujarat', 'Dabhoi': 'Gujarat', 'Bardoli': 'Gujarat',
-            'Tankara': 'Gujarat', 'Idar': 'Gujarat', 'Mahuva': 'Gujarat', 'Wankaner': 'Gujarat',
-            'Mundra': 'Gujarat', 'Umbergaon': 'Gujarat', 'Chotila': 'Gujarat', 'Bayad': 'Gujarat',
-            'Garbada': 'Gujarat', 'Kapadvanj': 'Gujarat', 'Thangadh': 'Gujarat', 'Vijaynagar': 'Gujarat',
-            'Amod': 'Gujarat', 'Jambusar': 'Gujarat', 'Palitana': 'Gujarat', 'Rajula': 'Gujarat',
-            'Kutiyana': 'Gujarat', 'Manavadar': 'Gujarat', 'Bansda': 'Gujarat',
-            'Chanasma': 'Gujarat', 'Vadnagar': 'Gujarat', 'Kheralu': 'Gujarat', 'Vijaypur': 'Gujarat',
-            'Mumbai': 'Maharashtra', 'Pune': 'Maharashtra', 'Nagpur': 'Maharashtra', 'Nashik': 'Maharashtra',
-            'Thane': 'Maharashtra', 'Aurangabad': 'Maharashtra', 'Solapur': 'Maharashtra', 'Kolhapur': 'Maharashtra',
-            'Amravati': 'Maharashtra', 'Nanded': 'Maharashtra', 'Sangli': 'Maharashtra', 'Jalgaon': 'Maharashtra',
-            'Akola': 'Maharashtra', 'Latur': 'Maharashtra', 'Dhule': 'Maharashtra', 'Ahmednagar': 'Maharashtra',
-            'Chandrapur': 'Maharashtra', 'Parbhani': 'Maharashtra', 'Ichalkaranji': 'Maharashtra', 'Jalna': 'Maharashtra',
-            'Bhusawal': 'Maharashtra', 'Satara': 'Maharashtra', 'Beed': 'Maharashtra', 'Pimpri-Chinchwad': 'Maharashtra',
-            'Panvel': 'Maharashtra', 'Bhiwandi': 'Maharashtra', 'Vasai': 'Maharashtra', 'Virar': 'Maharashtra',
-            'Lonavala': 'Maharashtra', 'Ratnagiri': 'Maharashtra', 'Wardha': 'Maharashtra', 'Yavatmal': 'Maharashtra',
-            'Washim': 'Maharashtra', 'Osmanabad': 'Maharashtra', 'Hingoli': 'Maharashtra', 'Buldhana': 'Maharashtra',
-            'Gondia': 'Maharashtra', 'Gadchiroli': 'Maharashtra', 'Bhandara': 'Maharashtra', 'Miraj': 'Maharashtra',
-            'Delhi': 'Delhi', 'New Delhi': 'Delhi',
-            'Jaipur': 'Rajasthan', 'Jodhpur': 'Rajasthan', 'Udaipur': 'Rajasthan', 'Kota': 'Rajasthan',
-            'Bikaner': 'Rajasthan', 'Ajmer': 'Rajasthan', 'Bhilwara': 'Rajasthan', 'Alwar': 'Rajasthan',
-            'Sikar': 'Rajasthan', 'Bharatpur': 'Rajasthan', 'Pali': 'Rajasthan', 'Sri Ganganagar': 'Rajasthan',
-            'Hanumangarh': 'Rajasthan', 'Tonk': 'Rajasthan', 'Kishangarh': 'Rajasthan', 'Beawar': 'Rajasthan',
-            'Churu': 'Rajasthan', 'Jhunjhunu': 'Rajasthan', 'Nagaur': 'Rajasthan', 'Barmer': 'Rajasthan',
-            'Jaisalmer': 'Rajasthan', 'Sawai Madhopur': 'Rajasthan', 'Dausa': 'Rajasthan', 'Chittorgarh': 'Rajasthan',
-            'Dholpur': 'Rajasthan', 'Sirohi': 'Rajasthan', 'Banswara': 'Rajasthan', 'Rajsamand': 'Rajasthan',
-            'Karauli': 'Rajasthan', 'Pratapgarh': 'Rajasthan', 'Gangapur City': 'Rajasthan', 'Makrana': 'Rajasthan',
-            'Bengaluru': 'Karnataka', 'Mysuru': 'Karnataka', 'Mangaluru': 'Karnataka', 'Hubballi': 'Karnataka',
-            'Belagavi': 'Karnataka', 'Kalaburagi': 'Karnataka', 'Davangere': 'Karnataka', 'Ballari': 'Karnataka',
-            'Vijayapura': 'Karnataka', 'Shivamogga': 'Karnataka', 'Tumakuru': 'Karnataka', 'Raichur': 'Karnataka',
-            'Bidar': 'Karnataka', 'Hospet': 'Karnataka', 'Gadag': 'Karnataka', 'Hassan': 'Karnataka',
-            'Mandya': 'Karnataka', 'Udupi': 'Karnataka', 'Chikkamagaluru': 'Karnataka', 'Kolar': 'Karnataka',
-            'Shimoga': 'Karnataka', 'Bagalkot': 'Karnataka', 'Dharwad': 'Karnataka', 'Karwar': 'Karnataka',
-            'Bhatkal': 'Karnataka', 'Chitradurga': 'Karnataka', 'Madikeri': 'Karnataka', 'Ramanagara': 'Karnataka',
-            'Hyderabad': 'Telangana', 'Warangal': 'Telangana', 'Nizamabad': 'Telangana', 'Karimnagar': 'Telangana',
-            'Khammam': 'Telangana', 'Ramagundam': 'Telangana', 'Mahbubnagar': 'Telangana', 'Nalgonda': 'Telangana',
-            'Adilabad': 'Telangana', 'Suryapet': 'Telangana', 'Miryalaguda': 'Telangana', 'Siddipet': 'Telangana',
-            'Chennai': 'Tamil Nadu', 'Coimbatore': 'Tamil Nadu', 'Madurai': 'Tamil Nadu', 'Salem': 'Tamil Nadu',
-            'Tiruchirappalli': 'Tamil Nadu', 'Tiruppur': 'Tamil Nadu', 'Vellore': 'Tamil Nadu', 'Erode': 'Tamil Nadu',
-            'Thoothukudi': 'Tamil Nadu', 'Dindigul': 'Tamil Nadu', 'Thanjavur': 'Tamil Nadu', 'Kumbakonam': 'Tamil Nadu',
-            'Kancheepuram': 'Tamil Nadu', 'Nagercoil': 'Tamil Nadu', 'Cuddalore': 'Tamil Nadu', 'Tirunelveli': 'Tamil Nadu',
-            'Karur': 'Tamil Nadu', 'Namakkal': 'Tamil Nadu', 'Ramanathapuram': 'Tamil Nadu', 'Villupuram': 'Tamil Nadu',
-            'Tenkasi': 'Tamil Nadu', 'Pudukkottai': 'Tamil Nadu', 'Nagapattinam': 'Tamil Nadu', 'Hosur': 'Tamil Nadu',
-            'Kolkata': 'West Bengal', 'Howrah': 'West Bengal', 'Siliguri': 'West Bengal', 'Durgapur': 'West Bengal',
-            'Asansol': 'West Bengal', 'Malda': 'West Bengal', 'Kharagpur': 'West Bengal', 'Haldia': 'West Bengal',
-            'Bardhaman': 'West Bengal', 'Krishnanagar': 'West Bengal', 'Baharampur': 'West Bengal', 'Jalpaiguri': 'West Bengal',
-            'Darjeeling': 'West Bengal', 'Medinipur': 'West Bengal', 'Raiganj': 'West Bengal', 'Cooch Behar': 'West Bengal',
-            'Alipore': 'West Bengal', 'Bally': 'West Bengal', 'Barasat': 'West Bengal', 'English Bazar': 'West Bengal',
-            'Lucknow': 'Uttar Pradesh', 'Kanpur': 'Uttar Pradesh', 'Varanasi': 'Uttar Pradesh', 'Agra': 'Uttar Pradesh',
-            'Meerut': 'Uttar Pradesh', 'Prayagraj': 'Uttar Pradesh', 'Bareilly': 'Uttar Pradesh', 'Gorakhpur': 'Uttar Pradesh',
-            'Aligarh': 'Uttar Pradesh', 'Moradabad': 'Uttar Pradesh', 'Saharanpur': 'Uttar Pradesh', 'Jhansi': 'Uttar Pradesh',
-            'Noida': 'Uttar Pradesh', 'Ghaziabad': 'Uttar Pradesh', 'Mathura': 'Uttar Pradesh', 'Firozabad': 'Uttar Pradesh',
-            'Muzaffarnagar': 'Uttar Pradesh', 'Rampur': 'Uttar Pradesh', 'Faizabad': 'Uttar Pradesh', 'Ghazipur': 'Uttar Pradesh',
-            'Etawah': 'Uttar Pradesh', 'Budaun': 'Uttar Pradesh', 'Raebareli': 'Uttar Pradesh', 'Sitapur': 'Uttar Pradesh',
-            'Banda': 'Uttar Pradesh', 'Bahraich': 'Uttar Pradesh', 'Ballia': 'Uttar Pradesh', 'Etah': 'Uttar Pradesh',
-            'Hapur': 'Uttar Pradesh', 'Unnao': 'Uttar Pradesh', 'Lalitpur': 'Uttar Pradesh', 'Bulandshahr': 'Uttar Pradesh',
-            'Bhopal': 'Madhya Pradesh', 'Indore': 'Madhya Pradesh', 'Gwalior': 'Madhya Pradesh', 'Jabalpur': 'Madhya Pradesh',
-            'Ujjain': 'Madhya Pradesh', 'Sagar': 'Madhya Pradesh', 'Dewas': 'Madhya Pradesh', 'Satna': 'Madhya Pradesh',
-            'Ratlam': 'Madhya Pradesh', 'Rewa': 'Madhya Pradesh', 'Murwara': 'Madhya Pradesh', 'Singrauli': 'Madhya Pradesh',
-            'Burhanpur': 'Madhya Pradesh', 'Khandwa': 'Madhya Pradesh', 'Khargone': 'Madhya Pradesh', 'Chhindwara': 'Madhya Pradesh',
-            'Betul': 'Madhya Pradesh', 'Guna': 'Madhya Pradesh', 'Sehore': 'Madhya Pradesh', 'Morena': 'Madhya Pradesh',
-            'Vidisha': 'Madhya Pradesh', 'Damoh': 'Madhya Pradesh', 'Neemuch': 'Madhya Pradesh', 'Mandsaur': 'Madhya Pradesh',
-            'Kochi': 'Kerala', 'Thiruvananthapuram': 'Kerala', 'Kozhikode': 'Kerala', 'Kollam': 'Kerala',
-            'Thrissur': 'Kerala', 'Alappuzha': 'Kerala', 'Kannur': 'Kerala', 'Kottayam': 'Kerala',
-            'Palakkad': 'Kerala', 'Malappuram': 'Kerala', 'Kasaragod': 'Kerala', 'Pathanamthitta': 'Kerala',
-            'Idukki': 'Kerala', 'Wayanad': 'Kerala', 'Ernakulam': 'Kerala',
-            'Chandigarh': 'Chandigarh', 'Amritsar': 'Punjab', 'Ludhiana': 'Punjab', 'Jalandhar': 'Punjab',
-            'Patiala': 'Punjab', 'Bathinda': 'Punjab', 'Mohali': 'Punjab', 'Firozpur': 'Punjab',
-            'Moga': 'Punjab', 'Pathankot': 'Punjab', 'Khanna': 'Punjab', 'Phagwara': 'Punjab',
-            'Hoshiarpur': 'Punjab', 'Sangrur': 'Punjab', 'Barnala': 'Punjab', 'Fazilka': 'Punjab',
-            'Gurdaspur': 'Punjab', 'Faridkot': 'Punjab', 'Kapurthala': 'Punjab', 'Nawanshahr': 'Punjab',
-            'Patna': 'Bihar', 'Gaya': 'Bihar', 'Darbhanga': 'Bihar', 'Muzaffarpur': 'Bihar',
-            'Bhagalpur': 'Bihar', 'Purnia': 'Bihar', 'Bihar Sharif': 'Bihar', 'Arrah': 'Bihar',
-            'Begusarai': 'Bihar', 'Katihar': 'Bihar', 'Munger': 'Bihar', 'Chhapra': 'Bihar',
-            'Saharsa': 'Bihar', 'Sasaram': 'Bihar', 'Hajipur': 'Bihar', 'Dehri': 'Bihar',
-            'Siwan': 'Bihar', 'Motihari': 'Bihar', 'Nawada': 'Bihar', 'Bettiah': 'Bihar',
-            'Ranchi': 'Jharkhand', 'Jamshedpur': 'Jharkhand', 'Dhanbad': 'Jharkhand', 'Bokaro': 'Jharkhand',
-            'Hazaribagh': 'Jharkhand', 'Deoghar': 'Jharkhand', 'Giridih': 'Jharkhand', 'Jamtara': 'Jharkhand',
-            'Ramgarh': 'Jharkhand', 'Phusro': 'Jharkhand', 'Gumla': 'Jharkhand', 'Chaibasa': 'Jharkhand',
-            'Bhubaneswar': 'Odisha', 'Cuttack': 'Odisha', 'Rourkela': 'Odisha', 'Berhampur': 'Odisha',
-            'Sambalpur': 'Odisha', 'Puri': 'Odisha', 'Balasore': 'Odisha', 'Bhadrak': 'Odisha',
-            'Baripada': 'Odisha', 'Jharsuguda': 'Odisha', 'Angul': 'Odisha', 'Paradeep': 'Odisha',
-            'Guwahati': 'Assam', 'Silchar': 'Assam', 'Dibrugarh': 'Assam', 'Jorhat': 'Assam',
-            'Tezpur': 'Assam', 'Nagaon': 'Assam', 'Tinsukia': 'Assam', 'Bongaigaon': 'Assam',
-            'Diphu': 'Assam', 'North Lakhimpur': 'Assam', 'Karimganj': 'Assam', 'Sivasagar': 'Assam',
-            'Raipur': 'Chhattisgarh', 'Bilaspur': 'Chhattisgarh', 'Korba': 'Chhattisgarh', 'Bhilai': 'Chhattisgarh',
-            'Durg': 'Chhattisgarh', 'Raigarh': 'Chhattisgarh', 'Rajnandgaon': 'Chhattisgarh', 'Jagdalpur': 'Chhattisgarh',
-            'Ambikapur': 'Chhattisgarh', 'Mahasamund': 'Chhattisgarh', 'Dhamtari': 'Chhattisgarh', 'Bhawanipatna': 'Odisha',
-            'Panaji': 'Goa', 'Vasco da Gama': 'Goa', 'Margao': 'Goa', 'Mapusa': 'Goa',
-            'Ponda': 'Goa', 'Bicholim': 'Goa', 'Curchorem': 'Goa', 'Cuncolim': 'Goa',
-            'Dehradun': 'Uttarakhand', 'Haridwar': 'Uttarakhand', 'Rishikesh': 'Uttarakhand', 'Nainital': 'Uttarakhand',
-            'Haldwani': 'Uttarakhand', 'Roorkee': 'Uttarakhand', 'Kashipur': 'Uttarakhand', 'Rudrapur': 'Uttarakhand',
-            'Almora': 'Uttarakhand', 'Pithoragarh': 'Uttarakhand', 'Pauri': 'Uttarakhand', 'Mussoorie': 'Uttarakhand',
-            'Shimla': 'Himachal Pradesh', 'Manali': 'Himachal Pradesh', 'Dharamshala': 'Himachal Pradesh', 'Solan': 'Himachal Pradesh',
-            'Mandi': 'Himachal Pradesh', 'Bilaspur (HP)': 'Himachal Pradesh', 'Chamba': 'Himachal Pradesh', 'Kullu': 'Himachal Pradesh',
-            'Srinagar': 'Jammu and Kashmir', 'Jammu': 'Jammu and Kashmir', 'Anantnag': 'Jammu and Kashmir', 'Baramulla': 'Jammu and Kashmir',
-            'Sopore': 'Jammu and Kashmir', 'Katra': 'Jammu and Kashmir', 'Udhampur': 'Jammu and Kashmir', 'Pulwama': 'Jammu and Kashmir',
-            'Kupwara': 'Jammu and Kashmir', 'Rajouri': 'Jammu and Kashmir', 'Doda': 'Jammu and Kashmir', 'Poonch': 'Jammu and Kashmir',
-            'Leh': 'Ladakh', 'Kargil': 'Ladakh',
-            'Agartala': 'Tripura', 'Udaipur (Tripura)': 'Tripura', 'Dharmanagar': 'Tripura', 'Kailashahar': 'Tripura',
-            'Shillong': 'Meghalaya', 'Tura': 'Meghalaya', 'Jowai': 'Meghalaya', 'Nongstoin': 'Meghalaya',
-            'Imphal': 'Manipur', 'Thoubal': 'Manipur', 'Bishnupur': 'Manipur', 'Kakching': 'Manipur',
-            'Aizawl': 'Mizoram', 'Lunglei': 'Mizoram', 'Champhai': 'Mizoram', 'Serchhip': 'Mizoram',
-            'Kohima': 'Nagaland', 'Dimapur': 'Nagaland', 'Mokokchung': 'Nagaland', 'Wokha': 'Nagaland',
-            'Gangtok': 'Sikkim', 'Namchi': 'Sikkim', 'Gyalshing': 'Sikkim', 'Mangan': 'Sikkim',
-            'Itanagar': 'Arunachal Pradesh', 'Naharlagun': 'Arunachal Pradesh', 'Pasighat': 'Arunachal Pradesh', 'Bomdila': 'Arunachal Pradesh',
-            'Puducherry': 'Puducherry', 'Karaikal': 'Puducherry', 'Yanam': 'Puducherry', 'Mahe': 'Puducherry',
-            'Port Blair': 'Andaman and Nicobar Islands', 'Kavaratti': 'Lakshadweep', 'Silvassa': 'Dadra and Nagar Haveli and Daman and Diu', 'Daman': 'Dadra and Nagar Haveli and Daman and Diu', 'Diu': 'Dadra and Nagar Haveli and Daman and Diu'
+        // ----- Location data (country -> state -> district -> taluka -> city) -----
+        indiaLocationsUrl: '{{ asset('data/india-locations.json') }}',
+        countriesStatesUrl: '{{ asset('data/countries-states.json') }}',
+        locations: null,
+        countriesStates: {},
+        locationsLoading: false,
+
+        manualAddress: { state: false, district: false, taluka: false, city: false },
+        manualCourier: { state: false, district: false, taluka: false, city: false },
+
+        async loadLocationData() {
+            if (this.locationsLoading || this.locations) return;
+            this.locationsLoading = true;
+            try {
+                const [indiaRes, worldRes] = await Promise.all([
+                    fetch(this.indiaLocationsUrl, { headers: { 'Accept': 'application/json' } }),
+                    fetch(this.countriesStatesUrl, { headers: { 'Accept': 'application/json' } }),
+                ]);
+                if (indiaRes.ok) this.locations = await indiaRes.json();
+                if (worldRes.ok) this.countriesStates = await worldRes.json();
+            } catch (e) {
+                // Location data is optional; fields fall back to free text inputs.
+            } finally {
+                this.locationsLoading = false;
+            }
+        },
+
+        isIndia(country) {
+            return (country || '').trim().toLowerCase() === 'india';
+        },
+
+        findLocationKey(map, name) {
+            if (!map || !name) return null;
+            const value = String(name).trim();
+            if (!value) return null;
+            if (Object.prototype.hasOwnProperty.call(map, value)) return value;
+            const lower = value.toLowerCase();
+            return Object.keys(map).find(key => key.toLowerCase() === lower) || null;
+        },
+
+        withCurrentLocation(options, current) {
+            const value = String(current || '').trim();
+            if (!options.length || !value || value === '__other__') return options;
+            return options.some(option => option.toLowerCase() === value.toLowerCase()) ? options : [value, ...options];
+        },
+
+        countryStateOptions(country) {
+            const value = (country || '').trim();
+            if (!value) return [];
+            if (this.isIndia(value)) {
+                return this.locations ? Object.keys(this.locations.states) : [];
+            }
+            const key = this.findLocationKey(this.countriesStates, value);
+            return key ? this.countriesStates[key] : [];
+        },
+
+        indiaStateEntry(country, state) {
+            if (!this.locations || !this.isIndia(country)) return null;
+            const key = this.findLocationKey(this.locations.states, state);
+            return key ? this.locations.states[key] : null;
+        },
+
+        addressStateOptions() {
+            return this.withCurrentLocation(this.countryStateOptions(this.form.country), this.form.state);
+        },
+
+        addressDistrictOptions() {
+            const entry = this.indiaStateEntry(this.form.country, this.form.state);
+            return this.withCurrentLocation(entry ? Object.keys(entry.districts) : [], this.form.district);
+        },
+
+        districtTalukaList(country, state, district) {
+            const entry = this.indiaStateEntry(country, state);
+            if (!entry) return [];
+            const key = this.findLocationKey(entry.districts, district);
+            return key ? entry.districts[key] : [];
+        },
+
+        addressTalukaOptions() {
+            return this.withCurrentLocation(
+                this.districtTalukaList(this.form.country, this.form.state, this.form.district),
+                this.form.taluka
+            );
         },
 
         addressCityOptions() {
-            if ((this.form.country || '').trim().toLowerCase() !== 'india') return [];
-            const state = (this.form.state || '').trim().toLowerCase();
-            if (!state) return [];
-            return Object.entries(this.cityStateMap)
-                .filter(([, cityState]) => cityState.toLowerCase() === state)
-                .map(([city]) => city)
-                .sort();
+            const entry = this.indiaStateEntry(this.form.country, this.form.state);
+            return this.withCurrentLocation(entry ? entry.cities : [], this.form.city);
+        },
+
+        courierStateOptions() {
+            return this.withCurrentLocation(this.countryStateOptions(this.form.courier_country), this.form.courier_state);
+        },
+
+        courierDistrictOptions() {
+            const entry = this.indiaStateEntry(this.form.courier_country, this.form.courier_state);
+            return this.withCurrentLocation(entry ? Object.keys(entry.districts) : [], this.form.courier_district);
+        },
+
+        courierTalukaOptions() {
+            return this.withCurrentLocation(
+                this.districtTalukaList(this.form.courier_country, this.form.courier_state, this.form.courier_district),
+                this.form.courier_taluka
+            );
         },
 
         courierCityOptions() {
-            if ((this.form.courier_country || '').trim().toLowerCase() !== 'india') return [];
-            const state = (this.form.courier_state || '').trim().toLowerCase();
-            if (!state) return [];
-            return Object.entries(this.cityStateMap)
-                .filter(([, cityState]) => cityState.toLowerCase() === state)
-                .map(([city]) => city)
-                .sort();
+            const entry = this.indiaStateEntry(this.form.courier_country, this.form.courier_state);
+            return this.withCurrentLocation(entry ? entry.cities : [], this.form.courier_city);
         },
 
         onAddressCountryChange() {
             this.form.state = '';
+            this.form.district = '';
+            this.form.taluka = '';
             this.form.city = '';
+            this.manualAddress = { state: false, district: false, taluka: false, city: false };
+            this.loadLocationData();
         },
 
-        onCourierCountryChange() {
-            this.form.courier_state = '';
-            this.form.courier_city = '';
+        onAddressStateChange(value) {
+            const selected = value === undefined ? this.form.state : value;
+            if (selected === '__other__') {
+                this.manualAddress.state = true;
+                this.form.state = '';
+            } else {
+                this.manualAddress.state = false;
+                this.form.state = selected;
+            }
+            this.form.district = '';
+            this.form.taluka = '';
+            this.form.city = '';
+            this.manualAddress.district = false;
+            this.manualAddress.taluka = false;
+            this.manualAddress.city = false;
+        },
+
+        onAddressDistrictChange(value) {
+            const selected = value === undefined ? this.form.district : value;
+            if (selected === '__other__') {
+                this.manualAddress.district = true;
+                this.form.district = '';
+            } else {
+                this.manualAddress.district = false;
+                this.form.district = selected;
+            }
+            const talukas = this.districtTalukaList(this.form.country, this.form.state, this.form.district);
+            if (talukas.length && this.form.taluka && !talukas.some(t => t.toLowerCase() === this.form.taluka.toLowerCase())) {
+                this.form.taluka = '';
+                this.manualAddress.taluka = false;
+            }
+        },
+
+        onAddressTalukaChange(value) {
+            const selected = value === undefined ? this.form.taluka : value;
+            if (selected === '__other__') {
+                this.manualAddress.taluka = true;
+                this.form.taluka = '';
+            } else {
+                this.manualAddress.taluka = false;
+                this.form.taluka = selected;
+            }
+        },
+
+        onAddressCityChange(value) {
+            const selected = value === undefined ? this.form.city : value;
+            if (selected === '__other__') {
+                this.manualAddress.city = true;
+                this.form.city = '';
+            } else {
+                this.manualAddress.city = false;
+                this.form.city = selected;
+            }
         },
 
         onAddressStateInput() {
+            this.form.district = '';
+            this.form.taluka = '';
             this.form.city = '';
+            this.manualAddress.district = false;
+            this.manualAddress.taluka = false;
+            this.manualAddress.city = false;
+        },
+
+        onAddressCityInput() {},
+
+        onCourierCountryChange() {
+            this.form.courier_state = '';
+            this.form.courier_district = '';
+            this.form.courier_taluka = '';
+            this.form.courier_city = '';
+            this.manualCourier = { state: false, district: false, taluka: false, city: false };
+            this.loadLocationData();
+        },
+
+        onCourierStateChange(value) {
+            const selected = value === undefined ? this.form.courier_state : value;
+            if (selected === '__other__') {
+                this.manualCourier.state = true;
+                this.form.courier_state = '';
+            } else {
+                this.manualCourier.state = false;
+                this.form.courier_state = selected;
+            }
+            this.form.courier_district = '';
+            this.form.courier_taluka = '';
+            this.form.courier_city = '';
+            this.manualCourier.district = false;
+            this.manualCourier.taluka = false;
+            this.manualCourier.city = false;
+        },
+
+        onCourierDistrictChange(value) {
+            const selected = value === undefined ? this.form.courier_district : value;
+            if (selected === '__other__') {
+                this.manualCourier.district = true;
+                this.form.courier_district = '';
+            } else {
+                this.manualCourier.district = false;
+                this.form.courier_district = selected;
+            }
+            const talukas = this.districtTalukaList(this.form.courier_country, this.form.courier_state, this.form.courier_district);
+            if (talukas.length && this.form.courier_taluka && !talukas.some(t => t.toLowerCase() === this.form.courier_taluka.toLowerCase())) {
+                this.form.courier_taluka = '';
+                this.manualCourier.taluka = false;
+            }
+        },
+
+        onCourierTalukaChange(value) {
+            const selected = value === undefined ? this.form.courier_taluka : value;
+            if (selected === '__other__') {
+                this.manualCourier.taluka = true;
+                this.form.courier_taluka = '';
+            } else {
+                this.manualCourier.taluka = false;
+                this.form.courier_taluka = selected;
+            }
+        },
+
+        onCourierCityChange(value) {
+            const selected = value === undefined ? this.form.courier_city : value;
+            if (selected === '__other__') {
+                this.manualCourier.city = true;
+                this.form.courier_city = '';
+            } else {
+                this.manualCourier.city = false;
+                this.form.courier_city = selected;
+            }
         },
 
         onCourierStateInput() {
+            this.form.courier_district = '';
+            this.form.courier_taluka = '';
             this.form.courier_city = '';
+            this.manualCourier.district = false;
+            this.manualCourier.taluka = false;
+            this.manualCourier.city = false;
         },
+
+        onCourierCityInput() {},
 
         onMobileCountryChange() {},
 
@@ -1466,6 +1648,7 @@ function quotationApp() {
             this.restoreState();
             if (!this.form.country) this.form.country = 'India';
             if (!this.form.courier_country) this.form.courier_country = 'India';
+            this.loadLocationData();
             this.slotLoad();
         },
 
