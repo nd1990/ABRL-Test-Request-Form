@@ -1769,7 +1769,7 @@ function quotationApp() {
                     s.tests = data.tests || [];
                     s.testId = '';
                     if (s.tests.length === 1) {
-                        this.confirmTest(s.tests[0]);
+                        this.confirmTest(s.tests[0], { silent: true });
                     } else if (!s.tests.length) {
                         this.slotMessage = 'No tests found for the selected Parameter, Discipline and NABL combination.';
                     }
@@ -1847,7 +1847,7 @@ function quotationApp() {
                 .join('|');
         },
 
-        confirmTest(t) {
+        confirmTest(t, options = {}) {
             if (!t) return;
             if (this.selectedTests.length >= this.maxTests) {
                 this.slotMessage = 'A maximum of five tests can be requested per Quotation/Test Request Form. If more than five tests are required, please submit a separate form for the additional tests.';
@@ -1858,7 +1858,13 @@ function quotationApp() {
             const key = this.testSelectionKey({ ...t, nabl });
             const duplicate = this.selectedTests.some(x => this.testSelectionKey(x) === key);
             if (duplicate) {
-                this.slotMessage = 'This Test / Parameter, NABL / NON NABL selection and Method combination is already in your selection. Please choose another Parameter.';
+                // A Discipline / Group (or other cascading) dropdown change must not be
+                // treated as a new test selection, so suppress the duplicate message for
+                // automatic single-test confirmations. Manual method selections still
+                // surface the validation message.
+                if (!options.silent) {
+                    this.slotMessage = 'This Test / Parameter, NABL / NON NABL selection and Method combination is already in your selection. Please choose another Parameter.';
+                }
                 return;
             }
             this.selectedTests.push({
