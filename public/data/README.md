@@ -12,5 +12,6 @@ The India file is based on the Local Government Directory (LGD) data published b
 Notes:
 
 - India uses the official LGD hierarchy. Districts/talukas are only available for India; for other countries the District and Taluka fields stay as free-text inputs.
+- LGD spellings are normalized to the common English spellings used by the form (for example `Anklesvar` → `Ankleshwar`, `Ahmadabad` → `Ahmedabad`, `Kachchh` → `Kutch`, `Panch Mahals` → `Panchmahal`). Administrative suffixes such as "Municipal Council" are removed, formatting is normalized (casing, spacing, roman numerals) and duplicate entries are merged.
 - The form loads these files lazily with `fetch` and keeps working (falling back to text inputs) if either request fails.
 - When refreshing the data, keep the same shape: `countries-states.json` is `{ "Country": ["State", ...] }` and `india-locations.json` is `{ "states": { "State": { "districts": { "District": ["Sub-district", ...] }, "cities": ["City", ...] } } }`.
