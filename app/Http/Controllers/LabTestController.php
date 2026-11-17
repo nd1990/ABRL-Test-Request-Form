@@ -18,7 +18,8 @@ class LabTestController extends Controller
      * Reverse flow (public form):
      *   ?parameter=       -> disciplines containing the parameter
      *   &discipline=      -> NABL / NON NABL types for the parameter
-     *   &nabl=            -> resolved distinct tests for the combination
+     *   &nabl=            -> materials for the parameter + discipline + NABL type
+     *   &material=        -> resolved distinct tests for the combination
      */
     public function options(Request $request)
     {
@@ -53,11 +54,16 @@ class LabTestController extends Controller
     {
         $discipline = $request->input('discipline');
         $nabl = $request->input('nabl');
+        $material = $request->input('material');
 
         $query = LabTest::active()->where('parameter', $parameter);
 
         if (!empty($discipline)) {
             $query->where('discipline', $discipline);
+        }
+
+        if (!empty($nabl)) {
+            $query->where('nabl_type', $nabl);
         }
 
         // Level 1: disciplines available for this parameter.
@@ -99,9 +105,35 @@ class LabTestController extends Controller
             ]);
         }
 
-        $query->where('nabl_type', $nabl);
+        // Level 3: materials available for this parameter + discipline + NABL type.
+        // If the catalog has no material recorded, skip this level and resolve tests directly.
+        if (empty($material)) {
+            $options = (clone $query)
+                ->select('material')
+                ->whereNotNull('material')
+                ->where('material', '!=', '')
+                ->distinct()
+                ->orderBy('material')
+                ->get()
+                ->pluck('material')
+                ->filter(fn ($m) => $m !== '')
+                ->values()
+                ->all();
 
-        // Level 3: resolved tests, deduplicated so method/price/quantity/protocol
+            if (!empty($options)) {
+                return response()->json([
+                    'level' => 'material',
+                    'parameter' => $parameter,
+                    'discipline' => $discipline,
+                    'nabl' => $nabl,
+                    'options' => $options,
+                ]);
+            }
+        } else {
+            $query->where('material', $material);
+        }
+
+        // Level 4: resolved tests, deduplicated so method/price/quantity/protocol
         // variants collapse into a single selectable test.
         $rows = $query->orderBy('id')->get();
 
@@ -142,6 +174,7 @@ class LabTestController extends Controller
             'parameter' => $parameter,
             'discipline' => $discipline,
             'nabl' => $nabl,
+            'material' => $material,
             'tests' => $tests->all(),
         ]);
     }

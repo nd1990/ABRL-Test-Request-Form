@@ -448,7 +448,7 @@
                         <!-- GST (optional) -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">GST Number <span class="text-gray-400">(optional)</span></label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">GST Number <span class="text-gray-400">(If GST Invoice required)</span></label>
                                 <input type="text" id="gst_number" x-model="form.gst_number" placeholder="Enter 15-character GSTIN" maxlength="15"
                                     @input="form.gst_number = form.gst_number.toUpperCase()"
                                     class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition uppercase">
@@ -639,7 +639,7 @@
                                 <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5" x-text="idx + 1"></span>
                                 <div class="min-w-0">
                                     <p class="text-sm font-semibold text-gray-900 leading-snug" x-text="t.parameter"></p>
-                                    <p class="mt-1 text-xs text-gray-600" x-text="[t.discipline, t.nabl].filter(Boolean).join(' · ')"></p>
+                                    <p class="mt-1 text-xs text-gray-600" x-text="[t.discipline, t.material, t.nabl].filter(Boolean).join(' · ')"></p>
                                     <p class="text-xs text-gray-400 mt-0.5" x-text="t.method || ''"></p>
                                 </div>
                             </div>
@@ -650,11 +650,11 @@
                     </template>
                 </div>
 
-                <!-- Active slot: cascading dropdowns (parameter -> discipline -> nabl) -->
+                <!-- Active slot: cascading dropdowns (parameter -> discipline -> nabl -> material -> method) -->
                 <div x-show="selectedTests.length < maxTests" class="mt-4 bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
                     <div class="mb-4">
                         <p class="text-sm font-bold text-gray-800" x-text="selectedTests.length > 0 ? 'Add Another Test' : 'Select a Test'"></p>
-                        <p class="text-xs text-gray-500 mt-0.5">Choose a parameter first, then its Discipline / Group, then NABL / NON NABL.</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Choose a parameter first, then its Discipline / Group, NABL / NON NABL, Material / Product, and finally the Method.</p>
                     </div>
 
                     <div class="space-y-3">
@@ -709,7 +709,18 @@
                             </select>
                         </div>
 
-                        <div x-show="slot.nabl && slot.tests.length > 1" x-cloak>
+                        <div x-show="slot.materialOptions.length > 0" x-cloak>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Material / Product</label>
+                            <select x-model="slot.material" @change="onSlotMaterialChange()"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                <option value="">Select Material / Product</option>
+                                <template x-for="m in slot.materialOptions" :key="m">
+                                    <option :value="m" x-text="m"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <div x-show="slot.tests.length > 1" x-cloak>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Method</label>
                             <select x-model="slot.testId" @change="onSlotTestChange()"
                                 class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
@@ -1669,8 +1680,8 @@ function quotationApp() {
         optionsUrl: '{{ route("lab-tests.options", [], false) }}',
 
         slot: {
-            parameter: '', discipline: '', nabl: '', testId: '',
-            parameterOptions: [], disciplineOptions: [], nablOptions: [], tests: [],
+            parameter: '', discipline: '', nabl: '', material: '', testId: '',
+            parameterOptions: [], disciplineOptions: [], nablOptions: [], materialOptions: [], tests: [],
             parameterSearch: '', parameterOpen: false,
             loading: false, _seq: 0
         },
@@ -1751,6 +1762,7 @@ function quotationApp() {
             if (s.parameter) params.parameter = s.parameter;
             if (s.discipline) params.discipline = s.discipline;
             if (s.nabl) params.nabl = s.nabl;
+            if (s.material) params.material = s.material;
             const qs = new URLSearchParams(params).toString();
             try {
                 const res = await fetch(this.optionsUrl + (qs ? '?' + qs : ''), {
@@ -1765,13 +1777,15 @@ function quotationApp() {
                     s.disciplineOptions = data.options || [];
                 } else if (data.level === 'nabl') {
                     s.nablOptions = data.options || [];
+                } else if (data.level === 'material') {
+                    s.materialOptions = data.options || [];
                 } else if (data.level === 'test') {
                     s.tests = data.tests || [];
                     s.testId = '';
                     if (s.tests.length === 1) {
                         this.confirmTest(s.tests[0], { silent: true });
                     } else if (!s.tests.length) {
-                        this.slotMessage = 'No tests found for the selected Parameter, Discipline and NABL combination.';
+                        this.slotMessage = 'No tests found for the selected Parameter, Discipline, NABL and Material combination.';
                     }
                 }
             } catch (e) {
@@ -1783,8 +1797,8 @@ function quotationApp() {
 
         onSlotParameterChange() {
             const s = this.slot;
-            s.discipline = ''; s.nabl = ''; s.testId = '';
-            s.disciplineOptions = []; s.nablOptions = []; s.tests = [];
+            s.discipline = ''; s.nabl = ''; s.material = ''; s.testId = '';
+            s.disciplineOptions = []; s.nablOptions = []; s.materialOptions = []; s.tests = [];
             this.slotMessage = '';
             if (s.parameter) this.slotLoad();
         },
@@ -1815,18 +1829,26 @@ function quotationApp() {
 
         onSlotDisciplineChange() {
             const s = this.slot;
-            s.nabl = ''; s.testId = '';
-            s.nablOptions = []; s.tests = [];
+            s.nabl = ''; s.material = ''; s.testId = '';
+            s.nablOptions = []; s.materialOptions = []; s.tests = [];
             this.slotMessage = '';
             if (s.discipline) this.slotLoad();
         },
 
         onSlotNablChange() {
             const s = this.slot;
+            s.material = ''; s.testId = '';
+            s.materialOptions = []; s.tests = [];
+            this.slotMessage = '';
+            if (s.nabl) this.slotLoad();
+        },
+
+        onSlotMaterialChange() {
+            const s = this.slot;
             s.testId = '';
             s.tests = [];
             this.slotMessage = '';
-            if (s.nabl) this.slotLoad();
+            if (s.material) this.slotLoad();
         },
 
         onSlotTestChange() {
@@ -1842,7 +1864,7 @@ function quotationApp() {
         },
 
         testSelectionKey(t) {
-            return [t.parameter, t.discipline, t.nabl ?? t.nabl_type, t.method]
+            return [t.parameter, t.discipline, t.nabl ?? t.nabl_type, t.material, t.method]
                 .map(value => String(value ?? '').trim())
                 .join('|');
         },
@@ -1883,8 +1905,8 @@ function quotationApp() {
         resetSlot() {
             const s = this.slot;
             s._seq++;
-            s.parameter = ''; s.discipline = ''; s.nabl = ''; s.testId = '';
-            s.disciplineOptions = []; s.nablOptions = []; s.tests = [];
+            s.parameter = ''; s.discipline = ''; s.nabl = ''; s.material = ''; s.testId = '';
+            s.disciplineOptions = []; s.nablOptions = []; s.materialOptions = []; s.tests = [];
             s.parameterSearch = ''; s.parameterOpen = false;
             this.slotMessage = '';
         },
