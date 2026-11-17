@@ -1856,9 +1856,7 @@ function quotationApp() {
         },
 
         slotTestLabel(t) {
-            const label = t.method || 'Method not specified';
-
-            return t.charges_per_sample != null ? `${label} — ₹${t.charges_per_sample}` : label;
+            return t.method || 'Method not specified';
         },
 
         testSelectionKey(t) {
