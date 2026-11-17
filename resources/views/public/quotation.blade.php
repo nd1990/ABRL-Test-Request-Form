@@ -720,7 +720,7 @@
                             </select>
                         </div>
 
-                        <div x-show="slot.tests.length > 1" x-cloak>
+                        <div x-show="slot.tests.length > 0" x-cloak>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Method</label>
                             <select x-model="slot.testId" @change="onSlotTestChange()"
                                 class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
@@ -729,7 +729,7 @@
                                     <option :value="t.id" x-text="slotTestLabel(t)"></option>
                                 </template>
                             </select>
-                            <p class="mt-1 text-xs text-gray-400">Multiple methods are available for this parameter.</p>
+                            <p x-show="slot.tests.length > 1" class="mt-1 text-xs text-gray-400">Multiple methods are available for this parameter.</p>
                         </div>
 
                         <p x-show="slot.loading" class="text-xs text-gray-400">Loading options...</p>
@@ -1782,9 +1782,7 @@ function quotationApp() {
                 } else if (data.level === 'test') {
                     s.tests = data.tests || [];
                     s.testId = '';
-                    if (s.tests.length === 1) {
-                        this.confirmTest(s.tests[0], { silent: true });
-                    } else if (!s.tests.length) {
+                    if (!s.tests.length) {
                         this.slotMessage = 'No tests found for the selected Parameter, Discipline, NABL and Material combination.';
                     }
                 }
