@@ -669,7 +669,7 @@
                                     @keydown.enter.prevent="selectFirstSlotParameter()"
                                     placeholder="Select Parameter"
                                     autocomplete="off"
-                                    class="w-full rounded-lg border border-gray-300 pl-3 pr-9 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                    class="w-full rounded-lg border border-gray-300 pl-3 pr-9 py-2.5 text-sm placeholder:text-gray-400 placeholder:italic focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
                                 <button type="button" tabindex="-1" @click="openSlotParameter()"
                                     class="absolute inset-y-0 right-2 flex items-center text-gray-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" /></svg>
@@ -691,7 +691,7 @@
                             <label class="block text-xs font-medium text-gray-500 mb-1">Discipline / Group</label>
                             <select x-model="slot.discipline" @change="onSlotDisciplineChange()"
                                 class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
-                                <option value="">Select Discipline / Group</option>
+                                <option value="" disabled class="text-gray-400 italic">Select Discipline / Group</option>
                                 <template x-for="d in slot.disciplineOptions" :key="d">
                                     <option :value="d" x-text="d"></option>
                                 </template>
@@ -702,7 +702,7 @@
                             <label class="block text-xs font-medium text-gray-500 mb-1">NABL / NON NABL</label>
                             <select x-model="slot.nabl" @change="onSlotNablChange()"
                                 class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
-                                <option value="">Select NABL / NON NABL</option>
+                                <option value="" disabled class="text-gray-400 italic">Select NABL / NON NABL</option>
                                 <template x-for="n in slot.nablOptions" :key="n">
                                     <option :value="n" x-text="n"></option>
                                 </template>
@@ -713,7 +713,7 @@
                             <label class="block text-xs font-medium text-gray-500 mb-1">Material / Product</label>
                             <select x-model="slot.material" @change="onSlotMaterialChange()"
                                 class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
-                                <option value="">Select Material / Product</option>
+                                <option value="" disabled class="text-gray-400 italic">Select Material / Product</option>
                                 <template x-for="m in slot.materialOptions" :key="m">
                                     <option :value="m" x-text="m"></option>
                                 </template>
@@ -724,7 +724,7 @@
                             <label class="block text-xs font-medium text-gray-500 mb-1">Method</label>
                             <select x-model="slot.testId" @change="onSlotTestChange()"
                                 class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
-                                <option value="">Select Method</option>
+                                <option value="" disabled class="text-gray-400 italic">Select Method</option>
                                 <template x-for="t in slot.tests" :key="'method-' + t.id">
                                     <option :value="t.id" x-text="slotTestLabel(t)"></option>
                                 </template>

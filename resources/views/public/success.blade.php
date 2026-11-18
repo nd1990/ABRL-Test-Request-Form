@@ -99,8 +99,20 @@
             </div>
             @endif
 
-            <div class="mt-6 text-center">
-                <a href="{{ route('quotation.index') }}" class="text-sm text-gray-500 hover:text-indigo-600 transition font-medium">Request another quotation</a>
+            <div class="mt-6 border-t border-gray-100 pt-6">
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a id="request-another-link" href="{{ route('quotation.index') }}"
+                        class="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-lg shadow-brand-500/20 transition focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9" /><polyline points="3 4 3 12 11 12" /></svg>
+                        Request another quotation
+                    </a>
+                    <button type="button" id="exit-button"
+                        class="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-600 hover:text-gray-800 font-semibold text-sm px-6 py-3 rounded-xl border border-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                        Exit
+                    </button>
+                </div>
+                <p id="request-another-expired" class="hidden mt-3 text-center text-xs text-gray-400">The “Request another quotation” link has expired. Please close this page or open a fresh form link.</p>
             </div>
         </div>
 
@@ -109,5 +121,51 @@
         </div>
     </main>
 <style>.step-enter{animation:fadeUp .4s ease both}@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}</style>
+<script>
+(function () {
+    const link = document.getElementById('request-another-link');
+    const note = document.getElementById('request-another-expired');
+    if (!link) return;
+
+    const storageKey = 'abrl-request-another-expiry-{{ $quotation->id }}';
+    const fiveMinutes = 5 * 60 * 1000;
+    let expiresAt = Date.now() + fiveMinutes;
+
+    try {
+        const saved = Number(sessionStorage.getItem(storageKey));
+        if (saved && saved > Date.now()) {
+            expiresAt = saved;
+        } else {
+            sessionStorage.setItem(storageKey, String(expiresAt));
+        }
+    } catch (e) {}
+
+    let timer = null;
+    function expire() {
+        if (timer) window.clearTimeout(timer);
+        link.removeAttribute('href');
+        link.setAttribute('aria-disabled', 'true');
+        link.classList.add('opacity-40', 'pointer-events-none', 'line-through');
+        if (note) note.classList.remove('hidden');
+    }
+    function schedule() {
+        const remaining = expiresAt - Date.now();
+        if (remaining <= 0) {
+            expire();
+            return;
+        }
+        timer = window.setTimeout(schedule, Math.min(remaining, 1000));
+    }
+    schedule();
+
+    const exitButton = document.getElementById('exit-button');
+    if (exitButton) {
+        exitButton.addEventListener('click', function () {
+            window.close();
+            window.setTimeout(function () { window.location.href = 'https://nexelt.company/'; }, 300);
+        });
+    }
+})();
+</script>
 </body>
 </html>
