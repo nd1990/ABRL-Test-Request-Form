@@ -31,7 +31,10 @@ class QuotationMail extends Mailable
             $emailSettings['subject'] ?? ('Quotation {{quotation_number}} from {{company_name}}')
         );
 
-        return new Envelope(subject: $subject);
+        return new Envelope(
+            subject: $subject,
+            replyTo: [config('mail.from.address')]
+        );
     }
 
     public function content(): Content

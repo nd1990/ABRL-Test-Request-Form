@@ -32,7 +32,10 @@ class NewQuotationNotificationMail extends Mailable implements ShouldQueue
             $emailSettings['notify_new_quotation_subject'] ?? 'New Quotation {{quotation_number}} received'
         );
 
-        return new Envelope(subject: $subject);
+        return new Envelope(
+            subject: $subject,
+            replyTo: [config('mail.from.address')]
+        );
     }
 
     public function content(): Content
