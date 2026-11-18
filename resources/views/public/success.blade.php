@@ -161,8 +161,7 @@
     const exitButton = document.getElementById('exit-button');
     if (exitButton) {
         exitButton.addEventListener('click', function () {
-            window.close();
-            window.setTimeout(function () { window.location.href = 'https://nexelt.company/'; }, 300);
+            window.location.href = @json(route('quotation.index'));
         });
     }
 })();
